@@ -1,0 +1,172 @@
+= Building a Simple Context Provider
+
+This lesson builds a context provider from scratch that extracts user information from conversations and uses it to personalize the agent's behavior. It demonstrates both lifecycle methods: `before_run()` injects dynamic instructions based on what the provider knows, and `after_run()` extracts structured data from what was said.
+
+== Define a Data Model
+
+Start with a Pydantic model for the data the provider will extract:
+
+[source,python]
+----
+from pydantic import BaseModel
+
+class UserInfo(BaseModel):
+    name: str | None = None
+    age: int | None = None
+----
+
+The LLM will return structured output matching this schema when the provider asks it to extract user information.
+
+== Create the Context Provider
+
+The `UserInfoMemory` provider does two things each turn:
+
+* **`before_run()`** -- Checks what it knows about the user and injects appropriate instructions. If the name is unknown, it tells the agent to ask for it. If the name is known, it tells the agent the user's name.
+* **`after_run()`** -- Extracts the user's name and age from conversation messages using structured LLM output.
+
+[source,python]
+----
+from typing import Any
+from agent_framework import (
+    AgentSession,
+    BaseContextProvider,
+    SessionContext,
+    SupportsChatGetResponse,
+)
+
+class UserInfoMemory(BaseContextProvider):
+    def __init__(self, client: SupportsChatGetResponse):
+        super().__init__("user-info-memory")
+        self._chat_client = client
+
+    async def before_run(
+        self,
+        *,
+        agent: Any,
+        session: AgentSession | None,
+        context: SessionContext,
+        state: dict[str, Any],
+    ) -> None:
+        my_state = state.setdefault(self.source_id, {})
+        user_info = my_state.setdefault("user_info", UserInfo())
+
+        if user_info.name is None:
+            context.extend_instructions(
+                self.source_id,
+                "Ask the user for their name and politely "
+                "decline to answer questions until they provide it.",
+            )
+        else:
+            context.extend_instructions(
+                self.source_id,
+                f"The user's name is {user_info.name}.",
+            )
+
+    async def after_run(
+        self,
+        *,
+        agent: Any,
+        session: AgentSession | None,
+        context: SessionContext,
+        state: dict[str, Any],
+    ) -> None:
+        my_state = state.setdefault(self.source_id, {})
+        user_info = my_state.setdefault("user_info", UserInfo())
+
+        if user_info.name is not None:
+            return
+
+        messages = context.get_messages(
+            include_input=True, include_response=True
+        )
+
+        try:
+            result = await self._chat_client.get_response(
+                messages=messages,
+                instructions="Extract the user's name from the conversation. "
+                "If not present, return null.",
+                options={"response_format": UserInfo},
+            )
+            extracted = result.value
+            if extracted and extracted.name:
+                user_info.name = extracted.name
+        except Exception:
+            pass
+----
+
+Notice that `before_run()` reads from `state` and `after_run()` writes to it. The state persists across turns within the session, so the provider accumulates knowledge over the conversation.
+
+== Use the Provider
+
+Create an agent with the provider and run a multi-turn conversation:
+
+[source,python]
+----
+import asyncio
+from agent_framework.openai import OpenAIResponsesClient
+
+client = OpenAIResponsesClient(
+    api_key=os.environ["OPENAI_API_KEY"],
+    model=os.environ["OPENAI_RESPONSES_MODEL_ID"],
+)
+
+async def main():
+    async with Agent(
+        client=client,
+        instructions="You are a friendly assistant.",
+        context_providers=[UserInfoMemory(client)],
+    ) as agent:
+        session = agent.create_session()
+
+        for msg in [
+            "Hello, what is 2 + 2?",
+            "My name is Alice",
+            "Now, what is 2 + 2?",
+        ]:
+            print(f"User: {msg}")
+            print(f"Assistant: {await agent.run(msg, session=session)}")
+
+asyncio.run(main())
+----
+
+Here is what happens on each turn:
+
+1. **Turn 1** -- `before_run()` sees no name in state. It injects "Ask the user for their name." The agent asks for the name instead of answering the math question.
+2. **Turn 2** -- The user says their name. `after_run()` extracts "Alice" using structured LLM output and stores it in state.
+3. **Turn 3** -- `before_run()` finds the name in state and injects "The user's name is Alice." The agent answers the math question and addresses the user by name.
+
+The context provider changed the agent's behavior dynamically on each turn, without any tool call.
+
+[.quiz]
+== Check your understanding
+
+[.question]
+== Context Provider State
+
+How does a context provider persist extracted data across conversation turns?
+
+* [ ] By storing data in instance variables on the provider class
+* [ ] By writing data to a database after each turn
+* [x] By storing data in the session state dictionary using the provider's source_id as key
+* [ ] By appending data to the agent's instructions string
+
+[TIP,role=hint]
+.Hint
+====
+Remember that a single provider instance is shared across all sessions. Think about where session-specific data should be stored.
+====
+
+[TIP,role=solution]
+.Solution
+====
+The correct answer is: **By storing data in the session state dictionary using the provider's source_id as key.**
+
+Context providers use `state[self.source_id]` to store session-specific data. This state dictionary is tied to the `AgentSession` and persists across turns. Storing data in instance variables would mix state between sessions, since a single provider instance serves all sessions.
+====
+
+[.summary]
+== Lesson Summary
+
+The `UserInfoMemory` provider uses `before_run()` to inject dynamic instructions and `after_run()` to extract structured data from conversations. State persists across turns in the session's `state` dictionary, letting the provider accumulate knowledge as the conversation progresses.
+
+In the next lesson, you will use `Neo4jContextProvider` to inject knowledge graph context using vector search.

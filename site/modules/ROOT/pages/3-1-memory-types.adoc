@@ -1,0 +1,91 @@
+= Memory Types
+
+A user tells your agent they prefer Christopher Nolan films. Two turns later, they ask for a recommendation. The agent has no idea what they said. The conversation history is gone, the preference was never stored, and the agent suggests a random comedy.
+
+The context providers from Module 2 solve a different problem. They inject pre-loaded knowledge, movie plots, genres, actors, from a graph that existed before the agent started. That knowledge is static. Memory is what the agent learns from conversations and carries forward.
+
+== What Memory Needs to Capture
+
+Three categories of information accumulate during agent conversations:
+
+1. **What was said** -- the conversation itself. A user asking about time travel movies, the agent recommending Interstellar, the user saying they already saw it. This history needs to persist across turns and sessions so the agent does not repeat itself.
+
+2. **What was learned** -- facts and preferences extracted from conversation. "The user prefers sci-fi" is not a message; it is a structured piece of knowledge derived from messages. These extracted facts build up a profile of the user and the topics discussed.
+
+3. **What was tried** -- the reasoning and tool calls the agent used to accomplish tasks. If the agent searched for time travel movies and found good results using a particular approach, that trace can inform how it handles similar requests later.
+
+== Three Memory Types
+
+The `neo4j-agent-memory` package maps these three categories to distinct memory types, all backed by Neo4j.
+
+=== Short-Term Memory
+
+Conversation messages stored as linked nodes in Neo4j. Each message gets a vector embedding, so the agent can do semantic search across past conversations, not just retrieve the last N messages. If a user mentioned "Blade Runner" three sessions ago, short-term memory can surface that conversation when the topic comes up again.
+
+=== Long-Term Memory
+
+Entities, preferences, and facts extracted from conversations using the POLE+O data model (Person, Object, Location, Event, Organization). When a user says "I love Christopher Nolan films," long-term memory stores that as a preference. When the agent discusses "Inception," it stores the movie as an entity linked to its director, genre, and the conversation where it was mentioned.
+
+This extraction happens automatically. Over time, the agent builds a graph of knowledge about each user and the topics they discuss.
+
+=== Reasoning Memory
+
+Traces of what the agent did and whether it worked. Each trace records the task, the steps taken, the tools called, and the outcome. When the agent encounters a similar task later, it can retrieve those traces and reuse strategies that succeeded or avoid approaches that failed.
+
+== How Neo4j Stores It
+
+All three memory types live in the same Neo4j database as graph structures. Messages form chains linked to sessions. Entities become nodes with typed relationships (PERSON, ORGANIZATION, OBJECT). Reasoning traces connect to the steps and tool calls that compose them.
+
+Because everything is in the same graph, memories connect to each other. An entity extracted from a conversation links back to the message it came from, the session it occurred in, and other entities it relates to. This is more than storage; it is a connected knowledge structure the agent can traverse.
+
+== The neo4j-agent-memory Package
+
+Install the package with the Microsoft Agent Framework integration:
+
+[source,bash]
+----
+pip install neo4j-agent-memory[microsoft-agent]
+----
+
+The package provides four components for MAF integration:
+
+* `MemoryClient` -- connects to Neo4j and exposes all three memory types
+* `Neo4jMicrosoftMemory` -- wraps the client into a unified interface for MAF agents
+* `Neo4jContextProvider` (memory variant) -- implements `before_run()`/`after_run()` for automatic memory injection and extraction
+* `create_memory_tools()` -- generates callable tools for explicit memory operations
+
+The next two lessons use these components: first the context provider for passive memory, then the tools for active memory.
+
+[.quiz]
+== Check your understanding
+
+[.question]
+== Types of Agent Memory
+
+What are the three types of agent memory provided by `neo4j-agent-memory`?
+
+* [ ] Input memory, output memory, and cache memory
+* [x] Short-term memory, long-term memory, and reasoning memory
+* [ ] Session memory, graph memory, and vector memory
+* [ ] Conversation memory, entity memory, and tool memory
+
+[TIP,role=hint]
+.Hint
+====
+Think about the different kinds of information an agent accumulates: recent conversations, extracted facts, and traces of past behavior.
+====
+
+[TIP,role=solution]
+.Solution
+====
+The correct answer is: **Short-term memory, long-term memory, and reasoning memory.**
+
+Short-term memory stores conversation messages with vector embeddings for semantic search. Long-term memory stores entities, preferences, and facts extracted from conversations using the POLE+O data model. Reasoning memory captures traces of agent behavior, including steps taken and tool calls made, so the agent can learn from past tasks.
+====
+
+[.summary]
+== Lesson Summary
+
+The `neo4j-agent-memory` package provides three memory types: short-term (conversation history with semantic search), long-term (entities, preferences, and facts in the POLE+O model), and reasoning (traces of past agent behavior). All are stored as connected graph structures in Neo4j.
+
+In the next lesson, you will use `Neo4jMicrosoftMemory` as a context provider to inject relevant memories into agent conversations automatically.

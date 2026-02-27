@@ -1,0 +1,176 @@
+= Graph-Enriched Retrieval
+
+In the previous lesson, vector search returned movie plot text that matched the query. That is useful, but your graph contains far more than plot text. Each movie is connected to genres, actors, and directors through typed relationships. Basic vector search misses all of that structure.
+
+Graph-enriched retrieval adds a Cypher traversal step after the vector search. The provider finds matching movies by plot similarity, then walks the graph to collect genres, cast, and directors for each match. The agent receives both the relevant text and the structured metadata.
+
+== The Limitation of Basic Search
+
+Vector search over `moviePlots` returns the plot text and similarity score for each matching movie. If you search for "time travel," you get plots that mention time travel concepts. But the result does not include the movie's title, release year, genres, or who starred in it.
+
+That metadata lives in the graph: `Movie` nodes connect to `Genre` nodes via `IN_GENRE`, to actors via `ACTED_IN`, and to directors via `DIRECTED`. Graph enrichment traverses these relationships after the initial search.
+
+== Define a Retrieval Query
+
+The `retrieval_query` parameter accepts a Cypher query that runs after the vector search. It receives two variables from the index search:
+
+* **`node`** -- The matched `Movie` node from the vector index
+* **`score`** -- The cosine similarity score
+
+The query traverses outward from the matched node:
+
+[source,cypher]
+----
+// Receives :param node and :param score from the vector index search
+MATCH (node)-[:IN_GENRE]->(g:Genre)
+WITH node, score, collect(DISTINCT g.name) AS genres
+OPTIONAL MATCH (p:Person)-[:ACTED_IN]->(node)
+WITH node, score, genres, collect(DISTINCT p.name)[0..5] AS actors
+OPTIONAL MATCH (d:Person)-[:DIRECTED]->(node)
+WITH node, score, genres, actors, collect(DISTINCT d.name) AS directors
+WHERE score IS NOT NULL
+RETURN
+    node.plot AS text,
+    score,
+    node.title AS title,
+    node.released AS released,
+    genres,
+    actors,
+    directors
+ORDER BY score DESC
+----
+
+This query starts from each matched movie and collects:
+
+* Genres via `Movie` -> `IN_GENRE` -> `Genre`
+* Up to 5 actors via `Person` -> `ACTED_IN` -> `Movie`
+* Directors via `Person` -> `DIRECTED` -> `Movie`
+
+The result includes plot text, similarity score, movie title, release year, genre names, actor names, and director names. Far richer than plot text alone.
+
+== Create the Graph-Enriched Provider
+
+When you provide a `retrieval_query`, the provider internally uses `VectorCypherRetriever` instead of the basic `VectorRetriever`:
+
+[source,python]
+----
+import os
+from agent_framework_neo4j import Neo4jContextProvider, OpenAIEmbedder
+
+RETRIEVAL_QUERY = """
+MATCH (node)-[:IN_GENRE]->(g:Genre)
+WITH node, score, collect(DISTINCT g.name) AS genres
+OPTIONAL MATCH (p:Person)-[:ACTED_IN]->(node)
+WITH node, score, genres, collect(DISTINCT p.name)[0..5] AS actors
+OPTIONAL MATCH (d:Person)-[:DIRECTED]->(node)
+WITH node, score, genres, actors, collect(DISTINCT d.name) AS directors
+WHERE score IS NOT NULL
+RETURN
+    node.plot AS text,
+    score,
+    node.title AS title,
+    node.released AS released,
+    genres,
+    actors,
+    directors
+ORDER BY score DESC
+"""
+
+embedder = OpenAIEmbedder(
+    api_key=os.environ["OPENAI_API_KEY"],
+    model="text-embedding-ada-002",
+)
+
+provider = Neo4jContextProvider(
+    uri=os.environ["NEO4J_URI"],
+    username=os.environ["NEO4J_USERNAME"],
+    password=os.environ["NEO4J_PASSWORD"],
+    index_name="moviePlots",
+    index_type="vector",
+    retrieval_query=RETRIEVAL_QUERY,
+    embedder=embedder,
+    top_k=5,
+    context_prompt=(
+        "## Graph-Enriched Movie Context\n"
+        "The following information combines semantic search results "
+        "with graph traversal to provide movie details including "
+        "genres, cast, and directors:"
+    ),
+)
+----
+
+The only difference from the previous lesson is the `retrieval_query` parameter. Everything else stays the same.
+
+== Run the Agent
+
+[source,python]
+----
+async def main():
+    async with provider:
+        agent = client.as_agent(
+            name="movie-enriched-agent",
+            instructions=(
+                "You are a movie recommendation assistant. Your context "
+                "includes movie plots enriched with genres, cast, and "
+                "directors from the knowledge graph.\n\n"
+                "When answering, reference specific movies by title "
+                "and mention relevant actors, directors, and genres "
+                "from the context."
+            ),
+            context_providers=[provider],
+        )
+
+        session = agent.create_session()
+        response = await agent.run(
+            "What sci-fi movies involve artificial intelligence?",
+            session=session,
+        )
+        print(response)
+
+asyncio.run(main())
+----
+
+The agent now receives context that includes plot text, movie title, release year, genres, actors, and directors for each match. It can give specific answers: "The Matrix (1999), directed by Lana and Lilly Wachowski, is a sci-fi action film about..." instead of a vague summary based on training data.
+
+== Experiment
+
+Try different retrieval query patterns:
+
+* Add `node.imdbRating` to the RETURN clause to include ratings
+* Change the actor limit from 5 to 3 or 10 and see how it affects context size
+* Modify `top_k` to retrieve more or fewer matches
+* Update the `context_prompt` to tell the agent to prioritize higher-rated movies
+
+[.quiz]
+== Check your understanding
+
+[.question]
+== Understanding the Retrieval Query
+
+What is the purpose of the `retrieval_query` parameter in `Neo4jContextProvider`?
+
+* [ ] It replaces the vector search entirely with a Cypher query
+* [ ] It creates a new index in Neo4j for faster searches
+* [x] It traverses graph relationships after index search to include structured context from related nodes
+* [ ] It filters out irrelevant results from the vector search
+
+[TIP,role=hint]
+.Hint
+====
+The retrieval query receives `node` and `score` from the index search. Think about what it does with the matched node.
+====
+
+[TIP,role=solution]
+.Solution
+====
+The correct answer is: **It traverses graph relationships after index search to include structured context from related nodes.**
+
+The `retrieval_query` is a Cypher query that runs after the vector (or fulltext) search. It receives the matched `node` and `score` from the index search, then traverses relationships to collect additional data from connected nodes. In the movie graph, this means following `IN_GENRE`, `ACTED_IN`, and `DIRECTED` relationships to include genre names, actor names, and directors alongside the matched plot text.
+====
+
+[.summary]
+== Lesson Summary
+
+Adding a `retrieval_query` to `Neo4jContextProvider` combines vector search with graph traversal. The Cypher query receives matched `node` and `score` variables from the index search, then traverses relationships to collect genres, actors, and directors. The agent gets structured metadata alongside plot text, producing more specific and grounded responses.
+
+In the next module, you will give agents persistent memory using Neo4j.

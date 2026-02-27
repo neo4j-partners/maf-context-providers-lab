@@ -1,0 +1,125 @@
+= What Are Context Providers?
+
+In the previous module, you built an agent with tools. The agent decided when to call those tools based on the function name and docstring. For an explicit query like "tell me about Inception," the tool worked well. For a vague query like "recommend something good," the agent had no reason to call the tool and answered from its training data alone.
+
+Context providers solve this problem. They inject relevant knowledge before every LLM call, regardless of the query.
+
+== The Problem with Tools Alone
+
+Tools are reactive. The agent must recognize that a tool is relevant and choose to call it. For background knowledge that should always inform the agent's responses, this has real limitations:
+
+* The agent may not realize the tool is relevant to a general question
+* The agent may skip the tool to answer faster
+* For every query, the agent has to reason about whether each tool applies
+
+== How Context Providers Work
+
+A context provider extends `BaseContextProvider` and implements two lifecycle methods:
+
+* **`before_run()`** -- Called automatically before every LLM invocation. Injects relevant context.
+* **`after_run()`** -- Called automatically after the LLM responds. Extracts and stores information.
+
+[source,python]
+----
+from agent_framework import BaseContextProvider, AgentSession, SessionContext
+from typing import Any
+
+class MyProvider(BaseContextProvider):
+    def __init__(self):
+        super().__init__("my-provider")
+
+    async def before_run(
+        self,
+        *,
+        agent: Any,
+        session: AgentSession | None,
+        context: SessionContext,
+        state: dict[str, Any],
+    ) -> None:
+        # Inject context before the LLM is called
+        context.extend_instructions(
+            self.source_id,
+            "Additional instructions for the agent."
+        )
+
+    async def after_run(
+        self,
+        *,
+        agent: Any,
+        session: AgentSession | None,
+        context: SessionContext,
+        state: dict[str, Any],
+    ) -> None:
+        # Extract information after the LLM responds
+        pass
+----
+
+== Injecting Context
+
+Context providers can inject information in two ways:
+
+* **`context.extend_instructions()`** -- Adds text to the agent's system instructions. Use this for behavioral guidance like "The user's name is Alice" or "Focus on sci-fi recommendations."
+* **`context.extend_messages()`** -- Adds messages to the conversation. Use this for data like search results from a knowledge graph.
+
+== State Management
+
+A single provider instance is shared across all sessions. Storing session-specific data in instance variables would mix state between users.
+
+Instead, use the `state` dictionary passed to `before_run()` and `after_run()`. State is scoped to the session and persists across conversation turns:
+
+[source,python]
+----
+async def before_run(self, *, state: dict[str, Any], **kwargs) -> None:
+    # Initialize state on first call
+    my_state = state.setdefault(self.source_id, {"count": 0})
+    my_state["count"] += 1
+----
+
+== Registering Providers
+
+Pass context providers when creating an agent:
+
+[source,python]
+----
+agent = client.as_agent(
+    name="my-agent",
+    instructions="You are a helpful assistant.",
+    context_providers=[MyProvider()],
+)
+----
+
+You can register multiple providers. Each runs in order before and after every invocation.
+
+[.quiz]
+== Check your understanding
+
+[.question]
+== Context Provider Lifecycle
+
+When does a context provider's `before_run()` method execute?
+
+* [ ] Only when the agent explicitly requests context
+* [ ] Once when the agent is created
+* [x] Automatically before every LLM invocation
+* [ ] Only on the first message in a session
+
+[TIP,role=hint]
+.Hint
+====
+Context providers are designed to run without the agent needing to decide -- consider when in the request lifecycle they are called.
+====
+
+[TIP,role=solution]
+.Solution
+====
+The correct answer is: **Automatically before every LLM invocation.**
+
+The `before_run()` method is called by the framework before every LLM invocation, without the agent needing to decide. This is what makes context providers different from tools -- they provide context consistently on every turn.
+====
+
+[.summary]
+== Lesson Summary
+
+Context providers run automatically before and after every LLM invocation using `before_run()` and `after_run()`. They can inject instructions or messages into the conversation, and store session-specific state in the `state` dictionary. Unlike tools, the agent does not decide whether to use them.
+
+In the next lesson, you will build a context provider from scratch.

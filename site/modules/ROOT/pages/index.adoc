@@ -1,15 +1,42 @@
-= MAF Context Providers Lab
+= Neo4j Context Providers for Microsoft Agent Framework
 
-Welcome to the MAF Context Providers Lab workshop.
+== Course Description
 
-== Overview
+Most agent frameworks treat knowledge retrieval as a tool the agent decides to call. The Microsoft Agent Framework takes a different approach: context providers run automatically before every agent invocation, injecting relevant knowledge without the agent needing to ask.
 
-TODO: Add workshop overview here.
+This course teaches you how to build Neo4j-backed context providers that give agents automatic access to knowledge graph data. You will:
 
-== Prerequisites
+. Create agents with tools that query a Neo4j graph database.
+. Build context providers that inject graph knowledge before every LLM call.
+. Use vector search and graph-enriched retrieval with `Neo4jContextProvider`.
+. Give agents persistent memory using `neo4j-agent-memory`.
 
-TODO: Add prerequisites here.
+The Microsoft Agent Framework is the direct successor to both Semantic Kernel and AutoGen, built by the same Microsoft teams. Its context provider architecture is a first-class concept with a defined lifecycle, not a plugin or afterthought.
 
-== Getting Started
+This course uses models from link:https://openai.com/[OpenAI^], although you can use the model and supplier of your choice.
 
-TODO: Add getting started instructions here.
+=== Prerequisites
+
+Before taking this course, you should have:
+
+* A basic understanding of Graph Databases and Neo4j
+* Knowledge of Python and basic familiarity with async programming
+
+To complete the practical tasks within this course, you will need an link:https://platform.openai.com[OpenAI API key^].
+
+We recommend taking the following courses:
+
+* link:https://graphacademy.neo4j.com/courses/neo4j-fundamentals/[Neo4j Fundamentals^]
+* link:https://graphacademy.neo4j.com/courses/genai-fundamentals/[Neo4j & GenAI Fundamentals^]
+
+=== Duration
+
+2 hours
+
+=== What you will learn
+
+* How the Microsoft Agent Framework differs from other agent frameworks
+* The context provider lifecycle (`before_run` / `after_run`) and how it differs from tools
+* How to build custom context providers that inject dynamic instructions
+* How to use `Neo4jContextProvider` for vector search and graph-enriched retrieval
+* How to give agents persistent memory with `neo4j-agent-memory`

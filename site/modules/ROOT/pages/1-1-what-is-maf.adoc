@@ -1,0 +1,106 @@
+= What is the Microsoft Agent Framework?
+
+The link:https://github.com/microsoft/agent-framework[Microsoft Agent Framework^] (MAF) is a multi-language framework for building, orchestrating, and deploying AI agents. It supports Python and .NET, and works with multiple LLM providers including Azure OpenAI, OpenAI, Anthropic, and Ollama.
+
+== History
+
+MAF is the direct successor to both link:https://github.com/microsoft/semantic-kernel[Semantic Kernel^] and link:https://github.com/microsoft/autogen[AutoGen^], created by the same teams at Microsoft. It takes AutoGen's straightforward agent abstractions and combines them with Semantic Kernel's enterprise features: session-based state management, type safety, middleware, and telemetry.
+
+Developers migrating from either framework have a clear upgrade path. The core patterns are familiar; the execution model is more structured.
+
+== Core Concepts
+
+MAF is built around five concepts:
+
+[cols="1,3"]
+|===
+| Concept | Description
+
+| **Agent**
+| An LLM-backed entity that processes inputs, calls tools, and generates responses.
+
+| **Tools**
+| Plain Python functions the agent can decide to call. The agent uses the function name and docstring to determine relevance. No decorators or registration required.
+
+| **Context Providers**
+| Components that run automatically before and after each agent invocation to inject or extract context. This is MAF's key differentiator.
+
+| **Sessions**
+| State containers that persist data across conversation turns.
+
+| **Workflows**
+| Graph-based orchestration connecting agents and functions for multi-step tasks.
+|===
+
+== Tools vs Context Providers
+
+This course focuses on context providers, the concept that sets MAF apart from other agent frameworks. The distinction from tools is central to everything that follows.
+
+[cols="1,2,2"]
+|===
+| | Tools | Context Providers
+
+| **When**
+| Agent decides to call
+| Runs automatically before every invocation
+
+| **How**
+| Agent sees function name and docstring
+| `before_run()` injects instructions or messages
+
+| **Use case**
+| On-demand actions (queries, mutations)
+| Always-available background knowledge
+
+| **Control**
+| Agent-managed
+| Framework-managed
+|===
+
+**Tools** are reactive. The agent must recognize that a tool is relevant and choose to call it. This works well for specific actions like "look up this movie" or "run this query." It works poorly for background knowledge that should inform every response, because the agent may not realize it should ask.
+
+**Context providers** handle the background case. Before every LLM invocation, the framework calls each provider's `before_run()` method, which can inject relevant data into the conversation. After the LLM responds, `after_run()` can extract and store information. The agent never decides whether to use the provider; it just receives the context.
+
+== Why MAF with Neo4j?
+
+A Neo4j context provider can search for relevant graph data and inject it before every response. The agent always has access to knowledge graph context without needing to decide when to query for it. Ask about a movie, and the provider has already searched the graph for relevant movies, actors, and genres before the LLM generates its answer.
+
+In this course, you will build context providers that:
+
+* Search Neo4j vector indexes for semantically relevant content
+* Traverse graph relationships for enriched context
+* Store and recall agent memories in Neo4j
+
+[.quiz]
+== Check your understanding
+
+[.question]
+== Microsoft Agent Framework Concepts
+
+What is the key difference between tools and context providers in the Microsoft Agent Framework? (Select one)
+
+* [ ] Tools run before the LLM, context providers run after
+* [x] Tools are called when the agent decides to, context providers run automatically before every invocation
+* [ ] Tools use Python functions, context providers use configuration files
+* [ ] There is no difference, they are interchangeable
+
+[TIP,role=hint]
+.Hint
+====
+Think about who decides when each mechanism runs -- the agent or the framework.
+====
+
+[TIP,role=solution]
+.Solution
+====
+The correct answer is: **Tools are called when the agent decides to, context providers run automatically before every invocation.**
+
+Tools are reactive -- the agent examines the function name and docstring and decides whether to call a tool for a given query. Context providers, on the other hand, are framework-managed and run automatically before every LLM invocation via their `before_run()` method, injecting context without the agent needing to decide.
+====
+
+[.summary]
+== Lesson Summary
+
+The Microsoft Agent Framework succeeds Semantic Kernel and AutoGen, combining both into a single framework. Its key differentiator is context providers: components that run automatically before and after every LLM call to inject and extract context. Tools require the agent to decide when to call them; context providers are framework-managed.
+
+In the next lesson, you will set up your development environment with OpenAI and Neo4j.

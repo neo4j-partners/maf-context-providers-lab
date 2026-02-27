@@ -1,0 +1,14 @@
+= Context Providers
+
+Context providers are what sets the Microsoft Agent Framework apart from other agent frameworks. They run automatically before and after every agent invocation, injecting knowledge and extracting state without the agent needing to decide.
+
+In this module, you will build context providers from scratch, then use `Neo4jContextProvider` to automatically inject movie knowledge from your graph database into every agent conversation.
+
+In this module, you will:
+
+* Understand the context provider lifecycle (`before_run` / `after_run`)
+* Build a simple context provider that extracts and injects user information
+* Use `Neo4jContextProvider` with vector search for automatic knowledge retrieval
+* Add graph-enriched retrieval using custom Cypher traversal queries
+
+xref:2-1-what-are-context-providers.adoc[Ready? Let's go ->]

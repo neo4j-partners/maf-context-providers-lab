@@ -1,0 +1,135 @@
+= Creating Your First Agent with Tools
+
+In this lesson, you will create an AI agent using the Microsoft Agent Framework and give it a tool that queries your Neo4j movie database.
+
+== Create the Client
+
+The `OpenAIResponsesClient` connects to the OpenAI API:
+
+[source,python]
+----
+import os
+import asyncio
+from agent_framework.openai import OpenAIResponsesClient
+
+client = OpenAIResponsesClient(
+    api_key=os.environ["OPENAI_API_KEY"],
+    model=os.environ["OPENAI_RESPONSES_MODEL_ID"],
+)
+----
+
+== Define a Tool
+
+In MAF, tools are plain Python functions with docstrings. The agent reads the function **name** and **docstring** to decide when to call the tool. No decorators or registration required.
+
+[source,python]
+----
+import neo4j
+
+driver = neo4j.GraphDatabase.driver(
+    os.environ["NEO4J_URI"],
+    auth=(os.environ["NEO4J_USERNAME"], os.environ["NEO4J_PASSWORD"]),
+)
+
+def get_movie_info(movie_title: str) -> str:
+    """Look up information about a movie in the graph database, including its genres, actors, and director."""
+    with driver.session() as session:
+        result = session.run(
+            "MATCH (m:Movie {title: $title}) "
+            "OPTIONAL MATCH (m)-[:IN_GENRE]->(g:Genre) "
+            "OPTIONAL MATCH (p:Person)-[:ACTED_IN]->(m) "
+            "OPTIONAL MATCH (d:Person)-[:DIRECTED]->(m) "
+            "RETURN m.title AS title, m.plot AS plot, "
+            "collect(DISTINCT g.name) AS genres, "
+            "collect(DISTINCT p.name)[0..5] AS actors, "
+            "collect(DISTINCT d.name) AS directors "
+            "LIMIT 1",
+            title=movie_title,
+        )
+        record = result.single()
+        return str(dict(record)) if record else f"No movie found with title: {movie_title}"
+----
+
+The `get_movie_info` function queries Neo4j for a movie and its relationships to genres, actors, and directors. When the agent receives a question about a specific movie, it recognizes this tool as relevant and calls it.
+
+== Create the Agent
+
+Use `client.as_agent()` to create a stateless agent with a name, instructions, and tools:
+
+[source,python]
+----
+agent = client.as_agent(
+    name="movie-agent",
+    instructions="You are a helpful assistant that answers questions about movies using a graph database.",
+    tools=[get_movie_info],
+)
+----
+
+== Run with Streaming
+
+Run the agent and stream the response:
+
+[source,python]
+----
+async def main():
+    async for update in agent.run_stream("Tell me about the movie Inception"):
+        if update.text:
+            print(update.text, end="", flush=True)
+    print()
+
+asyncio.run(main())
+----
+
+When you run this, the agent will:
+
+1. Receive the query "Tell me about the movie Inception"
+2. Recognize that `get_movie_info` is relevant based on its name and docstring
+3. Call the tool with `movie_title="Inception"`
+4. Generate a response using the Neo4j results (title, plot, genres, actors, director)
+
+== The Limitation of Tools
+
+Try asking the agent a question that does not name a specific movie:
+
+[source,python]
+----
+await agent.run("What are some good sci-fi movies about time travel?")
+----
+
+The agent may or may not call `get_movie_info`. It depends on whether the LLM decides the tool is relevant to a general question. Tools are **reactive**: the agent must choose to call them, and for broad or exploratory queries, it often does not.
+
+This is fine for explicit lookups ("tell me about Inception"), but what if you want the agent to **always** have relevant movie data in its context, regardless of how the question is phrased? That is where context providers come in, which you will explore in the next module.
+
+[.quiz]
+== Check your understanding
+
+[.question]
+== How Agents Use Tools
+
+How does a Microsoft Agent Framework agent know when to call a tool?
+
+* [ ] Tools are called on every request automatically
+* [ ] Tools are triggered by keyword matching in the user's message
+* [x] The agent uses the function name and docstring to decide if the tool is relevant
+* [ ] Tools must be explicitly called by the developer in code
+
+[TIP,role=hint]
+.Hint
+====
+Consider what information the agent has about a tool -- it can see the function's name and its docstring.
+====
+
+[TIP,role=solution]
+.Solution
+====
+The correct answer is: **The agent uses the function name and docstring to decide if the tool is relevant.**
+
+In the Microsoft Agent Framework, tools are plain Python functions. The agent examines the function name and docstring to determine whether calling the tool would help answer the user's query. This is different from context providers, which run automatically before every invocation.
+====
+
+[.summary]
+== Lesson Summary
+
+You created an agent with a `get_movie_info` tool that queries Neo4j for movies, genres, actors, and directors. The agent uses the function name and docstring to decide when to call the tool.
+
+The limitation: tools are reactive. The agent must decide to call them, which means it might skip relevant context for general queries. The next module introduces context providers, MAF's mechanism for automatic context injection on every turn.

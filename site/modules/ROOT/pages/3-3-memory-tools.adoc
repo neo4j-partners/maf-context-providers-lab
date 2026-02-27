@@ -1,0 +1,152 @@
+= Combining Context Providers with Memory Tools
+
+The memory context provider from the previous lesson handles memory passively. It injects relevant memories before each turn and stores new ones after. The agent never decides to look something up or save a preference; the framework does it automatically.
+
+That works well for general context, but sometimes the agent needs to take a deliberate action. A user says "remember that I hate horror movies" and expects the agent to explicitly store that preference. Or the agent needs to search for a specific entity in the knowledge graph before answering. Passive injection alone cannot handle these cases because the agent has no way to trigger a targeted memory operation.
+
+Memory tools solve this. They give the agent callable functions for searching, saving, and recalling memories on demand.
+
+== The Combined Pattern
+
+The most effective setup uses both mechanisms together:
+
+* The **context provider** handles background memory. Every turn, the agent automatically receives relevant past messages, preferences, and entities. No tool call needed.
+* **Memory tools** handle targeted operations. The agent decides when to explicitly save a preference, search for a specific entity, or look up past reasoning traces.
+
+Passive context covers the common case. Active tools handle the specific case.
+
+== Create Memory Tools
+
+`create_memory_tools()` generates callable `FunctionTool` instances bound to your memory instance:
+
+[source,python]
+----
+from neo4j_agent_memory.integrations.microsoft_agent import (
+    Neo4jMicrosoftMemory,
+    create_memory_tools,
+)
+
+memory = Neo4jMicrosoftMemory.from_memory_client(
+    memory_client=memory_client,
+    session_id="movie-tools-session",
+    include_short_term=True,
+    include_long_term=True,
+    extract_entities=True,
+)
+
+tools = create_memory_tools(memory)
+
+for tool in tools:
+    print(f"  - {tool.name}: {tool.description[:60]}...")
+----
+
+This produces six tools:
+
+* `search_memory` -- searches across all memory types for a given query
+* `remember_preference` -- saves a user preference (e.g., category "genre", preference "prefers sci-fi")
+* `recall_preferences` -- retrieves saved preferences matching a topic
+* `search_knowledge` -- searches the entity graph for people, movies, genres, and other extracted entities
+* `remember_fact` -- stores a factual statement as a subject-predicate-object triple
+* `find_similar_tasks` -- retrieves past reasoning traces for similar tasks
+
+The agent uses these the same way it uses any tool: by examining the function name and description, then deciding whether to call one based on the user's query.
+
+== Create the Agent with Both
+
+Pass the context provider and the tools together:
+
+[source,python]
+----
+agent = client.as_agent(
+    name="movie-assistant",
+    instructions=(
+        "You are a movie recommendation assistant with persistent memory.\n\n"
+        "When a user expresses a preference, save it with the "
+        "remember_preference tool. When making recommendations, "
+        "use recall_preferences to check what the user likes "
+        "before suggesting something.\n\n"
+        "You have access to a knowledge graph of movies and "
+        "your memory of past conversations."
+    ),
+    tools=tools,
+    context_providers=[memory.context_provider],
+)
+----
+
+The agent now operates on two levels. Background memory arrives automatically via the context provider. Targeted memory operations happen through explicit tool calls when the agent decides they are needed.
+
+== Run a Conversation
+
+[source,python]
+----
+import asyncio
+
+async def main():
+    session = agent.create_session()
+
+    queries = [
+        "I love Christopher Nolan movies and anything about space.",
+        "What are my movie preferences?",
+        "Based on what you know about me, what should I watch next?",
+    ]
+
+    for query in queries:
+        print(f"\nUser: {query}")
+        async for update in agent.run(query, stream=True, session=session):
+            if update.text:
+                print(update.text, end="", flush=True)
+        print()
+
+    await memory_client.__aexit__(None, None, None)
+
+asyncio.run(main())
+----
+
+Here is what happens on each turn:
+
+1. **Turn 1** -- The user expresses preferences. The agent recognizes this and calls `remember_preference` twice, once for "Christopher Nolan movies" and once for "space themes." Separately, the context provider's `after_run()` saves the message and extracts "Christopher Nolan" as a PERSON entity.
+2. **Turn 2** -- The user asks about their preferences. The agent calls `recall_preferences` to look up saved preferences and reports them. It could also get some of this from the passive context injected by `before_run()`, but the explicit tool call gives it a targeted, complete answer.
+3. **Turn 3** -- Both mechanisms contribute. `before_run()` injects relevant memories as background context. The agent can also call `search_knowledge` to find movies linked to Christopher Nolan in the entity graph, then `recall_preferences` to confirm the user likes space themes, before generating a recommendation.
+
+== Experiment
+
+Test the interaction between passive and active memory:
+
+* Tell the agent you dislike a genre, then ask for recommendations. Does it avoid that genre?
+* Ask the agent to remember a specific fact ("The Matrix was released in 1999") and verify it later with a question.
+* End the session, create a new one with the same `session_id`, and check whether long-term memories (preferences, entities) persist. Short-term messages from the old session should also be searchable.
+* Ask the agent a question it struggled with before. If reasoning traces are recorded, it may approach the task differently.
+
+[.quiz]
+== Check your understanding
+
+[.question]
+== Memory Tools
+
+What is the difference between the memory context provider and memory tools?
+
+* [ ] The context provider stores memories while tools retrieve them
+* [ ] Tools run automatically and context providers run on demand
+* [x] The context provider injects context automatically while tools let the agent explicitly search, save, and recall
+* [ ] There is no difference -- they provide the same functionality
+
+[TIP,role=hint]
+.Hint
+====
+Consider who decides when to act. Does the framework trigger it, or does the agent choose to call it?
+====
+
+[TIP,role=solution]
+.Solution
+====
+The correct answer is: **The context provider injects context automatically while tools let the agent explicitly search, save, and recall.**
+
+The memory context provider runs on every turn via `before_run()` and `after_run()`, injecting and extracting memories without the agent's involvement (passive memory). Memory tools are callable functions the agent invokes when it decides a targeted memory operation is needed (active memory). Using both together gives the agent background context on every turn plus the ability to perform specific memory actions on demand.
+====
+
+[.summary]
+== Lesson Summary
+
+Memory tools give the agent explicit control over search, save, and recall operations, while the context provider continues to handle background memory injection automatically. The combined pattern covers both passive context (always available) and active operations (agent-directed).
+
+This completes the course. You have built agents with tools, used context providers for automatic knowledge graph retrieval, added graph-enriched traversal, and given agents persistent memory backed by Neo4j.

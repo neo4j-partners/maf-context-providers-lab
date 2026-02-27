@@ -1,0 +1,63 @@
+= Setup Your Development Environment
+
+This course uses Python, the Microsoft Agent Framework, and a Neo4j Sandbox with the recommendations dataset (movies, actors, directors, genres, and user ratings).
+
+== Prerequisites
+
+* **Python 3.10+** installed
+* An **OpenAI API key** from link:https://platform.openai.com[platform.openai.com^]
+
+== Install Dependencies
+
+Install the required Python packages:
+
+[source,bash]
+----
+pip install agent-framework --pre
+pip install openai
+pip install neo4j-graphrag[openai]
+----
+
+The `agent-framework` package includes OpenAI support via `agent_framework.openai`.
+
+== OpenAI Setup
+
+Create an API key at link:https://platform.openai.com[platform.openai.com^] if you don't have one already.
+
+== Neo4j Setup
+
+This course uses the Neo4j Sandbox with the **recommendations** dataset, a movie database with actors, directors, genres, and user ratings. The sandbox includes vector indexes on movie plot embeddings that you will use for semantic search in later modules.
+
+Your Neo4j connection details:
+
+NEO4J_URI:: neo4j://your-neo4j-host:7687
+NEO4J_USERNAME:: neo4j
+NEO4J_PASSWORD:: your-password
+NEO4J_DATABASE:: neo4j
+
+== Configure Environment Variables
+
+Create a `.env` file with your credentials:
+
+[source]
+----
+OPENAI_API_KEY=sk-your-key-here
+OPENAI_RESPONSES_MODEL_ID=gpt-4o
+NEO4J_URI=neo4j://your-sandbox-ip:7687
+NEO4J_USERNAME=neo4j
+NEO4J_PASSWORD=your-password
+----
+
+NOTE: The Microsoft Agent Framework does **not** automatically load `.env` files. Use `python-dotenv` and call `load_dotenv()` at the start of your application, or set environment variables directly in your shell.
+
+== Continue
+
+When you are ready, you can move on to the next lesson where you will create your first agent.
+
+
+[.summary]
+== Lesson Summary
+
+You have installed the Microsoft Agent Framework, configured your OpenAI API key, and connected to a Neo4j Sandbox with the recommendations movie dataset.
+
+In the next lesson, you will create your first agent with a tool that queries the movie graph.
