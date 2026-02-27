@@ -1,15 +1,15 @@
-= Neo4j Context Providers
+= Building Self-Grounding Agents with Neo4j
 
-In the previous module, you learned how context providers work in the Microsoft Agent Framework and built one from scratch. Now you will use the `agent-framework-neo4j` package, which provides a production-ready `Neo4jContextProvider` that searches Neo4j indexes and injects results before every agent invocation.
+In the previous module, you learned how context providers work in the Microsoft Agent Framework and built one from scratch. Now you will use the `agent-framework-neo4j` package to build **self-grounding agents** — agents that automatically receive relevant knowledge graph context on every interaction. The `Neo4jContextProvider` searches Neo4j indexes and injects results before every agent invocation, grounding the agent in real data without tool calls.
 
-This module covers the package architecture, all three supported search modes (vector, fulltext, and hybrid), and graph-enriched retrieval using custom Cypher traversal queries.
+This module covers the package architecture, vector search with graph-enriched retrieval, and optional alternative search modes (fulltext and hybrid).
 
 In this module, you will:
 
 * Understand the `agent-framework-neo4j` package and how `Neo4jContextProvider` extends `BaseContextProvider`
 * Use vector search for semantic similarity over movie plot embeddings
-* Use fulltext search for keyword matching without an embedder
-* Combine both with hybrid search for the best of both approaches
 * Add graph-enriched retrieval using custom Cypher traversal queries
+* _(Optional)_ Use fulltext search for keyword matching without an embedder
+* _(Optional)_ Combine both with hybrid search for the best of both approaches
 
 xref:3-1-neo4j-context-providers-overview.adoc[Ready? Let's go ->]

@@ -1,4 +1,5 @@
 = Hybrid Search with Neo4jContextProvider
+:optional: true
 
 Vector search understands concepts but can miss exact terms. Fulltext search matches keywords precisely but misses semantic connections. Hybrid search runs both and combines the results, giving you semantic understanding and keyword precision in one query.
 
@@ -106,7 +107,7 @@ Use hybrid when your users mix conceptual and keyword-based queries. Use vector-
 
 Like the other search modes, hybrid search supports the `retrieval_query` parameter for graph enrichment. When provided, the provider uses `HybridCypherRetriever` instead of the basic `HybridRetriever`. The retrieval query works the same way as with vector search: it receives `node` and `score` from the combined search results and can traverse relationships to collect additional context.
 
-You will explore graph enrichment in detail in the next lesson.
+Graph enrichment is covered in detail in the Graph-Enriched Retrieval lesson earlier in this module.
 
 [.quiz]
 == Check your understanding
@@ -140,4 +141,4 @@ Hybrid search runs both vector search (which requires a vector index and an embe
 
 Hybrid search combines vector and fulltext search by running both and merging the results. It requires a vector index, a fulltext index, and an embedder. This mode catches both semantic and keyword matches, making it the most versatile option when users mix conceptual and specific queries.
 
-In the next lesson, you will add graph-enriched retrieval to traverse relationships after index search for richer context.
+In the next module, you will give agents persistent memory using the `neo4j-agent-memory` package.

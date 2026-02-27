@@ -1,6 +1,6 @@
 = Vector Search with Neo4jContextProvider
 
-In the previous lesson, you saw the `Neo4jContextProvider` architecture and its three search modes. In this lesson, you will use it with vector search to find movies by plot similarity. The provider embeds the user's query, searches a Neo4j vector index, and injects matching results before every LLM call.
+In the previous lesson, you saw the `Neo4jContextProvider` architecture and its three search modes. In this lesson, you will build your first self-grounding agent using vector search. The provider embeds the user's query, searches a Neo4j vector index, and injects matching results before every LLM call — grounding the agent in real graph data automatically.
 
 == Install the Package
 
@@ -145,4 +145,4 @@ The `Neo4jContextProvider` implements `before_run()` to take the user's recent m
 
 `Neo4jContextProvider` with `index_type="vector"` embeds the user's query, searches the `moviePlots` vector index in Neo4j, and injects matching results as context messages before the LLM generates a response. The agent receives relevant movie data automatically without calling any tool.
 
-In the next lesson, you will use fulltext search for keyword-based matching without an embedder.
+In the next lesson, you will add graph-enriched retrieval to traverse relationships after the vector search, giving the agent structured metadata like genres, actors, and directors alongside plot text.

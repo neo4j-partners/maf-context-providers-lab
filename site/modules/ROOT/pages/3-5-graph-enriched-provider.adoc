@@ -1,12 +1,12 @@
 = Graph-Enriched Retrieval
 
-In the previous lessons, you used vector, fulltext, and hybrid search to find relevant movies. Each mode returned matching content, but your graph contains far more than text. Each movie is connected to genres, actors, and directors through typed relationships. Basic search misses all of that structure.
+In the previous lesson, you used vector search to find relevant movies by semantic similarity. The search returned matching plot text, but your graph contains far more than text. Each movie is connected to genres, actors, and directors through typed relationships. Basic search misses all of that structure.
 
 Graph-enriched retrieval adds a Cypher traversal step after the index search. The provider finds matching movies, then walks the graph to collect genres, cast, and directors for each match. The agent receives both the relevant text and the structured metadata.
 
 == The Limitation of Basic Search
 
-The search modes from the previous lessons return matching text and a similarity score for each result. If you search for "time travel," you get plots that mention time travel concepts. But the result doesn't include the movie's title, release year, genres, or who starred in it.
+The vector search from the previous lesson returns matching text and a similarity score for each result. If you search for "time travel," you get plots that mention time travel concepts. But the result doesn't include the movie's title, release year, genres, or who starred in it.
 
 That metadata lives in the graph: `Movie` nodes connect to `Genre` nodes via `IN_GENRE`, to actors via `ACTED_IN`, and to directors via `DIRECTED`. Graph enrichment traverses these relationships after the initial search.
 
@@ -173,4 +173,6 @@ The `retrieval_query` is a Cypher query that runs after the vector (or fulltext)
 
 Adding a `retrieval_query` to `Neo4jContextProvider` combines any search mode with graph traversal. The Cypher query receives matched `node` and `score` variables from the index search, then traverses relationships to collect genres, actors, and directors. The agent gets structured metadata alongside plot text, producing more specific and grounded responses.
 
-In the next module, you will give agents persistent memory using the `neo4j-agent-memory` package.
+The next two lessons cover fulltext and hybrid search as optional alternatives to vector search. If you want to continue to agent memory, you can skip ahead to the next module.
+
+In the next optional lesson, you will use fulltext search for keyword matching without an embedder.

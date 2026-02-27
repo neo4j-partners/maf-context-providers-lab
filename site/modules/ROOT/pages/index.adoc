@@ -2,9 +2,9 @@
 
 == Course Description
 
-Most agent frameworks treat knowledge retrieval as a tool the agent decides to call. The Microsoft Agent Framework takes a different approach: context providers run automatically before every agent invocation, injecting relevant knowledge without the agent needing to ask.
+Most agent frameworks treat knowledge retrieval as a tool the agent decides to call. The Microsoft Agent Framework takes a different approach: **context providers** run automatically before every agent invocation, injecting relevant knowledge without the agent needing to ask. The result is a **self-grounding agent** — one that consistently receives relevant knowledge from a graph on every interaction, without relying on traditional retrieval tools or custom orchestration code.
 
-This course teaches you how to build Neo4j-backed context providers that give agents automatic access to knowledge graph data. You will:
+This course teaches you how to build self-grounding agents backed by Neo4j. You will:
 
 . Create agents with tools that query a Neo4j graph database.
 . Build context providers that inject graph knowledge before every LLM call.
@@ -36,6 +36,7 @@ We recommend taking the following courses:
 
 === What you will learn
 
+* What self-grounding agents are and how context providers enable them
 * How the Microsoft Agent Framework differs from other agent frameworks
 * The context provider lifecycle (`before_run` / `after_run`) and how it differs from tools
 * How to build custom context providers that inject dynamic instructions

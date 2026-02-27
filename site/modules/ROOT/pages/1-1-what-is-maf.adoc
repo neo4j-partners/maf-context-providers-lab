@@ -61,11 +61,13 @@ This course focuses on context providers, the concept that sets MAF apart from o
 
 **Context providers** handle the background case. Before every LLM invocation, the framework calls each provider's `before_run()` method, which can inject relevant data into the conversation. After the LLM responds, `after_run()` can extract and store information. The agent never decides whether to use the provider; it just receives the context.
 
-== Why MAF with Neo4j?
+== Self-Grounding Agents with Neo4j
 
-A Neo4j context provider can search for relevant graph data and inject it before every response. The agent always has access to knowledge graph context without needing to decide when to query for it. Ask about a movie, and the provider has already searched the graph for relevant movies, actors, and genres before the LLM generates its answer.
+Context providers enable a powerful pattern: **self-grounding agents**. A self-grounding agent automatically receives relevant knowledge from a data source on every interaction, without relying on tools or custom orchestration code. The agent doesn't decide whether to look up information — it always has it.
 
-In this course, you will build context providers that:
+A Neo4j context provider searches for relevant graph data and injects it before every response. Ask about a movie, and the provider has already searched the graph for relevant movies, actors, and genres before the LLM generates its answer. The agent is grounded in real data on every turn.
+
+In this course, you will build self-grounding agents that:
 
 * Search Neo4j vector indexes for semantically relevant content
 * Traverse graph relationships for enriched context
@@ -101,6 +103,6 @@ Tools are reactive -- the agent examines the function name and docstring and dec
 [.summary]
 == Lesson Summary
 
-The Microsoft Agent Framework succeeds Semantic Kernel and AutoGen, combining both into a single framework. Its key differentiator is context providers: components that run automatically before and after every LLM call to inject and extract context. Tools require the agent to decide when to call them; context providers are framework-managed.
+The Microsoft Agent Framework succeeds Semantic Kernel and AutoGen, combining both into a single framework. Its key differentiator is context providers: components that run automatically before and after every LLM call to inject and extract context. This enables self-grounding agents that are always informed by relevant data without requiring tool calls.
 
 In the next lesson, you will set up your development environment with OpenAI and Neo4j.

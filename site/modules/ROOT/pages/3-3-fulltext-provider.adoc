@@ -1,4 +1,5 @@
 = Fulltext Search with Neo4jContextProvider
+:optional: true
 
 Vector search finds movies by semantic similarity: "stories about machines becoming conscious" matches movies about artificial intelligence even if those exact words never appear in the plot. Fulltext search works differently. It matches on the actual words in the query. If the user asks about "Christopher Nolan," fulltext search finds plots that contain those exact terms.
 
@@ -151,4 +152,4 @@ Fulltext search uses BM25 keyword ranking against a Neo4j fulltext index. It doe
 
 Fulltext search with `Neo4jContextProvider` uses `index_type="fulltext"` to match queries against a Neo4j fulltext index using BM25 ranking. It doesn't require an embedder, filters stop words by default, and works best for keyword-based queries with specific names or terms.
 
-In the next lesson, you will combine vector and fulltext search using hybrid mode.
+In the next optional lesson, you will combine vector and fulltext search using hybrid mode.
