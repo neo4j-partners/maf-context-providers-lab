@@ -1,0 +1,15 @@
+= MAF Context Providers Lab
+
+Welcome to the MAF Context Providers Lab workshop.
+
+== Overview
+
+TODO: Add workshop overview here.
+
+== Prerequisites
+
+TODO: Add prerequisites here.
+
+== Getting Started
+
+TODO: Add getting started instructions here.

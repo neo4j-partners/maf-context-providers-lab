@@ -1,0 +1,12 @@
+name: maf-context-providers-lab
+title: MAF Context Providers Lab
+version: '1.0'
+start_page: ROOT:index.adoc
+nav:
+- nav.adoc
+asciidoc:
+  attributes:
+    source-highlighter: highlight.js
+    icons: font
+    idprefix: ''
+    idseparator: '-'
