@@ -5,9 +5,9 @@ site:
 
 content:
   sources:
-  - url: .
+  - url: ..
     branches: HEAD
-    start_path: .
+    start_path: site
 
 ui:
   bundle:
