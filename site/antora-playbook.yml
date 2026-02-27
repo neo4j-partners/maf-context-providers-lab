@@ -1,5 +1,5 @@
 site:
-  title: MAF Context Providers Lab
+  title: Self-Grounding Agents with MAF and Neo4j
   url: https://neo4j-partners.github.io/maf-context-providers-lab
   start_page: maf-context-providers-lab::index.adoc
 

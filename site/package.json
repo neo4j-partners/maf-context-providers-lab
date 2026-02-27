@@ -1,7 +1,7 @@
 {
   "name": "maf-context-providers-lab",
   "version": "1.0.0",
-  "description": "MAF Context Providers Lab - Neo4j Workshop",
+  "description": "Self-Grounding Agents with MAF and Neo4j - Neo4j Workshop",
   "scripts": {
     "convert-diagrams": "node scripts/convert-excalidraw.js",
     "build": "antora antora-playbook.yml",
