@@ -2,15 +2,15 @@
 
 A user tells your agent they prefer Christopher Nolan films. Two turns later, they ask for a recommendation. The agent has no idea what they said. The conversation history is gone, the preference was never stored, and the agent suggests a random comedy.
 
-The context providers from Module 2 solve a different problem. They inject pre-loaded knowledge, movie plots, genres, actors, from a graph that existed before the agent started. That knowledge is static. Memory is what the agent learns from conversations and carries forward.
+The context providers from Modules 2 and 3 solve a different problem. They inject pre-loaded knowledge, movie plots, genres, actors, from a graph that existed before the agent started. That knowledge is static. Memory is what the agent learns from conversations and carries forward.
 
 == What Memory Needs to Capture
 
 Three categories of information accumulate during agent conversations:
 
-1. **What was said** -- the conversation itself. A user asking about time travel movies, the agent recommending Interstellar, the user saying they already saw it. This history needs to persist across turns and sessions so the agent does not repeat itself.
+1. **What was said** -- the conversation itself. A user asking about time travel movies, the agent recommending Interstellar, the user saying they already saw it. This history needs to persist across turns and sessions so the agent doesn't repeat itself.
 
-2. **What was learned** -- facts and preferences extracted from conversation. "The user prefers sci-fi" is not a message; it is a structured piece of knowledge derived from messages. These extracted facts build up a profile of the user and the topics discussed.
+2. **What was learned** -- facts and preferences extracted from conversation. "The user prefers sci-fi" isn't a message; it's a structured piece of knowledge derived from messages. These extracted facts build up a profile of the user and the topics discussed.
 
 3. **What was tried** -- the reasoning and tool calls the agent used to accomplish tasks. If the agent searched for time travel movies and found good results using a particular approach, that trace can inform how it handles similar requests later.
 
@@ -36,7 +36,7 @@ Traces of what the agent did and whether it worked. Each trace records the task,
 
 All three memory types live in the same Neo4j database as graph structures. Messages form chains linked to sessions. Entities become nodes with typed relationships (PERSON, ORGANIZATION, OBJECT). Reasoning traces connect to the steps and tool calls that compose them.
 
-Because everything is in the same graph, memories connect to each other. An entity extracted from a conversation links back to the message it came from, the session it occurred in, and other entities it relates to. This is more than storage; it is a connected knowledge structure the agent can traverse.
+Because everything is in the same graph, memories connect to each other. An entity extracted from a conversation links back to the message it came from, the session it occurred in, and other entities it relates to. This is more than storage; it's a connected knowledge structure the agent can traverse.
 
 == The neo4j-agent-memory Package
 

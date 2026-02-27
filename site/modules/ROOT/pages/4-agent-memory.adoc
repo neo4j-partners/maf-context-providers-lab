@@ -4,7 +4,7 @@ The context providers from Module 3 injected pre-loaded knowledge graph data int
 
 Agent memory works differently. It captures what the agent learns during conversations, including user preferences, entity mentions, and reasoning traces, then stores them in Neo4j for retrieval in future turns and sessions.
 
-The `neo4j-agent-memory` package provides a comprehensive memory system with a multi-stage entity extraction pipeline, three memory types, and optional graph algorithm integration. It integrates with the Microsoft Agent Framework through context providers and callable tools.
+The `neo4j-agent-memory` package provides three memory types (short-term, long-term, and reasoning), a multi-stage entity extraction pipeline, and optional graph algorithm integration. It integrates with the Microsoft Agent Framework through context providers and callable tools.
 
 In this module, you will:
 

@@ -2,7 +2,7 @@
 
 Vector search finds movies by semantic similarity: "stories about machines becoming conscious" matches movies about artificial intelligence even if those exact words never appear in the plot. Fulltext search works differently. It matches on the actual words in the query. If the user asks about "Christopher Nolan," fulltext search finds plots that contain those exact terms.
 
-Fulltext search does not require an embedder. It uses Neo4j's built-in fulltext indexing with BM25 ranking, making it simpler to set up and faster to execute.
+Fulltext search doesn't require an embedder. It uses Neo4j's built-in fulltext indexing with BM25 ranking, making it simpler to set up and faster to execute.
 
 == When to Use Fulltext Search
 
@@ -10,14 +10,14 @@ Fulltext search is the better choice when:
 
 * The user mentions specific names, titles, or terms that should match literally
 * You want keyword precision rather than semantic interpretation
-* You do not have or need vector embeddings on your nodes
+* You don't have or need vector embeddings on your nodes
 * You want lower latency (no embedding API call required)
 
 Vector search is better when the query is conceptual ("feel-good movies about unlikely friendships") rather than keyword-based.
 
 == Create a Fulltext Index
 
-The recommendations sandbox includes movie plot text on `Movie` nodes. To use fulltext search, you need a fulltext index. If one does not already exist, create it:
+The recommendations sandbox includes movie plot text on `Movie` nodes. To use fulltext search, you need a fulltext index. If one doesn't already exist, create it:
 
 [source,cypher]
 ----
@@ -52,7 +52,7 @@ provider = Neo4jContextProvider(
 )
 ----
 
-That is the entire setup. No embedder, no embedding model configuration.
+That's the entire setup. No embedder, no embedding model configuration.
 
 == Stop Word Filtering
 
@@ -149,6 +149,6 @@ Fulltext search uses BM25 keyword ranking against a Neo4j fulltext index. It doe
 [.summary]
 == Lesson Summary
 
-Fulltext search with `Neo4jContextProvider` uses `index_type="fulltext"` to match queries against a Neo4j fulltext index using BM25 ranking. It does not require an embedder, filters stop words by default, and works best for keyword-based queries with specific names or terms.
+Fulltext search with `Neo4jContextProvider` uses `index_type="fulltext"` to match queries against a Neo4j fulltext index using BM25 ranking. It doesn't require an embedder, filters stop words by default, and works best for keyword-based queries with specific names or terms.
 
 In the next lesson, you will combine vector and fulltext search using hybrid mode.

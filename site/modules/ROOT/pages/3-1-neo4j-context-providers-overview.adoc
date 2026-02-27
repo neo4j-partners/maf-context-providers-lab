@@ -1,8 +1,8 @@
 = Neo4j Context Providers Overview
 
-In the previous module, you built a context provider from scratch. That provider managed its own state and injected instructions based on simple logic. For production knowledge graph retrieval, you need something more capable: index-based search, embeddings, configurable result formatting, and support for different search strategies.
+The context provider you built from scratch in Module 2 managed its own state and injected instructions based on simple logic. Production knowledge graph retrieval needs more than that, including index-based search, embeddings, configurable result formatting, and support for different search strategies.
 
-The `agent-framework-neo4j` package provides `Neo4jContextProvider`, a ready-made context provider that connects to a Neo4j database, searches an index, and injects the results before every LLM call. It extends the same `BaseContextProvider` you used in Module 2 but handles the search, embedding, and formatting internally.
+The `agent-framework-neo4j` package provides `Neo4jContextProvider`, a ready-made context provider that connects to a Neo4j database, searches an index, and injects the results before every LLM call. It extends the same `BaseContextProvider` you used earlier but handles the search, embedding, and formatting internally.
 
 == Install the Package
 
@@ -23,7 +23,7 @@ The package depends on `agent-framework-core` (the MAF core library) and `neo4j-
 4. Executes a search against a Neo4j index based on the configured `index_type`
 5. Formats the results and injects them as context messages via `context.extend_messages()`
 
-The provider does not extract entities or keywords from the query. It passes the full message text to the search index and lets Neo4j handle relevance ranking.
+The provider doesn't extract entities or keywords from the query. It passes the full message text to the search index and lets Neo4j handle relevance ranking.
 
 == Three Search Modes
 

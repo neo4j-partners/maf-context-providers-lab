@@ -88,7 +88,7 @@ asyncio.run(main())
 
 This query benefits from both search strategies:
 
-* **Vector search** finds movies semantically related to "sci-fi movies about dreams" even if those exact words do not appear in the plot
+* **Vector search** finds movies semantically related to "sci-fi movies about dreams" even if those exact words don't appear in the plot
 * **Fulltext search** finds plots containing "Christopher Nolan" and "dreams" as literal terms
 
 Hybrid combines both result sets. A movie like Inception ranks highly because it matches on both dimensions.

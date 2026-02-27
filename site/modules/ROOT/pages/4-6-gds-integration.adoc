@@ -1,6 +1,6 @@
 = Graph Algorithm Integration
 
-The memory graph stores entities, relationships, conversations, and reasoning traces as connected nodes. Graph algorithms can analyze this structure to answer questions that simple lookups cannot: Which entities are most central to the user's interests? What is the shortest connection path between two entities? Which entities are similar based on their graph neighborhood?
+The memory graph stores entities, relationships, conversations, and reasoning traces as connected nodes. Graph algorithms can analyze this structure to answer questions that simple lookups can't: Which entities are most central to the user's interests? What is the shortest connection path between two entities? Which entities are similar based on their graph neighborhood?
 
 The `neo4j-agent-memory` package includes optional integration with Neo4j Graph Data Science (GDS) that exposes these capabilities as agent tools.
 

@@ -2,26 +2,26 @@
 
 In the previous lessons, you used vector, fulltext, and hybrid search to find relevant movies. Each mode returned matching content, but your graph contains far more than text. Each movie is connected to genres, actors, and directors through typed relationships. Basic search misses all of that structure.
 
-Graph-enriched retrieval adds a Cypher traversal step after the vector search. The provider finds matching movies by plot similarity, then walks the graph to collect genres, cast, and directors for each match. The agent receives both the relevant text and the structured metadata.
+Graph-enriched retrieval adds a Cypher traversal step after the index search. The provider finds matching movies, then walks the graph to collect genres, cast, and directors for each match. The agent receives both the relevant text and the structured metadata.
 
 == The Limitation of Basic Search
 
-Vector search over `moviePlots` returns the plot text and similarity score for each matching movie. If you search for "time travel," you get plots that mention time travel concepts. But the result does not include the movie's title, release year, genres, or who starred in it.
+The search modes from the previous lessons return matching text and a similarity score for each result. If you search for "time travel," you get plots that mention time travel concepts. But the result doesn't include the movie's title, release year, genres, or who starred in it.
 
 That metadata lives in the graph: `Movie` nodes connect to `Genre` nodes via `IN_GENRE`, to actors via `ACTED_IN`, and to directors via `DIRECTED`. Graph enrichment traverses these relationships after the initial search.
 
 == Define a Retrieval Query
 
-The `retrieval_query` parameter accepts a Cypher query that runs after the vector search. It receives two variables from the index search:
+The `retrieval_query` parameter accepts a Cypher query that runs after the index search. It receives two variables:
 
-* **`node`** -- The matched `Movie` node from the vector index
-* **`score`** -- The cosine similarity score
+* **`node`** -- The matched `Movie` node from the index
+* **`score`** -- The relevance score from the search
 
 The query traverses outward from the matched node:
 
 [source,cypher]
 ----
-// Receives :param node and :param score from the vector index search
+// Receives :param node and :param score from the index search
 MATCH (node)-[:IN_GENRE]->(g:Genre)
 WITH node, score, collect(DISTINCT g.name) AS genres
 OPTIONAL MATCH (p:Person)-[:ACTED_IN]->(node)
@@ -50,7 +50,7 @@ The result includes plot text, similarity score, movie title, release year, genr
 
 == Create the Graph-Enriched Provider
 
-When you provide a `retrieval_query`, the provider internally uses `VectorCypherRetriever` instead of the basic `VectorRetriever`:
+When you provide a `retrieval_query`, the provider internally uses a Cypher-enhanced retriever (e.g., `VectorCypherRetriever` for vector mode, `HybridCypherRetriever` for hybrid mode) instead of the basic retriever. This example uses vector search:
 
 [source,python]
 ----
@@ -99,7 +99,7 @@ provider = Neo4jContextProvider(
 )
 ----
 
-The only difference from the previous lesson is the `retrieval_query` parameter. Everything else stays the same.
+The only difference from the vector search lesson is the `retrieval_query` parameter. Everything else stays the same.
 
 == Run the Agent
 
