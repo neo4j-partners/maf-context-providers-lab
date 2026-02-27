@@ -1,4 +1,4 @@
-= Neo4j Knowledge Retrieval Overview
+= Neo4j Knowledge Retrieval Context Provider Overview
 
 The context provider you built from scratch in Module 2 managed its own state and injected instructions based on simple logic. Production knowledge graph retrieval needs more than that, including index-based search, embeddings, configurable result formatting, and support for different search strategies.
 

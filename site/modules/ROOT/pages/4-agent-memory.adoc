@@ -1,10 +1,10 @@
-= Agent Memory
+= Neo4j Agent Memory Context Provider
 
-The context providers from Module 3 injected pre-loaded knowledge graph data into your agent's conversations. That data was static. It existed in Neo4j before the agent ever ran.
+The context provider from Module 3 injected pre-existing knowledge graph data into agent conversations. That data was static, loaded into Neo4j before the agent ever ran.
 
-Agent memory works differently. It captures what the agent learns during conversations, including user preferences, entity mentions, and reasoning traces, then stores them in Neo4j for retrieval in future turns and sessions.
+The `neo4j-agent-memory` package takes a different approach. It provides a context provider that captures what the agent learns _during_ conversations, including user preferences, entity mentions, and reasoning traces, then stores them in Neo4j for retrieval in future turns and sessions. Like the knowledge retrieval context provider, it hooks into MAF's agent lifecycle through `before_run()` and `after_run()` methods. Before each LLM call, it retrieves relevant memories and injects them into context. After each call, it extracts new information from the conversation and persists it to the graph.
 
-The `neo4j-agent-memory` package provides three memory types (short-term, long-term, and reasoning), a multi-stage entity extraction pipeline, and optional graph algorithm integration. It integrates with the Microsoft Agent Framework through context providers and callable tools.
+The package provides three memory types (short-term, long-term, and reasoning), a multi-stage entity extraction pipeline, and optional graph algorithm integration. It integrates with the Microsoft Agent Framework through context providers and callable tools.
 
 In this module, you will:
 
