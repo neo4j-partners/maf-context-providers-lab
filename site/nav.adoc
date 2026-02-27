@@ -1,4 +1,4 @@
-* xref:index.adoc[Building Self-Grounding Agents with Microsoft Agent Framework and Neo4j]
+* xref:index.adoc[Self-Grounding Agents with MAF and Neo4j]
 * xref:1-introduction.adoc[Introduction to Microsoft Agent Framework]
 ** xref:1-1-what-is-maf.adoc[What is the Microsoft Agent Framework?]
 ** xref:1-2-setup.adoc[Setup Your Development Environment]
