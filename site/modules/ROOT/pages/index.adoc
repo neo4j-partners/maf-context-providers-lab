@@ -8,8 +8,9 @@ This course teaches you how to build Neo4j-backed context providers that give ag
 
 . Create agents with tools that query a Neo4j graph database.
 . Build context providers that inject graph knowledge before every LLM call.
-. Use vector search and graph-enriched retrieval with `Neo4jContextProvider`.
-. Give agents persistent memory using `neo4j-agent-memory`.
+. Use vector, fulltext, and hybrid search with `Neo4jContextProvider` from the `agent-framework-neo4j` package.
+. Add graph-enriched retrieval using custom Cypher traversal queries.
+. Give agents persistent memory with entity extraction, reasoning traces, and graph algorithms using `neo4j-agent-memory`.
 
 The Microsoft Agent Framework is the direct successor to both Semantic Kernel and AutoGen, built by the same Microsoft teams. Its context provider architecture is a first-class concept with a defined lifecycle, not a plugin or afterthought.
 
@@ -38,5 +39,6 @@ We recommend taking the following courses:
 * How the Microsoft Agent Framework differs from other agent frameworks
 * The context provider lifecycle (`before_run` / `after_run`) and how it differs from tools
 * How to build custom context providers that inject dynamic instructions
-* How to use `Neo4jContextProvider` for vector search and graph-enriched retrieval
-* How to give agents persistent memory with `neo4j-agent-memory`
+* How to use `Neo4jContextProvider` with vector, fulltext, and hybrid search modes
+* How to add graph-enriched retrieval using custom Cypher traversal queries
+* How to give agents persistent memory with entity extraction, reasoning traces, and graph algorithms

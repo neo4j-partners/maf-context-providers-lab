@@ -169,4 +169,4 @@ Context providers use `state[self.source_id]` to store session-specific data. Th
 
 The `UserInfoMemory` provider uses `before_run()` to inject dynamic instructions and `after_run()` to extract structured data from conversations. State persists across turns in the session's `state` dictionary, letting the provider accumulate knowledge as the conversation progresses.
 
-In the next lesson, you will use `Neo4jContextProvider` to inject knowledge graph context using vector search.
+In the next module, you will use `Neo4jContextProvider` from the `agent-framework-neo4j` package to inject knowledge graph context using vector, fulltext, and hybrid search.

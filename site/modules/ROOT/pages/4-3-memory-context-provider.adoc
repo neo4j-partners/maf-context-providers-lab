@@ -1,6 +1,6 @@
 = Memory as a Context Provider
 
-The `Neo4jContextProvider` from Module 2 injected knowledge graph data before every agent turn. The memory context provider does the same thing, but for memories the agent has accumulated during conversations. Before each turn, it retrieves relevant past messages, extracted entities, and user preferences. After each turn, it stores new messages and extracts entities from the conversation.
+The `Neo4jContextProvider` from Module 3 injected knowledge graph data before every agent turn. The memory context provider does the same thing, but for memories the agent has accumulated during conversations. Before each turn, it retrieves relevant past messages, extracted entities, and user preferences. After each turn, it stores new messages and extracts entities using the pipeline from the previous lesson.
 
 The interface is `Neo4jMicrosoftMemory`, which wraps the memory client into a context provider and chat message store.
 
@@ -60,7 +60,7 @@ The parameters control what gets injected and extracted:
 
 == Attach the Context Provider
 
-Pass `memory.context_provider` to the agent the same way you passed `Neo4jContextProvider` in Module 2:
+Pass `memory.context_provider` to the agent the same way you passed `Neo4jContextProvider` in Module 3:
 
 [source,python]
 ----
@@ -85,7 +85,7 @@ agent = client.as_agent(
 
 == The Memory Lifecycle
 
-The provider follows the same `before_run()` / `after_run()` lifecycle from Module 2, applied to memory retrieval and storage.
+The provider follows the same `before_run()` / `after_run()` lifecycle from Module 3, applied to memory retrieval and storage.
 
 **`before_run()`** searches across memory types and injects what it finds as instructions. For a query about sci-fi recommendations, it might inject recent conversation messages mentioning sci-fi, a stored preference for Christopher Nolan films, and a past reasoning trace where the agent successfully recommended Interstellar.
 

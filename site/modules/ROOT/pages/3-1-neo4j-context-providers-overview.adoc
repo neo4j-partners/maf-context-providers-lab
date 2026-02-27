@@ -1,0 +1,126 @@
+= Neo4j Context Providers Overview
+
+In the previous module, you built a context provider from scratch. That provider managed its own state and injected instructions based on simple logic. For production knowledge graph retrieval, you need something more capable: index-based search, embeddings, configurable result formatting, and support for different search strategies.
+
+The `agent-framework-neo4j` package provides `Neo4jContextProvider`, a ready-made context provider that connects to a Neo4j database, searches an index, and injects the results before every LLM call. It extends the same `BaseContextProvider` you used in Module 2 but handles the search, embedding, and formatting internally.
+
+== Install the Package
+
+[source,bash]
+----
+pip install agent-framework-neo4j
+----
+
+The package depends on `agent-framework-core` (the MAF core library) and `neo4j-graphrag` (Neo4j's retriever library). Both are installed automatically.
+
+== How It Works
+
+`Neo4jContextProvider` implements `before_run()` with the following steps:
+
+1. Filters incoming messages to user and assistant roles
+2. Takes the most recent messages (configurable via `message_history_count`)
+3. Concatenates the message text into a search query
+4. Executes a search against a Neo4j index based on the configured `index_type`
+5. Formats the results and injects them as context messages via `context.extend_messages()`
+
+The provider does not extract entities or keywords from the query. It passes the full message text to the search index and lets Neo4j handle relevance ranking.
+
+== Three Search Modes
+
+The `index_type` parameter determines which search strategy the provider uses:
+
+[cols="1,2,2,1"]
+|===
+| Mode | How It Works | Best For | Embedder Required?
+
+| `"vector"`
+| Embeds the query, searches a vector index by cosine similarity
+| Semantic similarity -- finding conceptually related content
+| Yes
+
+| `"fulltext"`
+| Tokenizes the query, removes stop words, searches a fulltext index by BM25 ranking
+| Keyword matching -- finding content with specific terms
+| No
+
+| `"hybrid"`
+| Runs both vector and fulltext search, combines the scores
+| Best of both worlds -- semantic understanding plus keyword precision
+| Yes
+|===
+
+Each mode uses a different retriever from the `neo4j-graphrag` library internally. You configure the mode when creating the provider and the provider handles the rest.
+
+== Configuration Options
+
+All three modes share these core parameters:
+
+* **`uri`**, **`username`**, **`password`** -- Neo4j connection details. Falls back to `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD` environment variables if not provided.
+* **`index_name`** -- The name of the Neo4j index to query. Required.
+* **`index_type`** -- One of `"vector"`, `"fulltext"`, or `"hybrid"`. Defaults to `"vector"`.
+* **`top_k`** -- Number of results to retrieve. Defaults to 5.
+* **`context_prompt`** -- Text prepended to search results to guide the LLM.
+* **`message_history_count`** -- Number of recent messages to include in the search query. Defaults to 10.
+
+Mode-specific parameters:
+
+* **`embedder`** -- Required for `"vector"` and `"hybrid"` modes. An object implementing the `neo4j-graphrag` `Embedder` interface.
+* **`fulltext_index_name`** -- Required for `"hybrid"` mode. The name of the fulltext index to combine with vector search.
+* **`filter_stop_words`** -- For `"fulltext"` mode. Removes common words (articles, prepositions, question words) before searching. Defaults to `True`.
+* **`retrieval_query`** -- Optional Cypher query for graph enrichment after index search. Works with all three modes.
+
+== Async Context Manager
+
+The provider manages its Neo4j connection as an async context manager. Use `async with` to ensure the connection is properly opened and closed:
+
+[source,python]
+----
+async with provider:
+    agent = client.as_agent(
+        name="my-agent",
+        instructions="...",
+        context_providers=[provider],
+    )
+    session = agent.create_session()
+    response = await agent.run("query", session=session)
+----
+
+The provider connects to Neo4j on entry, verifies connectivity, initializes the appropriate retriever, and closes the connection on exit.
+
+== What Comes Next
+
+The following lessons walk through each search mode in detail, starting with vector search, then fulltext, hybrid, and finally graph-enriched retrieval that combines index search with Cypher traversal.
+
+[.quiz]
+== Check your understanding
+
+[.question]
+== Neo4j Context Provider Search Modes
+
+Which search modes does `Neo4jContextProvider` support?
+
+* [ ] Only vector search
+* [ ] Vector and fulltext search
+* [x] Vector, fulltext, and hybrid search
+* [ ] Vector, fulltext, hybrid, and graph search
+
+[TIP,role=hint]
+.Hint
+====
+Think about the three values that `index_type` can take. Graph enrichment is an add-on feature via `retrieval_query`, not a separate search mode.
+====
+
+[TIP,role=solution]
+.Solution
+====
+The correct answer is: **Vector, fulltext, and hybrid search.**
+
+`Neo4jContextProvider` supports three search modes configured via the `index_type` parameter: `"vector"` for semantic similarity using embeddings, `"fulltext"` for keyword matching using BM25 ranking, and `"hybrid"` which combines both approaches. Graph-enriched retrieval is an optional enhancement available on any mode via the `retrieval_query` parameter, not a separate search mode.
+====
+
+[.summary]
+== Lesson Summary
+
+The `agent-framework-neo4j` package provides `Neo4jContextProvider`, which extends `BaseContextProvider` to search Neo4j indexes and inject results before every LLM call. It supports three search modes: vector (semantic similarity), fulltext (keyword matching), and hybrid (both combined). Configuration includes connection details, index name, search type, and optional graph enrichment via Cypher.
+
+In the next lesson, you will use vector search to find movies by plot similarity.

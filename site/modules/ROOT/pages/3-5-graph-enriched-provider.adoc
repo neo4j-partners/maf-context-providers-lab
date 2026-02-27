@@ -1,6 +1,6 @@
 = Graph-Enriched Retrieval
 
-In the previous lesson, vector search returned movie plot text that matched the query. That is useful, but your graph contains far more than plot text. Each movie is connected to genres, actors, and directors through typed relationships. Basic vector search misses all of that structure.
+In the previous lessons, you used vector, fulltext, and hybrid search to find relevant movies. Each mode returned matching content, but your graph contains far more than text. Each movie is connected to genres, actors, and directors through typed relationships. Basic search misses all of that structure.
 
 Graph-enriched retrieval adds a Cypher traversal step after the vector search. The provider finds matching movies by plot similarity, then walks the graph to collect genres, cast, and directors for each match. The agent receives both the relevant text and the structured metadata.
 
@@ -171,6 +171,6 @@ The `retrieval_query` is a Cypher query that runs after the vector (or fulltext)
 [.summary]
 == Lesson Summary
 
-Adding a `retrieval_query` to `Neo4jContextProvider` combines vector search with graph traversal. The Cypher query receives matched `node` and `score` variables from the index search, then traverses relationships to collect genres, actors, and directors. The agent gets structured metadata alongside plot text, producing more specific and grounded responses.
+Adding a `retrieval_query` to `Neo4jContextProvider` combines any search mode with graph traversal. The Cypher query receives matched `node` and `score` variables from the index search, then traverses relationships to collect genres, actors, and directors. The agent gets structured metadata alongside plot text, producing more specific and grounded responses.
 
-In the next module, you will give agents persistent memory using Neo4j.
+In the next module, you will give agents persistent memory using the `neo4j-agent-memory` package.

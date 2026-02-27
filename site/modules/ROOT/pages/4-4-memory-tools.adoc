@@ -149,4 +149,4 @@ The memory context provider runs on every turn via `before_run()` and `after_run
 
 Memory tools give the agent explicit control over search, save, and recall operations, while the context provider continues to handle background memory injection automatically. The combined pattern covers both passive context (always available) and active operations (agent-directed).
 
-This completes the course. You have built agents with tools, used context providers for automatic knowledge graph retrieval, added graph-enriched traversal, and given agents persistent memory backed by Neo4j.
+In the next lesson, you will explore reasoning memory to capture and learn from past agent executions.

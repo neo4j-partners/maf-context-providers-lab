@@ -1,0 +1,15 @@
+= Neo4j Context Providers
+
+In the previous module, you learned how context providers work in the Microsoft Agent Framework and built one from scratch. Now you will use the `agent-framework-neo4j` package, which provides a production-ready `Neo4jContextProvider` that searches Neo4j indexes and injects results before every agent invocation.
+
+This module covers the package architecture, all three supported search modes (vector, fulltext, and hybrid), and graph-enriched retrieval using custom Cypher traversal queries.
+
+In this module, you will:
+
+* Understand the `agent-framework-neo4j` package and how `Neo4jContextProvider` extends `BaseContextProvider`
+* Use vector search for semantic similarity over movie plot embeddings
+* Use fulltext search for keyword matching without an embedder
+* Combine both with hybrid search for the best of both approaches
+* Add graph-enriched retrieval using custom Cypher traversal queries
+
+xref:3-1-neo4j-context-providers-overview.adoc[Ready? Let's go ->]

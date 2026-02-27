@@ -1,0 +1,143 @@
+= Hybrid Search with Neo4jContextProvider
+
+Vector search understands concepts but can miss exact terms. Fulltext search matches keywords precisely but misses semantic connections. Hybrid search runs both and combines the results, giving you semantic understanding and keyword precision in one query.
+
+== How Hybrid Search Works
+
+When `index_type` is set to `"hybrid"`, the provider:
+
+1. Embeds the query and runs a vector search against the vector index
+2. Tokenizes the query and runs a fulltext search against a separate fulltext index
+3. Combines the scores from both searches to produce a single ranked result set
+
+This means a movie can rank highly because its plot is semantically similar to the query, because it contains the exact keywords, or both. Results that score well on both dimensions rise to the top.
+
+== Requirements
+
+Hybrid search requires:
+
+* A **vector index** with embeddings on the target nodes (the `index_name` parameter)
+* A **fulltext index** on the same or related text (the `fulltext_index_name` parameter)
+* An **embedder** to generate query vectors
+
+Both indexes must exist in Neo4j before the provider can use them.
+
+== Configure the Provider
+
+[source,python]
+----
+import os
+from agent_framework_neo4j import Neo4jContextProvider, OpenAIEmbedder
+
+embedder = OpenAIEmbedder(
+    api_key=os.environ["OPENAI_API_KEY"],
+    model="text-embedding-ada-002",
+)
+
+provider = Neo4jContextProvider(
+    uri=os.environ["NEO4J_URI"],
+    username=os.environ["NEO4J_USERNAME"],
+    password=os.environ["NEO4J_PASSWORD"],
+    index_name="moviePlots",
+    index_type="hybrid",
+    fulltext_index_name="moviePlotsFulltext",
+    embedder=embedder,
+    top_k=5,
+    context_prompt=(
+        "## Movie Knowledge Graph Context\n"
+        "Use the following movie information from the knowledge graph "
+        "to answer questions:"
+    ),
+)
+----
+
+The key difference from vector-only search is the `fulltext_index_name` parameter, which tells the provider which fulltext index to use alongside the vector index.
+
+== Run the Agent
+
+[source,python]
+----
+import asyncio
+from agent_framework.openai import OpenAIResponsesClient
+
+client = OpenAIResponsesClient(
+    api_key=os.environ["OPENAI_API_KEY"],
+    model=os.environ["OPENAI_RESPONSES_MODEL_ID"],
+)
+
+async def main():
+    async with provider:
+        agent = client.as_agent(
+            name="movie-hybrid-agent",
+            instructions=(
+                "You are a movie recommendation assistant. Answer questions "
+                "using the movie data provided in your context."
+            ),
+            context_providers=[provider],
+        )
+
+        session = agent.create_session()
+        response = await agent.run(
+            "I'm looking for Christopher Nolan sci-fi movies about dreams",
+            session=session,
+        )
+        print(response)
+
+asyncio.run(main())
+----
+
+This query benefits from both search strategies:
+
+* **Vector search** finds movies semantically related to "sci-fi movies about dreams" even if those exact words do not appear in the plot
+* **Fulltext search** finds plots containing "Christopher Nolan" and "dreams" as literal terms
+
+Hybrid combines both result sets. A movie like Inception ranks highly because it matches on both dimensions.
+
+== When to Use Hybrid
+
+Hybrid search is the most versatile mode but comes with trade-offs:
+
+* **Advantages**: Catches both semantic and keyword matches, reduces the chance of missing relevant results
+* **Trade-offs**: Requires both indexes to exist, needs an embedder (adds latency), uses more resources than either mode alone
+
+Use hybrid when your users mix conceptual and keyword-based queries. Use vector-only when queries are primarily conceptual. Use fulltext-only when queries are primarily keyword-based and you want the simplest setup.
+
+== Graph Enrichment
+
+Like the other search modes, hybrid search supports the `retrieval_query` parameter for graph enrichment. When provided, the provider uses `HybridCypherRetriever` instead of the basic `HybridRetriever`. The retrieval query works the same way as with vector search: it receives `node` and `score` from the combined search results and can traverse relationships to collect additional context.
+
+You will explore graph enrichment in detail in the next lesson.
+
+[.quiz]
+== Check your understanding
+
+[.question]
+== Hybrid Search Requirements
+
+What does hybrid search in `Neo4jContextProvider` require compared to vector-only search?
+
+* [ ] Only a fulltext index -- no vector index needed
+* [ ] A different embedder model specifically for hybrid mode
+* [x] Both a vector index and a fulltext index, plus an embedder
+* [ ] No additional configuration -- hybrid is the default mode
+
+[TIP,role=hint]
+.Hint
+====
+Hybrid search combines two search strategies. Think about what each strategy needs to operate.
+====
+
+[TIP,role=solution]
+.Solution
+====
+The correct answer is: **Both a vector index and a fulltext index, plus an embedder.**
+
+Hybrid search runs both vector search (which requires a vector index and an embedder) and fulltext search (which requires a fulltext index) simultaneously, then combines the results. The `index_name` parameter points to the vector index, `fulltext_index_name` points to the fulltext index, and the `embedder` generates query vectors for the vector search component.
+====
+
+[.summary]
+== Lesson Summary
+
+Hybrid search combines vector and fulltext search by running both and merging the results. It requires a vector index, a fulltext index, and an embedder. This mode catches both semantic and keyword matches, making it the most versatile option when users mix conceptual and specific queries.
+
+In the next lesson, you will add graph-enriched retrieval to traverse relationships after index search for richer context.

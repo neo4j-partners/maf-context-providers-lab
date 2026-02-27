@@ -54,7 +54,7 @@ The package provides four components for MAF integration:
 * `Neo4jContextProvider` (memory variant) -- implements `before_run()`/`after_run()` for automatic memory injection and extraction
 * `create_memory_tools()` -- generates callable tools for explicit memory operations
 
-The next two lessons use these components: first the context provider for passive memory, then the tools for active memory.
+The next lesson covers how entities are extracted from conversations. Subsequent lessons use these components for passive memory (context provider), active memory (tools), reasoning traces, and graph algorithm integration.
 
 [.quiz]
 == Check your understanding
@@ -88,4 +88,4 @@ Short-term memory stores conversation messages with vector embeddings for semant
 
 The `neo4j-agent-memory` package provides three memory types: short-term (conversation history with semantic search), long-term (entities, preferences, and facts in the POLE+O model), and reasoning (traces of past agent behavior). All are stored as connected graph structures in Neo4j.
 
-In the next lesson, you will use `Neo4jMicrosoftMemory` as a context provider to inject relevant memories into agent conversations automatically.
+In the next lesson, you will learn how the multi-stage entity extraction pipeline turns unstructured conversation text into structured graph entities.
