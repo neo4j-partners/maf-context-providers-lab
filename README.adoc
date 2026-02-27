@@ -1,5 +1,7 @@
 = Self-Grounding Agents with MAF and Neo4j
 
+https://neo4j-partners.github.io/maf-context-providers-lab[View the published site^]
+
 A workshop site for the Self-Grounding Agents with MAF and Neo4j course, built with https://antora.org[Antora].
 
 == Prerequisites
