@@ -1,18 +1,17 @@
 = Self-Grounding Agents with MAF and Neo4j
 
-== Course Description
+== Self-Grounding Agents with MAF and Neo4j
 
-Most agent frameworks treat knowledge retrieval as a tool the agent decides to call. The Microsoft Agent Framework takes a different approach: **context providers** run automatically before every agent invocation, injecting relevant knowledge without the agent needing to ask. The result is a **self-grounding agent** — one that consistently receives relevant knowledge from a graph on every interaction, without relying on traditional retrieval tools or custom orchestration code.
+AI agents are powerful, but they share a set of common problems:
 
-This course teaches you how to build self-grounding agents backed by Neo4j. You will:
+* **Hallucinations** — Without access to real data, agents fabricate answers that sound plausible but are wrong.
+* **Lack of context** — Agents have no awareness of your domain knowledge, business data, or the relationships between entities unless you explicitly provide it.
+* **Lack of memory** — Every conversation starts from scratch. Agents forget user preferences, past interactions, and previously learned facts.
+* **Unreliable retrieval** — Most frameworks treat knowledge retrieval as a tool the agent decides to call. The agent may skip the tool, not realize it is relevant, or simply answer from its training data alone.
 
-. Create agents with tools that query a Neo4j graph database.
-. Build context providers that inject graph knowledge before every LLM call.
-. Use vector, fulltext, and hybrid search with `Neo4jContextProvider` from the `agent-framework-neo4j` package.
-. Add graph-enriched retrieval using custom Cypher traversal queries.
-. Give agents persistent memory with entity extraction, reasoning traces, and graph algorithms using `neo4j-agent-memory`.
+A **self-grounding agent** solves these problems by automatically receiving relevant knowledge from a graph database on every interaction — without relying on the agent to decide when to retrieve it. The Microsoft Agent Framework (MAF) makes this possible through **context providers**, a first-class concept that runs before and after every LLM call to inject knowledge and extract state.
 
-The Microsoft Agent Framework is the direct successor to both Semantic Kernel and AutoGen, built by the same Microsoft teams. Its context provider architecture is a first-class concept with a defined lifecycle, not a plugin or afterthought.
+This course teaches you how to build self-grounding agents using MAF and Neo4j. You will start with the fundamentals of MAF, learn how context providers work, then connect them to Neo4j for automatic knowledge graph retrieval with vector, fulltext, and hybrid search. Finally, you will give your agents persistent memory so they remember conversations, extract entities, and learn from past reasoning.
 
 This course uses models from link:https://openai.com/[OpenAI^], although you can use the model and supplier of your choice.
 
