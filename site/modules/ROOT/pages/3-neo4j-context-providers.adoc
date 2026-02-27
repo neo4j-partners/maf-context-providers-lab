@@ -1,8 +1,13 @@
-= Building Self-Grounding Agents with Neo4j
+= Neo4j Knowledge Retrieval
 
-In the previous module, you learned how context providers work in the Microsoft Agent Framework and built one from scratch. Now you will use the `agent-framework-neo4j` package to build **self-grounding agents** — agents that automatically receive relevant knowledge graph context on every interaction. The `Neo4jContextProvider` searches Neo4j indexes and injects results before every agent invocation, grounding the agent in real data without tool calls.
+In the previous module, you learned how context providers work in the Microsoft Agent Framework and built one from scratch. Now you will connect context providers to Neo4j to build **self-grounding agents** — agents that automatically receive relevant knowledge on every interaction.
 
-This module covers the package architecture, vector search with graph-enriched retrieval, and optional alternative search modes (fulltext and hybrid).
+Neo4j provides two context provider packages for MAF, each solving a different problem:
+
+* **link:https://github.com/neo4j-labs/neo4j-maf-provider[agent-framework-neo4j^]** — Retrieves knowledge from Neo4j indexes (vector, fulltext, or hybrid search) and injects it before every LLM call. Use this to ground agents in your existing knowledge graph data.
+* **link:https://github.com/neo4j-labs/agent-memory[neo4j-agent-memory^]** — Gives agents persistent memory across conversations. Captures user preferences, entity mentions, and reasoning traces during conversations and stores them in Neo4j for future retrieval.
+
+This module covers `agent-framework-neo4j` for knowledge graph retrieval. The next module covers `neo4j-agent-memory` for persistent agent memory.
 
 In this module, you will:
 

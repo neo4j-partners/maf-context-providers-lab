@@ -1,8 +1,10 @@
-= Neo4j Context Providers Overview
+= Neo4j Knowledge Retrieval Overview
 
 The context provider you built from scratch in Module 2 managed its own state and injected instructions based on simple logic. Production knowledge graph retrieval needs more than that, including index-based search, embeddings, configurable result formatting, and support for different search strategies.
 
-The `agent-framework-neo4j` package provides `Neo4jContextProvider`, a ready-made context provider that connects to a Neo4j database, searches an index, and injects the results before every LLM call. It extends the same `BaseContextProvider` you used earlier but handles the search, embedding, and formatting internally.
+The link:https://github.com/neo4j-labs/neo4j-maf-provider[`agent-framework-neo4j`^] package provides `Neo4jContextProvider`, a ready-made context provider that connects to a Neo4j database, searches an index, and injects the results before every LLM call. It extends the same `BaseContextProvider` you used earlier but handles the search, embedding, and formatting internally.
+
+NOTE: This is one of two Neo4j context provider packages for MAF. This module covers `agent-framework-neo4j` for knowledge graph retrieval. The next module covers link:https://github.com/neo4j-labs/agent-memory[`neo4j-agent-memory`^] for persistent agent memory.
 
 == Install the Package
 
