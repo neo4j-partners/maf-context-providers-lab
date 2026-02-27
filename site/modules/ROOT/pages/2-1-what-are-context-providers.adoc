@@ -19,6 +19,23 @@ A context provider extends `BaseContextProvider` and implements two lifecycle me
 * **`before_run()`** -- Called automatically before every LLM invocation. Injects relevant context.
 * **`after_run()`** -- Called automatically after the LLM responds. Extracts and stores information.
 
+The following diagram shows how context providers fit into the agent execution lifecycle:
+
+....
+Agent.run(query)
+    |
+    +-- 1. Context Providers: before_run()
+    |       +-- Inject instructions, messages, and tools into SessionContext
+    |
+    +-- 2. LLM Invocation
+    |       +-- Process instructions + context + user query
+    |       +-- Decide which tools to call (if any)
+    |       +-- Generate response
+    |
+    +-- 3. Context Providers: after_run()
+            +-- Extract data, store messages, update session state
+....
+
 [source,python]
 ----
 from agent_framework import BaseContextProvider, AgentSession, SessionContext

@@ -1,4 +1,4 @@
-= Neo4j Context Providers for Microsoft Agent Framework
+= Building Self-Grounding Agents with Microsoft Agent Framework and Neo4j
 
 == Course Description
 
