@@ -332,9 +332,9 @@ All exercise stubs are **correctly aligned with solutions**:
 
 | # | Action | Priority | Where to Fix |
 |---|---|---|---|
-| 1 | Fix `print(response)` → `print(response.text)` in M3/L2, M3/L3, M3/L4, M3/L5 | **HIGH** | Course source (4 lesson files) |
-| 2 | Update M4/L3 solution to movie-themed queries, session_id, agent name | **MEDIUM** | Companion repo (`solutions/memory_context_provider.py`) |
-| 3 | Update M4/L4 solution to movie-themed queries, session_id, agent name | **MEDIUM** | Companion repo (`solutions/memory_tools_agent.py`) |
+| 1 | Fix `print(response)` → `print(response.text)` in M3/L2, M3/L3, M3/L4, M3/L5 | **HIGH** | Course source (4 lesson files) | **DONE** |
+| 2 | Update M4/L3 solution to movie-themed queries, session_id, agent name | **MEDIUM** | Companion repo (`solutions/memory_context_provider.py`) | **DONE** |
+| 3 | Update M4/L4 solution to movie-themed queries, session_id, agent name | **MEDIUM** | Companion repo (`solutions/memory_tools_agent.py`) | **DONE** |
 | 4 | Update M3/L3 solution query to match course (`"Tell me about movies with Keanu Reeves"`) | **LOW** | Companion repo (`solutions/fulltext_context_provider.py`) |
 | 5 | Align `context_prompt` text between course and solutions (M3/L2, M3/L3, M3/L5) | **LOW** | Pick one, update the other |
 | 6 | Align agent names between course and solutions (M3/L2, M3/L3, M3/L5) | **LOW** | Pick one, update the other |
