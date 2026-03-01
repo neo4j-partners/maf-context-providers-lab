@@ -39,6 +39,8 @@ settings = MemorySettings(
 )
 ----
 
+NOTE: `MemorySettings` also supports automatic environment variable loading with the `NAM_` prefix (e.g., `NAM_NEO4J__URI`). The explicit configuration shown here reuses the same `NEO4J_URI`, `NEO4J_USERNAME`, and `NEO4J_PASSWORD` environment variables used by the Neo4j context provider lessons.
+
 Key parameters:
 
 * **`extractor_type`** -- Set to `"pipeline"` for the multi-stage approach. Can also be `"llm"` for LLM-only extraction.

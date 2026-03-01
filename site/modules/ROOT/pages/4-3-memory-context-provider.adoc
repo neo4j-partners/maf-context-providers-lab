@@ -21,12 +21,20 @@ settings = MemorySettings(
         "password": SecretStr(os.environ["NEO4J_PASSWORD"]),
     },
 )
-
-memory_client = MemoryClient(settings)
-await memory_client.__aenter__()
 ----
 
-The `MemoryClient` is an async context manager that opens a connection to Neo4j and exposes the short-term, long-term, and reasoning memory APIs.
+NOTE: `MemorySettings` also supports automatic environment variable loading with the `NAM_` prefix (e.g., `NAM_NEO4J__URI`). The explicit configuration shown here reuses the same `NEO4J_URI`, `NEO4J_USERNAME`, and `NEO4J_PASSWORD` environment variables used by the Neo4j context provider lessons.
+
+Use `MemoryClient` as an async context manager to open the connection:
+
+[source,python]
+----
+async with MemoryClient(settings) as memory_client:
+    # memory_client is now connected to Neo4j
+    ...
+----
+
+The `async with` block automatically connects on entry and closes the connection on exit. The `MemoryClient` exposes the short-term, long-term, and reasoning memory APIs.
 
 == Create the Unified Memory
 
@@ -66,10 +74,7 @@ Pass `memory.context_provider` to the agent the same way you passed `Neo4jContex
 ----
 from agent_framework.openai import OpenAIResponsesClient
 
-client = OpenAIResponsesClient(
-    api_key=os.environ["OPENAI_API_KEY"],
-    model=os.environ["OPENAI_RESPONSES_MODEL_ID"],
-)
+client = OpenAIResponsesClient()
 
 agent = client.as_agent(
     name="movie-memory-agent",
@@ -100,20 +105,39 @@ None of this requires the agent to call a tool. The framework runs the provider 
 import asyncio
 
 async def main():
-    session = agent.create_session()
+    async with MemoryClient(settings) as memory_client:
+        memory = Neo4jMicrosoftMemory.from_memory_client(
+            memory_client=memory_client,
+            session_id="movie-chat-session",
+            include_short_term=True,
+            include_long_term=True,
+            include_reasoning=True,
+            extract_entities=True,
+        )
 
-    queries = [
-        "I really enjoy sci-fi movies, especially ones about time travel.",
-        "What did I say my favorite genre was?",
-        "Can you recommend something I might like?",
-    ]
+        agent = client.as_agent(
+            name="movie-memory-agent",
+            instructions=(
+                "You are a movie recommendation assistant with persistent "
+                "memory. You remember what users have told you about their "
+                "preferences, which movies you have discussed, and what "
+                "you recommended in past sessions."
+            ),
+            context_providers=[memory.context_provider],
+        )
 
-    for query in queries:
-        print(f"\nUser: {query}")
-        response = await agent.run(query, session=session)
-        print(f"Assistant: {response}")
+        session = agent.create_session()
 
-    await memory_client.__aexit__(None, None, None)
+        queries = [
+            "I really enjoy sci-fi movies, especially ones about time travel.",
+            "What did I say my favorite genre was?",
+            "Can you recommend something I might like?",
+        ]
+
+        for query in queries:
+            print(f"\nUser: {query}")
+            response = await agent.run(query, session=session)
+            print(f"Assistant: {response.text}")
 
 asyncio.run(main())
 ----

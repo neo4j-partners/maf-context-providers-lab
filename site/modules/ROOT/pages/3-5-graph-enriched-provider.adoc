@@ -54,8 +54,10 @@ When you provide a `retrieval_query`, the provider internally uses a Cypher-enha
 
 [source,python]
 ----
-import os
-from agent_framework_neo4j import Neo4jContextProvider, OpenAIEmbedder
+from agent_framework_neo4j import Neo4jContextProvider, Neo4jSettings
+from neo4j_graphrag.embeddings.openai import OpenAIEmbeddings
+
+neo4j_settings = Neo4jSettings()
 
 RETRIEVAL_QUERY = """
 MATCH (node)-[:IN_GENRE]->(g:Genre)
@@ -76,16 +78,13 @@ RETURN
 ORDER BY score DESC
 """
 
-embedder = OpenAIEmbedder(
-    api_key=os.environ["OPENAI_API_KEY"],
-    model="text-embedding-ada-002",
-)
+embedder = OpenAIEmbeddings(model="text-embedding-ada-002")
 
 provider = Neo4jContextProvider(
-    uri=os.environ["NEO4J_URI"],
-    username=os.environ["NEO4J_USERNAME"],
-    password=os.environ["NEO4J_PASSWORD"],
-    index_name="moviePlots",
+    uri=neo4j_settings.uri,
+    username=neo4j_settings.username,
+    password=neo4j_settings.get_password(),
+    index_name=neo4j_settings.vector_index_name,
     index_type="vector",
     retrieval_query=RETRIEVAL_QUERY,
     embedder=embedder,

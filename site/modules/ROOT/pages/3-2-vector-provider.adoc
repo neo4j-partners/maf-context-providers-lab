@@ -22,34 +22,34 @@ The agent receives relevant movie data automatically on every turn, regardless o
 
 == Create an Embedder
 
-Vector search needs an embedder to convert text into vector representations. The `agent-framework-neo4j` package includes an `OpenAIEmbedder`:
+Vector search needs an embedder to convert text into vector representations. The `neo4j_graphrag` package provides `OpenAIEmbeddings`:
 
 [source,python]
 ----
-import os
-from agent_framework_neo4j import OpenAIEmbedder
+from neo4j_graphrag.embeddings.openai import OpenAIEmbeddings
 
-embedder = OpenAIEmbedder(
-    api_key=os.environ["OPENAI_API_KEY"],
-    model="text-embedding-ada-002",
-)
+embedder = OpenAIEmbeddings(model="text-embedding-ada-002")
 ----
 
 The embedder converts the user's query into a 1536-dimensional vector that can be compared against the `plotEmbedding` vectors stored on Movie nodes in your sandbox.
 
 == Create the Context Provider
 
-Configure the provider with your Neo4j connection details and the `moviePlots` vector index:
+Configure the provider with your Neo4j connection details and the vector index.
+
+`Neo4jSettings` reads connection details and index names from environment variables (`NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD`, `NEO4J_VECTOR_INDEX_NAME`):
 
 [source,python]
 ----
-from agent_framework_neo4j import Neo4jContextProvider
+from agent_framework_neo4j import Neo4jContextProvider, Neo4jSettings
+
+neo4j_settings = Neo4jSettings()
 
 provider = Neo4jContextProvider(
-    uri=os.environ["NEO4J_URI"],
-    username=os.environ["NEO4J_USERNAME"],
-    password=os.environ["NEO4J_PASSWORD"],
-    index_name="moviePlots",
+    uri=neo4j_settings.uri,
+    username=neo4j_settings.username,
+    password=neo4j_settings.get_password(),
+    index_name=neo4j_settings.vector_index_name,
     index_type="vector",
     embedder=embedder,
     top_k=5,
@@ -63,7 +63,7 @@ provider = Neo4jContextProvider(
 
 Key parameters:
 
-* **`index_name`** -- The name of the Neo4j vector index. The recommendations sandbox has a `moviePlots` index on `Movie.plotEmbedding`.
+* **`index_name`** -- The name of the Neo4j vector index. `Neo4jSettings` reads this from the `NEO4J_VECTOR_INDEX_NAME` environment variable.
 * **`index_type`** -- Set to `"vector"` for semantic search against plot embeddings.
 * **`embedder`** -- Generates query vectors using the same model (text-embedding-ada-002) that created the stored embeddings.
 * **`top_k`** -- Number of results to retrieve. Five gives a good balance between context richness and token usage.

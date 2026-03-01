@@ -82,22 +82,46 @@ The agent now operates on two levels. Background memory arrives automatically vi
 import asyncio
 
 async def main():
-    session = agent.create_session()
+    async with MemoryClient(settings) as memory_client:
+        memory = Neo4jMicrosoftMemory.from_memory_client(
+            memory_client=memory_client,
+            session_id="movie-tools-session",
+            include_short_term=True,
+            include_long_term=True,
+            extract_entities=True,
+        )
 
-    queries = [
-        "I love Christopher Nolan movies and anything about space.",
-        "What are my movie preferences?",
-        "Based on what you know about me, what should I watch next?",
-    ]
+        tools = create_memory_tools(memory)
 
-    for query in queries:
-        print(f"\nUser: {query}")
-        async for update in agent.run(query, stream=True, session=session):
-            if update.text:
-                print(update.text, end="", flush=True)
-        print()
+        agent = client.as_agent(
+            name="movie-assistant",
+            instructions=(
+                "You are a movie recommendation assistant with persistent memory.\n\n"
+                "When a user expresses a preference, save it with the "
+                "remember_preference tool. When making recommendations, "
+                "use recall_preferences to check what the user likes "
+                "before suggesting something.\n\n"
+                "You have access to a knowledge graph of movies and "
+                "your memory of past conversations."
+            ),
+            tools=tools,
+            context_providers=[memory.context_provider],
+        )
 
-    await memory_client.__aexit__(None, None, None)
+        session = agent.create_session()
+
+        queries = [
+            "I love Christopher Nolan movies and anything about space.",
+            "What are my movie preferences?",
+            "Based on what you know about me, what should I watch next?",
+        ]
+
+        for query in queries:
+            print(f"\nUser: {query}")
+            async for update in agent.run(query, stream=True, session=session):
+                if update.text:
+                    print(update.text, end="", flush=True)
+            print()
 
 asyncio.run(main())
 ----
@@ -107,6 +131,40 @@ Here is what happens on each turn:
 1. **Turn 1** -- The user expresses preferences. The agent recognizes this and calls `remember_preference` twice, once for "Christopher Nolan movies" and once for "space themes." Separately, the context provider's `after_run()` saves the message and extracts "Christopher Nolan" as a PERSON entity.
 2. **Turn 2** -- The user asks about their preferences. The agent calls `recall_preferences` to look up saved preferences and reports them. It could also get some of this from the passive context injected by `before_run()`, but the explicit tool call gives it a targeted, complete answer.
 3. **Turn 3** -- Both mechanisms contribute. `before_run()` injects relevant memories as background context. The agent can also call `search_knowledge` to find movies linked to Christopher Nolan in the entity graph, then `recall_preferences` to confirm the user likes space themes, before generating a recommendation.
+
+== Verify Stored Memories
+
+After the conversation, you can inspect what the memory system has stored. Use `search_memory()` to query across all memory types:
+
+[source,python]
+----
+results = await memory.search_memory(
+    query="user preferences and interests",
+    include_messages=True,
+    include_entities=True,
+    include_preferences=True,
+    limit=5,
+)
+
+print("=== Stored Memories ===\n")
+
+if results.get("preferences"):
+    print("Preferences:")
+    for pref in results["preferences"]:
+        print(f"  [{pref['category']}] {pref['preference']}")
+    print()
+
+if results.get("entities"):
+    print("Entities:")
+    for entity in results["entities"][:5]:
+        print(f"  {entity['name']} ({entity['type']})")
+    print()
+
+if results.get("messages"):
+    print(f"Messages stored: {len(results['messages'])}")
+----
+
+This confirms that the combined context provider and tools approach has persisted preferences, extracted entities, and stored conversation messages in Neo4j.
 
 == Experiment
 
