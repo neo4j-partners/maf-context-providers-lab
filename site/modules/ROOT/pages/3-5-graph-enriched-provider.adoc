@@ -124,7 +124,7 @@ async def main():
             "What sci-fi movies involve artificial intelligence?",
             session=session,
         )
-        print(response)
+        print(response.text)
 
 asyncio.run(main())
 ----

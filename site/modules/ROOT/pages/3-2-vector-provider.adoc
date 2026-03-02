@@ -91,7 +91,7 @@ async def main():
             "What are some good movies about time travel?",
             session=session,
         )
-        print(response)
+        print(response.text)
 
 asyncio.run(main())
 ----

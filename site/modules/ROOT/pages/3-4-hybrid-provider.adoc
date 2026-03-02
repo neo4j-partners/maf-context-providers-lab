@@ -78,7 +78,7 @@ async def main():
             "I'm looking for Christopher Nolan sci-fi movies about dreams",
             session=session,
         )
-        print(response)
+        print(response.text)
 
 asyncio.run(main())
 ----

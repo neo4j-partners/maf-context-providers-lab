@@ -20,7 +20,7 @@ Vector search is better when the query is conceptual ("feel-good movies about un
 
 The recommendations sandbox includes movie plot text on `Movie` nodes. To use fulltext search, you need a fulltext index. If one doesn't already exist, create it:
 
-[source,cypher]
+[source,cypher,role=noplay]
 ----
 CREATE FULLTEXT INDEX moviePlotsFulltext IF NOT EXISTS
 FOR (m:Movie)
@@ -102,7 +102,7 @@ async def main():
             "Tell me about movies with Keanu Reeves",
             session=session,
         )
-        print(response)
+        print(response.text)
 
 asyncio.run(main())
 ----
