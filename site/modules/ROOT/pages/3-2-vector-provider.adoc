@@ -29,7 +29,10 @@ Vector search needs an embedder to convert text into vector representations. The
 
 [source,python]
 ----
-include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/vector_context_provider.py[tag=embedder]
+# Create embedder for converting queries to vectors
+# Uses OPENAI_API_KEY from environment automatically
+embedder = OpenAIEmbeddings(model="text-embedding-ada-002")
+
 ----
 
 The embedder converts the user's query into a 1536-dimensional vector that can be compared against the `plotEmbedding` vectors stored on Movie nodes in your sandbox.
@@ -42,12 +45,29 @@ Configure the provider with your Neo4j connection details and the vector index.
 
 [source,python]
 ----
-include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/vector_context_provider.py[tag=settings]
+# Load settings from environment variables
+neo4j_settings = Neo4jSettings()
+
 ----
 
 [source,python]
 ----
-include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/vector_context_provider.py[tag=provider]
+# Create context provider with vector search
+provider = Neo4jContextProvider(
+    uri=neo4j_settings.uri,
+    username=neo4j_settings.username,
+    password=neo4j_settings.get_password(),
+    index_name=neo4j_settings.vector_index_name,
+    index_type="vector",
+    embedder=embedder,
+    top_k=5,
+    context_prompt=(
+        "## Semantic Search Results\n"
+        "Use the following semantically relevant movie plots from the "
+        "knowledge graph to answer questions about movies:"
+    ),
+)
+
 ----
 
 Key parameters:
@@ -64,12 +84,40 @@ The provider connects to Neo4j using an async context manager. Pass it to the ag
 
 [source,python]
 ----
-include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/vector_context_provider.py[tag=agent]
+async def main():
+    async with provider:
+        client = OpenAIResponsesClient()
+
+        agent = client.as_agent(
+            name="vector-agent",
+            instructions=(
+                "You are a helpful assistant that answers questions about "
+                "movies using the provided semantic search context. "
+                "Be concise and accurate. When the context contains "
+                "relevant information, cite it in your response."
+            ),
+            context_providers=[provider],
+        )
+
+        session = agent.create_session()
+        # end::agent[]
+
+        # tag::run[]
+        query = "Find me movies about time travel"
+        print(f"User: {query}\n")
+        print("Answer: ", end="", flush=True)
+        response = await agent.run(query, session=session)
+        print(response.text)
+        print()
+        # end::run[]
+
+asyncio.run(main())
+
 ----
 
 [source,python]
 ----
-include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/vector_context_provider.py[tag=run]
+
 ----
 
 When the agent receives "What are some good movies about time travel?":
@@ -94,7 +142,68 @@ This is the core value of context providers: consistent, automatic knowledge ret
 ====
 [source,python]
 ----
-include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/vector_context_provider.py[tag=**]
+import asyncio
+import os
+
+from dotenv import load_dotenv
+load_dotenv()
+
+from agent_framework.openai import OpenAIResponsesClient
+from agent_framework_neo4j import Neo4jContextProvider, Neo4jSettings
+from neo4j_graphrag.embeddings.openai import OpenAIEmbeddings
+
+# Load settings from environment variables
+neo4j_settings = Neo4jSettings()
+
+# Create embedder for converting queries to vectors
+# Uses OPENAI_API_KEY from environment automatically
+embedder = OpenAIEmbeddings(model="text-embedding-ada-002")
+
+# Create context provider with vector search
+provider = Neo4jContextProvider(
+    uri=neo4j_settings.uri,
+    username=neo4j_settings.username,
+    password=neo4j_settings.get_password(),
+    index_name=neo4j_settings.vector_index_name,
+    index_type="vector",
+    embedder=embedder,
+    top_k=5,
+    context_prompt=(
+        "## Semantic Search Results\n"
+        "Use the following semantically relevant movie plots from the "
+        "knowledge graph to answer questions about movies:"
+    ),
+)
+
+async def main():
+    async with provider:
+        client = OpenAIResponsesClient()
+
+        agent = client.as_agent(
+            name="vector-agent",
+            instructions=(
+                "You are a helpful assistant that answers questions about "
+                "movies using the provided semantic search context. "
+                "Be concise and accurate. When the context contains "
+                "relevant information, cite it in your response."
+            ),
+            context_providers=[provider],
+        )
+
+        session = agent.create_session()
+        # end::agent[]
+
+        # tag::run[]
+        query = "Find me movies about time travel"
+        print(f"User: {query}\n")
+        print("Answer: ", end="", flush=True)
+        response = await agent.run(query, session=session)
+        print(response.text)
+        print()
+        # end::run[]
+
+asyncio.run(main())
+
 ----
 ====
 

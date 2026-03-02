@@ -148,6 +148,77 @@ def apply_leveloffset(content: str, offset: int) -> str:
     return "".join(result)
 
 
+def extract_tagged_content(file_path: Path, tag: str | None) -> str:
+    """Extract tagged content from a source file.
+
+    For tag=None: return the entire file.
+    For tag='**': return the entire file with tag markers stripped.
+    For tag='name': return lines between # tag::name[] and # end::name[].
+    """
+    text = file_path.read_text()
+
+    if tag is None:
+        return text
+
+    lines = text.splitlines(keepends=True)
+
+    if tag == "**":
+        # Return everything except tag marker lines
+        return "".join(
+            line for line in lines
+            if not re.match(r"^#\s*(tag|end)::\w+\[\]\s*$", line)
+        )
+
+    # Extract specific tag
+    result = []
+    capturing = False
+    for line in lines:
+        if re.match(rf"^#\s*tag::{re.escape(tag)}\[\]\s*$", line):
+            capturing = True
+            continue
+        if re.match(rf"^#\s*end::{re.escape(tag)}\[\]\s*$", line):
+            capturing = False
+            continue
+        if capturing:
+            result.append(line)
+
+    return "".join(result)
+
+
+def resolve_repository_includes(content: str, repo_local_path: Path | None) -> str:
+    """Resolve include::{repository-raw}/{branch}/... directives using local repo."""
+    if repo_local_path is None:
+        return content
+
+    pattern = re.compile(
+        r"^include::\{repository-raw\}/\{branch\}/([^\[]+)\[([^\]]*)\]\s*$",
+        re.MULTILINE,
+    )
+
+    def replace_repo_include(match: re.Match) -> str:
+        rel_path = match.group(1)
+        attrs = match.group(2)
+        file_path = repo_local_path / rel_path
+
+        if not file_path.exists():
+            print(f"    WARNING: Missing repo file: {rel_path}")
+            return f"// WARNING: Missing include: {rel_path}\n"
+
+        # Parse tag attribute
+        tag = None
+        tag_match = re.search(r"tag=(\S+)", attrs)
+        if tag_match:
+            tag = tag_match.group(1)
+
+        try:
+            return extract_tagged_content(file_path, tag)
+        except Exception as e:
+            print(f"    WARNING: Error extracting tag={tag} from {rel_path}: {e}")
+            return f"// WARNING: Failed to extract tag={tag} from {rel_path}\n"
+
+    return pattern.sub(replace_repo_include, content)
+
+
 def resolve_includes(content: str, lesson_dir: Path) -> str:
     """Inline include::questions/... directives."""
     pattern = re.compile(
@@ -228,10 +299,16 @@ def remove_includes_section(content: str) -> str:
     return pattern.sub("", content).rstrip() + "\n"
 
 
-def transform_lesson(content: str, lesson_dir: Path, duration: str) -> str:
+def transform_lesson(
+    content: str,
+    lesson_dir: Path,
+    duration: str,
+    repo_local_path: Path | None = None,
+) -> str:
     """Apply all transformations to a lesson file."""
     content = strip_attributes(content)
     content = resolve_includes(content, lesson_dir)
+    content = resolve_repository_includes(content, repo_local_path)
     content = convert_course_links(content)
     content = remove_read_macros(content)
     content = remove_ifeval_blocks(content)
@@ -455,8 +532,16 @@ def main() -> None:
     course_dir = load_env()
     site_dir = Path(__file__).parent / "site"
 
+    repo_local = os.environ.get("REPOSITORY_LOCAL_PATH")
+    repo_local_path = Path(repo_local) if repo_local else None
+    if repo_local_path and not repo_local_path.exists():
+        print(f"Warning: REPOSITORY_LOCAL_PATH does not exist: {repo_local_path}")
+        repo_local_path = None
+
     print(f"Source: {course_dir}")
     print(f"Target: {site_dir}")
+    if repo_local_path:
+        print(f"Repo:   {repo_local_path}")
 
     # Discover course structure
     print("Discovering course structure...")
@@ -494,7 +579,8 @@ def main() -> None:
         for lesson in module.lessons:
             print(f"    Lesson: {lesson.title}")
             lesson_content = transform_lesson(
-                lesson.content, lesson.source_dir, course.duration
+                lesson.content, lesson.source_dir, course.duration,
+                repo_local_path,
             )
             page_name = lesson_page_name(module.order, lesson)
             (pages_dir / page_name).write_text(lesson_content)

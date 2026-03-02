@@ -19,7 +19,24 @@ The extraction behavior is configured through `MemorySettings`:
 
 [source,python]
 ----
-include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/entity_extraction.py[tag=settings]
+settings = MemorySettings(
+    neo4j={
+        "uri": os.environ["NEO4J_URI"],
+        "username": os.environ["NEO4J_USERNAME"],
+        "password": SecretStr(os.environ["NEO4J_PASSWORD"]),
+    },
+    extraction={
+        "extractor_type": "pipeline",
+        "enable_spacy": True,
+        "enable_gliner": True,
+        "enable_llm_fallback": True,
+        "confidence_threshold": 0.5,
+        "entity_types": [
+            "PERSON", "ORGANIZATION", "LOCATION", "EVENT", "OBJECT"
+        ],
+    },
+)
+
 ----
 
 NOTE: `MemorySettings` also supports automatic environment variable loading with the `NAM_` prefix (e.g., `NAM_NEO4J__URI`). The explicit configuration shown here reuses the same `NEO4J_URI`, `NEO4J_USERNAME`, and `NEO4J_PASSWORD` environment variables used by the Neo4j context provider lessons.
@@ -42,7 +59,18 @@ When multiple stages find the same entity, the pipeline needs to decide which re
 
 [source,python]
 ----
-include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/entity_extraction.py[tag=merge_strategy]
+settings_with_merge = MemorySettings(
+    neo4j={
+        "uri": os.environ["NEO4J_URI"],
+        "username": os.environ["NEO4J_USERNAME"],
+        "password": SecretStr(os.environ["NEO4J_PASSWORD"]),
+    },
+    extraction={
+        "extractor_type": "pipeline",
+        "merge_strategy": "confidence",
+    },
+)
+
 ----
 
 == Entity Deduplication
@@ -57,7 +85,20 @@ This deduplication is configured through `resolution` settings:
 
 [source,python]
 ----
-include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/entity_extraction.py[tag=resolution]
+settings_with_resolution = MemorySettings(
+    neo4j={
+        "uri": os.environ["NEO4J_URI"],
+        "username": os.environ["NEO4J_USERNAME"],
+        "password": SecretStr(os.environ["NEO4J_PASSWORD"]),
+    },
+    resolution={
+        "strategy": "composite",
+        "exact_threshold": 1.0,
+        "fuzzy_threshold": 0.85,
+        "semantic_threshold": 0.8,
+    },
+)
+
 ----
 
 == How Entities Map to Neo4j
@@ -99,7 +140,15 @@ You can also extract entities manually:
 
 [source,python]
 ----
-include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/entity_extraction.py[tag=manual_entity]
+async def add_manual_entity():
+    async with MemoryClient(settings) as memory_client:
+        entity = await memory_client.long_term.add_entity(
+            name="Inception",
+            entity_type="OBJECT",
+            description="2010 science fiction film directed by Christopher Nolan",
+        )
+        print(f"Added entity: {entity}")
+
 ----
 
 Manual extraction is useful when you want to pre-populate the memory graph with known entities before conversations begin.

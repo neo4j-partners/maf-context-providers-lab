@@ -11,7 +11,15 @@ Connect to Neo4j and create a memory client:
 
 [source,python]
 ----
-include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/memory_context_provider.py[tag=settings]
+# Configure memory settings with Neo4j connection
+settings = MemorySettings(
+    neo4j={
+        "uri": os.environ["NEO4J_URI"],
+        "username": os.environ["NEO4J_USERNAME"],
+        "password": SecretStr(os.environ["NEO4J_PASSWORD"]),
+    },
+)
+
 ----
 
 NOTE: `MemorySettings` also supports automatic environment variable loading with the `NAM_` prefix (e.g., `NAM_NEO4J__URI`). The explicit configuration shown here reuses the same `NEO4J_URI`, `NEO4J_USERNAME`, and `NEO4J_PASSWORD` environment variables used by the Neo4j context provider lessons.
@@ -33,7 +41,67 @@ The `async with` block automatically connects on entry and closes the connection
 
 [source,python]
 ----
-include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/memory_context_provider.py[tag=memory]
+async def main():
+    async with MemoryClient(settings) as memory_client:
+        # Create unified memory interface
+        session_id = "movie-chat-session"
+
+        memory = Neo4jMicrosoftMemory.from_memory_client(
+            memory_client=memory_client,
+            session_id=session_id,
+            include_short_term=True,
+            include_long_term=True,
+            include_reasoning=True,
+            extract_entities=True,
+        )
+        # end::memory[]
+
+        # tag::agent[]
+        client = OpenAIResponsesClient()
+
+        agent = client.as_agent(
+            name="movie-memory-agent",
+            instructions=(
+                "You are a movie recommendation assistant with persistent "
+                "memory. You remember what users have told you about their "
+                "preferences, which movies you have discussed, and what "
+                "you recommended in past sessions."
+            ),
+            context_providers=[memory.context_provider],
+        )
+
+        session = agent.create_session()
+        # end::agent[]
+
+        # tag::run[]
+        queries = [
+            "I really enjoy sci-fi movies, especially ones about time travel.",
+            "What did I say my favorite genre was?",
+            "Can you recommend something I might like?",
+        ]
+
+        for query in queries:
+            print(f"\nUser: {query}")
+            response = await agent.run(query, session=session)
+            print(f"Assistant: {response.text}")
+        # end::run[]
+
+        # tag::search[]
+        results = await memory.search_memory(
+            query="sci-fi movies",
+            include_messages=True,
+            include_entities=True,
+            include_preferences=True,
+            limit=5,
+        )
+
+        print("Messages:", results.get("messages", []))
+        print("Entities:", results.get("entities", []))
+        print("Preferences:", results.get("preferences", []))
+        # end::search[]
+
+asyncio.run(main())
+
 ----
 
 The parameters control what gets injected and extracted:
@@ -50,7 +118,7 @@ Pass `memory.context_provider` to the agent the same way you passed `Neo4jContex
 
 [source,python]
 ----
-include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/memory_context_provider.py[tag=agent]
+
 ----
 
 == The Memory Lifecycle
@@ -67,7 +135,7 @@ None of this requires the agent to call a tool. The framework runs the provider 
 
 [source,python]
 ----
-include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/memory_context_provider.py[tag=run]
+
 ----
 
 Walk through what happens on each turn:
@@ -82,7 +150,7 @@ After the conversation, verify what the provider stored by searching the memory 
 
 [source,python]
 ----
-include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/memory_context_provider.py[tag=search]
+
 ----
 
 This returns the messages, entities, and preferences that `after_run()` extracted and stored in Neo4j. You should see the conversation messages, entity nodes for "sci-fi" and "time travel," and potentially a preference record.
@@ -92,7 +160,91 @@ This returns the messages, entities, and preferences that `after_run()` extracte
 ====
 [source,python]
 ----
-include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/memory_context_provider.py[tag=**]
+import asyncio
+import os
+
+from dotenv import load_dotenv
+load_dotenv()
+
+from pydantic import SecretStr
+
+from agent_framework.openai import OpenAIResponsesClient
+
+from neo4j_agent_memory import MemoryClient, MemorySettings
+from neo4j_agent_memory.integrations.microsoft_agent import (
+    Neo4jMicrosoftMemory,
+)
+
+# Configure memory settings with Neo4j connection
+settings = MemorySettings(
+    neo4j={
+        "uri": os.environ["NEO4J_URI"],
+        "username": os.environ["NEO4J_USERNAME"],
+        "password": SecretStr(os.environ["NEO4J_PASSWORD"]),
+    },
+)
+
+async def main():
+    async with MemoryClient(settings) as memory_client:
+        # Create unified memory interface
+        session_id = "movie-chat-session"
+
+        memory = Neo4jMicrosoftMemory.from_memory_client(
+            memory_client=memory_client,
+            session_id=session_id,
+            include_short_term=True,
+            include_long_term=True,
+            include_reasoning=True,
+            extract_entities=True,
+        )
+        # end::memory[]
+
+        # tag::agent[]
+        client = OpenAIResponsesClient()
+
+        agent = client.as_agent(
+            name="movie-memory-agent",
+            instructions=(
+                "You are a movie recommendation assistant with persistent "
+                "memory. You remember what users have told you about their "
+                "preferences, which movies you have discussed, and what "
+                "you recommended in past sessions."
+            ),
+            context_providers=[memory.context_provider],
+        )
+
+        session = agent.create_session()
+        # end::agent[]
+
+        # tag::run[]
+        queries = [
+            "I really enjoy sci-fi movies, especially ones about time travel.",
+            "What did I say my favorite genre was?",
+            "Can you recommend something I might like?",
+        ]
+
+        for query in queries:
+            print(f"\nUser: {query}")
+            response = await agent.run(query, session=session)
+            print(f"Assistant: {response.text}")
+        # end::run[]
+
+        # tag::search[]
+        results = await memory.search_memory(
+            query="sci-fi movies",
+            include_messages=True,
+            include_entities=True,
+            include_preferences=True,
+            limit=5,
+        )
+
+        print("Messages:", results.get("messages", []))
+        print("Entities:", results.get("entities", []))
+        print("Preferences:", results.get("preferences", []))
+        # end::search[]
+
+asyncio.run(main())
+
 ----
 ====
 
