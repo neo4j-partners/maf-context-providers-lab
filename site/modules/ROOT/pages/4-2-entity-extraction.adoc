@@ -1,4 +1,5 @@
 = Entity Extraction Pipeline
+:branch: main
 
 Long-term memory stores entities, preferences, and facts extracted from conversations. But how does the extraction happen? The `neo4j-agent-memory` package uses a multi-stage pipeline that combines fast pattern matching with accurate model-based extraction to pull structured entities from unstructured conversation text.
 
@@ -6,8 +7,8 @@ Long-term memory stores entities, preferences, and facts extracted from conversa
 
 Entity extraction runs as a three-stage pipeline. Each stage has different strengths, and the results are merged to maximize coverage and accuracy:
 
-1. **spaCy** -- Fast, rule-based named entity recognition. Identifies common entity types (people, organizations, locations) using linguistic patterns. Runs locally with no API calls.
-2. **GLiNER** -- A lightweight model specialized for entity extraction. More accurate than spaCy for domain-specific entities. Supports POLE+O schema types out of the box.
+1. **link:https://spacy.io/[spaCy^]** -- Fast, rule-based named entity recognition. Identifies common entity types (people, organizations, locations) using linguistic patterns. Runs locally with no API calls.
+2. **link:https://github.com/urchade/GLiNER[GLiNER^]** -- A lightweight model specialized for entity extraction. More accurate than spaCy for domain-specific entities. Supports POLE+O schema types out of the box.
 3. **LLM fallback** -- Uses a language model to extract entities that the first two stages missed. Most accurate but slowest and most expensive.
 
 Each stage runs in sequence. If spaCy catches "Christopher Nolan" as a PERSON, GLiNER confirms it and may add a confidence score, and the LLM stage can skip entities already found.
@@ -18,25 +19,7 @@ The extraction behavior is configured through `MemorySettings`:
 
 [source,python]
 ----
-from neo4j_agent_memory import MemorySettings
-
-settings = MemorySettings(
-    neo4j={
-        "uri": os.environ["NEO4J_URI"],
-        "username": os.environ["NEO4J_USERNAME"],
-        "password": SecretStr(os.environ["NEO4J_PASSWORD"]),
-    },
-    extraction={
-        "extractor_type": "pipeline",
-        "enable_spacy": True,
-        "enable_gliner": True,
-        "enable_llm_fallback": True,
-        "confidence_threshold": 0.5,
-        "entity_types": [
-            "PERSON", "ORGANIZATION", "LOCATION", "EVENT", "OBJECT"
-        ],
-    },
-)
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/entity_extraction.py[tag=settings]
 ----
 
 NOTE: `MemorySettings` also supports automatic environment variable loading with the `NAM_` prefix (e.g., `NAM_NEO4J__URI`). The explicit configuration shown here reuses the same `NEO4J_URI`, `NEO4J_USERNAME`, and `NEO4J_PASSWORD` environment variables used by the Neo4j context provider lessons.
@@ -59,13 +42,7 @@ When multiple stages find the same entity, the pipeline needs to decide which re
 
 [source,python]
 ----
-settings = MemorySettings(
-    # ...
-    extraction={
-        "extractor_type": "pipeline",
-        "merge_strategy": "confidence",
-    },
-)
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/entity_extraction.py[tag=merge_strategy]
 ----
 
 == Entity Deduplication
@@ -80,15 +57,7 @@ This deduplication is configured through `resolution` settings:
 
 [source,python]
 ----
-settings = MemorySettings(
-    # ...
-    resolution={
-        "strategy": "composite",
-        "exact_threshold": 1.0,
-        "fuzzy_threshold": 0.85,
-        "semantic_threshold": 0.8,
-    },
-)
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/entity_extraction.py[tag=resolution]
 ----
 
 == How Entities Map to Neo4j
@@ -130,12 +99,7 @@ You can also extract entities manually:
 
 [source,python]
 ----
-entity = await memory_client.long_term.add_entity(
-    name="Inception",
-    entity_type="OBJECT",
-    description="2010 science fiction film directed by Christopher Nolan",
-    confidence=0.95,
-)
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/entity_extraction.py[tag=manual_entity]
 ----
 
 Manual extraction is useful when you want to pre-populate the memory graph with known entities before conversations begin.

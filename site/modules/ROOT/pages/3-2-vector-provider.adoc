@@ -1,4 +1,5 @@
 = Vector Search with Neo4jContextProvider
+:branch: main
 
 In the previous lesson, you saw the `Neo4jContextProvider` architecture and its three search modes. In this lesson, you will build your first self-grounding agent using vector search. The provider embeds the user's query — converts it into a numerical vector (a list of floats) that captures its semantic meaning — then searches a Neo4j vector index for stored vectors that are most similar, and injects matching results before every LLM call — grounding the agent in real graph data automatically.
 
@@ -28,9 +29,7 @@ Vector search needs an embedder to convert text into vector representations. The
 
 [source,python]
 ----
-from neo4j_graphrag.embeddings.openai import OpenAIEmbeddings
-
-embedder = OpenAIEmbeddings(model="text-embedding-ada-002")
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/vector_context_provider.py[tag=embedder]
 ----
 
 The embedder converts the user's query into a 1536-dimensional vector that can be compared against the `plotEmbedding` vectors stored on Movie nodes in your sandbox.
@@ -43,24 +42,12 @@ Configure the provider with your Neo4j connection details and the vector index.
 
 [source,python]
 ----
-from agent_framework_neo4j import Neo4jContextProvider, Neo4jSettings
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/vector_context_provider.py[tag=settings]
+----
 
-neo4j_settings = Neo4jSettings()
-
-provider = Neo4jContextProvider(
-    uri=neo4j_settings.uri,
-    username=neo4j_settings.username,
-    password=neo4j_settings.get_password(),
-    index_name=neo4j_settings.vector_index_name,
-    index_type="vector",
-    embedder=embedder,
-    top_k=5,
-    context_prompt=(
-        "## Movie Knowledge Graph Context\n"
-        "Use the following movie information from the knowledge graph "
-        "to answer questions:"
-    ),
-)
+[source,python]
+----
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/vector_context_provider.py[tag=provider]
 ----
 
 Key parameters:
@@ -77,25 +64,12 @@ The provider connects to Neo4j using an async context manager. Pass it to the ag
 
 [source,python]
 ----
-async def main():
-    async with provider:
-        agent = client.as_agent(
-            name="movie-knowledge-agent",
-            instructions=(
-                "You are a movie recommendation assistant. Answer questions "
-                "using the movie data provided in your context."
-            ),
-            context_providers=[provider],
-        )
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/vector_context_provider.py[tag=agent]
+----
 
-        session = agent.create_session()
-        response = await agent.run(
-            "What are some good movies about time travel?",
-            session=session,
-        )
-        print(response.text)
-
-asyncio.run(main())
+[source,python]
+----
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/vector_context_provider.py[tag=run]
 ----
 
 When the agent receives "What are some good movies about time travel?":
@@ -114,6 +88,15 @@ Without the context provider, the agent answers time travel questions from its t
 With the provider, the agent's response is grounded in the movies that actually exist in your Neo4j graph. It can reference specific plots, mention less obvious films that match semantically, and give answers consistent with your data.
 
 This is the core value of context providers: consistent, automatic knowledge retrieval on every turn.
+
+[%collapsible]
+.Click to see the complete code
+====
+[source,python]
+----
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/vector_context_provider.py[tag=**]
+----
+====
 
 [.quiz]
 == Check your understanding

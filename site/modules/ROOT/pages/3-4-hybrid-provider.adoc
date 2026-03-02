@@ -1,5 +1,6 @@
 = Hybrid Search with Neo4jContextProvider
 :optional: true
+:branch: main
 
 Vector search understands concepts but can miss exact terms. Fulltext search matches keywords precisely but misses semantic connections. Hybrid search runs both and combines the results, giving you semantic understanding and keyword precision in one query.
 
@@ -27,28 +28,17 @@ Both indexes must exist in Neo4j before the provider can use them.
 
 [source,python]
 ----
-from agent_framework_neo4j import Neo4jContextProvider, Neo4jSettings
-from neo4j_graphrag.embeddings.openai import OpenAIEmbeddings
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/hybrid_provider.py[tag=settings]
+----
 
-neo4j_settings = Neo4jSettings()
+[source,python]
+----
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/hybrid_provider.py[tag=embedder]
+----
 
-embedder = OpenAIEmbeddings(model="text-embedding-ada-002")
-
-provider = Neo4jContextProvider(
-    uri=neo4j_settings.uri,
-    username=neo4j_settings.username,
-    password=neo4j_settings.get_password(),
-    index_name=neo4j_settings.vector_index_name,
-    index_type="hybrid",
-    fulltext_index_name=neo4j_settings.fulltext_index_name,
-    embedder=embedder,
-    top_k=5,
-    context_prompt=(
-        "## Movie Knowledge Graph Context\n"
-        "Use the following movie information from the knowledge graph "
-        "to answer questions:"
-    ),
-)
+[source,python]
+----
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/hybrid_provider.py[tag=provider]
 ----
 
 The key difference from vector-only search is the `fulltext_index_name` parameter, which tells the provider which fulltext index to use alongside the vector index.
@@ -57,30 +47,12 @@ The key difference from vector-only search is the `fulltext_index_name` paramete
 
 [source,python]
 ----
-import asyncio
-from agent_framework.openai import OpenAIResponsesClient
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/hybrid_provider.py[tag=agent]
+----
 
-client = OpenAIResponsesClient()
-
-async def main():
-    async with provider:
-        agent = client.as_agent(
-            name="movie-hybrid-agent",
-            instructions=(
-                "You are a movie recommendation assistant. Answer questions "
-                "using the movie data provided in your context."
-            ),
-            context_providers=[provider],
-        )
-
-        session = agent.create_session()
-        response = await agent.run(
-            "I'm looking for Christopher Nolan sci-fi movies about dreams",
-            session=session,
-        )
-        print(response.text)
-
-asyncio.run(main())
+[source,python]
+----
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/hybrid_provider.py[tag=run]
 ----
 
 This query benefits from both search strategies:
@@ -104,6 +76,15 @@ Use hybrid when your users mix conceptual and keyword-based queries. Use vector-
 Like the other search modes, hybrid search supports the `retrieval_query` parameter for graph enrichment. When provided, the provider uses `HybridCypherRetriever` instead of the basic `HybridRetriever`. The retrieval query works the same way as with vector search: it receives `node` and `score` from the combined search results and can traverse relationships to collect additional context.
 
 Graph enrichment is covered in detail in the Graph-Enriched Retrieval lesson earlier in this module.
+
+[%collapsible]
+.Click to see the complete code
+====
+[source,python]
+----
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/hybrid_provider.py[tag=**]
+----
+====
 
 [.quiz]
 == Check your understanding

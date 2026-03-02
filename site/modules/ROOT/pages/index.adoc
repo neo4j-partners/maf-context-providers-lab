@@ -1,4 +1,5 @@
 = Self-Grounding Agents with MAF and Neo4j
+:repository: neo4j-partners/genai-maf-context-providers
 
 == Self-Grounding Agents with MAF and Neo4j
 

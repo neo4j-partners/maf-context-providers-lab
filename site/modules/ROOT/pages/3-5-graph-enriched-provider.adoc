@@ -1,4 +1,5 @@
 = Graph-Enriched Retrieval
+:branch: main
 
 In the previous lesson, you used vector search to find relevant movies by semantic similarity. The search returned matching plot text, but your graph contains far more than text. Each movie is connected to genres, actors, and directors through typed relationships. Basic search misses all of that structure.
 
@@ -52,50 +53,18 @@ The result includes plot text, similarity score, movie title, release year, genr
 
 When you provide a `retrieval_query`, the provider internally uses a Cypher-enhanced retriever (e.g., `VectorCypherRetriever` for vector mode, `HybridCypherRetriever` for hybrid mode) instead of the basic retriever. This example uses vector search:
 
+Define the retrieval query as a Python string:
+
 [source,python]
 ----
-from agent_framework_neo4j import Neo4jContextProvider, Neo4jSettings
-from neo4j_graphrag.embeddings.openai import OpenAIEmbeddings
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/graph_enriched_provider.py[tag=retrieval_query]
+----
 
-neo4j_settings = Neo4jSettings()
+Pass it to the provider via the `retrieval_query` parameter:
 
-RETRIEVAL_QUERY = """
-MATCH (node)-[:IN_GENRE]->(g:Genre)
-WITH node, score, collect(DISTINCT g.name) AS genres
-OPTIONAL MATCH (p:Person)-[:ACTED_IN]->(node)
-WITH node, score, genres, collect(DISTINCT p.name)[0..5] AS actors
-OPTIONAL MATCH (d:Person)-[:DIRECTED]->(node)
-WITH node, score, genres, actors, collect(DISTINCT d.name) AS directors
-WHERE score IS NOT NULL
-RETURN
-    node.plot AS text,
-    score,
-    node.title AS title,
-    node.released AS released,
-    genres,
-    actors,
-    directors
-ORDER BY score DESC
-"""
-
-embedder = OpenAIEmbeddings(model="text-embedding-ada-002")
-
-provider = Neo4jContextProvider(
-    uri=neo4j_settings.uri,
-    username=neo4j_settings.username,
-    password=neo4j_settings.get_password(),
-    index_name=neo4j_settings.vector_index_name,
-    index_type="vector",
-    retrieval_query=RETRIEVAL_QUERY,
-    embedder=embedder,
-    top_k=5,
-    context_prompt=(
-        "## Graph-Enriched Movie Context\n"
-        "The following information combines semantic search results "
-        "with graph traversal to provide movie details including "
-        "genres, cast, and directors:"
-    ),
-)
+[source,python]
+----
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/graph_enriched_provider.py[tag=provider]
 ----
 
 The only difference from the vector search lesson is the `retrieval_query` parameter. Everything else stays the same.
@@ -104,29 +73,12 @@ The only difference from the vector search lesson is the `retrieval_query` param
 
 [source,python]
 ----
-async def main():
-    async with provider:
-        agent = client.as_agent(
-            name="movie-enriched-agent",
-            instructions=(
-                "You are a movie recommendation assistant. Your context "
-                "includes movie plots enriched with genres, cast, and "
-                "directors from the knowledge graph.\n\n"
-                "When answering, reference specific movies by title "
-                "and mention relevant actors, directors, and genres "
-                "from the context."
-            ),
-            context_providers=[provider],
-        )
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/graph_enriched_provider.py[tag=agent]
+----
 
-        session = agent.create_session()
-        response = await agent.run(
-            "What sci-fi movies involve artificial intelligence?",
-            session=session,
-        )
-        print(response.text)
-
-asyncio.run(main())
+[source,python]
+----
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/graph_enriched_provider.py[tag=run]
 ----
 
 The agent now receives context that includes plot text, movie title, release year, genres, actors, and directors for each match. It can give specific answers: "The Matrix (1999), directed by Lana and Lilly Wachowski, is a sci-fi action film about..." instead of a vague summary based on training data.
@@ -139,6 +91,15 @@ Try different retrieval query patterns:
 * Change the actor limit from 5 to 3 or 10 and see how it affects context size
 * Modify `top_k` to retrieve more or fewer matches
 * Update the `context_prompt` to tell the agent to prioritize higher-rated movies
+
+[%collapsible]
+.Click to see the complete code
+====
+[source,python]
+----
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/graph_enriched_provider.py[tag=**]
+----
+====
 
 [.quiz]
 == Check your understanding

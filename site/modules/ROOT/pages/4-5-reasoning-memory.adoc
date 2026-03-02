@@ -1,4 +1,5 @@
 = Reasoning Memory
+:branch: main
 
 Short-term memory captures what was said. Long-term memory captures what was learned. Reasoning memory captures what the agent did and whether it worked. When the agent encounters a similar task later, it can retrieve past reasoning traces to reuse successful strategies and avoid approaches that failed.
 
@@ -20,26 +21,7 @@ The `record_agent_trace()` function captures a completed agent execution:
 
 [source,python]
 ----
-from neo4j_agent_memory.integrations.microsoft_agent import (
-    record_agent_trace,
-)
-
-trace = await record_agent_trace(
-    memory=memory,
-    messages=conversation_messages,
-    task="Find sci-fi movies about time travel",
-    tool_calls=[
-        {
-            "name": "search_knowledge",
-            "arguments": {"query": "time travel sci-fi"},
-            "result": ["Interstellar", "The Matrix", "Back to the Future"],
-            "status": "success",
-            "duration_ms": 150,
-        }
-    ],
-    outcome="Recommended Interstellar based on user preference for Nolan films",
-    success=True,
-)
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/reasoning_memory.py[tag=record_trace]
 ----
 
 The trace is stored in Neo4j as connected nodes: the trace links to its steps, each step links to its tool calls, and the entire structure connects to the session where it occurred.
@@ -50,28 +32,7 @@ For real-time agent execution, the `StreamingTraceRecorder` context manager reco
 
 [source,python]
 ----
-from neo4j_agent_memory.memory.reasoning import StreamingTraceRecorder
-
-async with StreamingTraceRecorder(
-    memory_client.reasoning,
-    session_id="user-123",
-    task="Recommend a movie for the user",
-) as recorder:
-    step = await recorder.start_step(
-        thought="User likes Christopher Nolan. Check preferences.",
-        action="recall_preferences",
-    )
-
-    await recorder.record_tool_call(
-        "recall_preferences",
-        {"topic": "movies"},
-        result={"preferences": ["Christopher Nolan", "sci-fi"]},
-    )
-
-    await recorder.add_observation(
-        "User prefers Christopher Nolan and sci-fi. "
-        "Recommending Interstellar."
-    )
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/reasoning_memory.py[tag=streaming_recorder]
 ----
 
 The recorder automatically timestamps each step and tool call, and completes the trace when the context manager exits.
@@ -82,21 +43,7 @@ When the agent encounters a new task, it can search for reasoning traces from si
 
 [source,python]
 ----
-from neo4j_agent_memory.integrations.microsoft_agent import (
-    get_similar_traces,
-)
-
-traces = await get_similar_traces(
-    memory=memory,
-    task="Find action movies with good ratings",
-    limit=3,
-)
-
-for trace in traces:
-    print(f"Task: {trace.task}")
-    print(f"Outcome: {trace.outcome}")
-    print(f"Success: {trace.success}")
-    print(f"Steps: {len(trace.steps)}")
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/reasoning_memory.py[tag=find_similar]
 ----
 
 The search uses the vector embedding of the task description to find semantically similar past traces. If the agent previously handled "Find sci-fi movies the user would enjoy" successfully, that trace would match.
@@ -107,11 +54,7 @@ Reasoning memory tracks aggregate statistics about tool usage:
 
 [source,python]
 ----
-stats = await memory_client.reasoning.get_tool_stats()
-
-for tool in stats:
-    print(f"{tool.name}: {tool.success_rate:.0%} success, "
-          f"avg {tool.avg_duration_ms}ms")
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/reasoning_memory.py[tag=tool_stats]
 ----
 
 This reveals which tools work reliably, which are slow, and which fail often. The agent can use this information to prefer tools with higher success rates.

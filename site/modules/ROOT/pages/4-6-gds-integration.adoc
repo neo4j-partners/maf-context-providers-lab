@@ -1,4 +1,5 @@
 = Graph Algorithm Integration
+:branch: main
 
 The memory graph stores entities, relationships, conversations, and reasoning traces as connected nodes. Graph algorithms can analyze this structure to answer questions that simple lookups can't: Which entities are most central to the user's interests? What is the shortest connection path between two entities? Which entities are similar based on their graph neighborhood?
 
@@ -18,24 +19,7 @@ GDS is optional. Enable it through `Neo4jMicrosoftMemory`:
 
 [source,python]
 ----
-from neo4j_agent_memory.integrations.microsoft_agent import (
-    Neo4jMicrosoftMemory,
-    GDSConfig,
-)
-
-memory = Neo4jMicrosoftMemory.from_memory_client(
-    memory_client=memory_client,
-    session_id="movie-gds-session",
-    include_short_term=True,
-    include_long_term=True,
-    include_reasoning=True,
-    extract_entities=True,
-    gds_config=GDSConfig(
-        enabled=True,
-        use_pagerank_for_ranking=True,
-        pagerank_weight=0.3,
-    ),
-)
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/gds_integration.py[tag=gds_config]
 ----
 
 GDS configuration options:
@@ -51,11 +35,7 @@ When GDS is enabled, `create_memory_tools()` generates additional tools:
 
 [source,python]
 ----
-from neo4j_agent_memory.integrations.microsoft_agent import (
-    create_memory_tools,
-)
-
-tools = create_memory_tools(memory, include_gds_tools=True)
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/gds_integration.py[tag=gds_tools]
 ----
 
 The additional tools are:
@@ -68,22 +48,12 @@ The additional tools are:
 
 [source,python]
 ----
-agent = client.as_agent(
-    name="movie-gds-agent",
-    instructions=(
-        "You are a movie assistant with access to a knowledge graph. "
-        "You can find connections between entities, discover similar "
-        "items, and identify the most important topics in conversations."
-    ),
-    tools=tools,
-    context_providers=[memory.context_provider],
-)
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/gds_integration.py[tag=agent]
+----
 
-session = agent.create_session()
-response = await agent.run(
-    "How is Christopher Nolan connected to Ridley Scott?",
-    session=session,
-)
+[source,python]
+----
+include::{repository-raw}/{branch}/genai-maf-context-providers/solutions/gds_integration.py[tag=run]
 ----
 
 The agent uses `find_connection_path` to traverse the entity graph, finding connections through shared actors, genres, themes, or conversation mentions. The result shows the path of entities and relationships connecting the two directors.
