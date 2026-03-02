@@ -2,9 +2,9 @@
 
 The context provider you built from scratch in Module 2 managed its own state and injected instructions based on simple logic. Production knowledge graph retrieval needs more than that, including index-based search, embeddings, configurable result formatting, and support for different search strategies.
 
-The link:https://github.com/neo4j-labs/neo4j-maf-provider[`agent-framework-neo4j`^] package provides `Neo4jContextProvider`, a ready-made context provider that connects to a Neo4j database, searches an index, and injects the results before every LLM call. It extends the same `BaseContextProvider` you used earlier but handles the search, embedding, and formatting internally.
+Neo4j provides two context provider packages for MAF. link:https://github.com/neo4j-labs/neo4j-maf-provider[`agent-framework-neo4j`^] for knowledge graph retrieval and link:https://github.com/neo4j-labs/agent-memory[`neo4j-agent-memory`^] for persistent agent memory. This module covers `agent-framework-neo4j`. The next module covers `neo4j-agent-memory`.
 
-NOTE: This is one of two Neo4j context provider packages for MAF. This module covers `agent-framework-neo4j` for knowledge graph retrieval. The next module covers link:https://github.com/neo4j-labs/agent-memory[`neo4j-agent-memory`^] for persistent agent memory.
+The `agent-framework-neo4j` package provides `Neo4jContextProvider`, a ready-made context provider that connects to a Neo4j database, searches an index, and injects the results before every LLM call. It extends the same `BaseContextProvider` you used earlier but handles the search, embedding, and formatting internally.
 
 == Install the Package
 
@@ -52,6 +52,8 @@ The `index_type` parameter determines which search strategy the provider uses:
 |===
 
 Each mode uses a different retriever from the `neo4j-graphrag` library internally. You configure the mode when creating the provider and the provider handles the rest.
+
+Each provider instance supports a single `index_type`. If you need multiple search strategies -- for example, vector search on one index and fulltext search on another -- create separate provider instances and pass them all to the agent's `context_providers` list. The agent merges the context from every provider before calling the LLM.
 
 == Configuration Options
 
