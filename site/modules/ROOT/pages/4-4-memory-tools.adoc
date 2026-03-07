@@ -1,6 +1,8 @@
 = Combining Context Providers with Memory Tools
 :branch: main
 
+TIP: Complete this lesson hands-on by opening `labs/lab-8-memory-tools.ipynb` in your Codespace.
+
 The memory context provider from the previous lesson handles memory passively. It injects relevant memories before each turn and stores new ones after. The agent never decides to look something up or save a preference; the framework does it automatically.
 
 That works well for general context, but sometimes the agent needs to take a deliberate action. A user says "remember that I hate horror movies" and expects the agent to explicitly store that preference. Or the agent needs to search for a specific entity in the knowledge graph before answering. Passive injection alone can't handle these cases because the agent has no way to trigger a targeted memory operation.

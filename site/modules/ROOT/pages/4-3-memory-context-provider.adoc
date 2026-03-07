@@ -1,6 +1,8 @@
 = Memory as a Context Provider
 :branch: main
 
+TIP: Complete this lesson hands-on by opening `labs/lab-7-memory-provider.ipynb` in your Codespace.
+
 The `Neo4jContextProvider` from Module 3 injected knowledge graph data before every agent turn. The memory context provider does the same thing, but for memories the agent has accumulated during conversations. Before each turn, it retrieves relevant past messages, extracted entities, and user preferences. After each turn, it stores new messages and extracts entities using the pipeline from the previous lesson.
 
 The interface is `Neo4jMicrosoftMemory`, which wraps the memory client into a context provider and chat message store.

@@ -1,6 +1,8 @@
 = Building a Simple Context Provider
 :branch: main
 
+TIP: Complete this lesson hands-on by opening `labs/lab-2-context-provider.ipynb` in your Codespace.
+
 This lesson builds a context provider from scratch that extracts user information from conversations and uses it to personalize the agent's behavior. It demonstrates both lifecycle methods: `before_run()` injects dynamic instructions based on what the provider knows, and `after_run()` extracts structured data from what was said.
 
 == Define a Data Model

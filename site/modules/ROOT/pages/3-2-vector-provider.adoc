@@ -1,6 +1,10 @@
 = Vector Search with Neo4jContextProvider
 :branch: main
 
+TIP: Complete this lesson hands-on by opening `labs/lab-3-vector-provider.ipynb` in your Codespace.
+
+TIP: If you haven't already, run `python genai-maf-context-providers/setup.py` to load movie plot embeddings and create the required indexes. Without this step, the vector search will fail with a "No index with name moviePlots found" error. See the xref:1-2-setup.adoc[Setup] lesson for details.
+
 In the previous lesson, you saw the `Neo4jContextProvider` architecture and its three search modes. In this lesson, you will build your first self-grounding agent using vector search. The provider embeds the user's query — converts it into a numerical vector (a list of floats) that captures its semantic meaning — then searches a Neo4j vector index for stored vectors that are most similar, and injects matching results before every LLM call — grounding the agent in real graph data automatically.
 
 IMPORTANT: The data in your Neo4j database must be embedded using the same model and dimensions as the embedder used for search. If your stored vectors were created with `text-embedding-ada-002` (1536 dimensions), the query embedder must also use `text-embedding-ada-002`. Mismatched models or dimensions will return poor or no results. The `neo4j-graphrag` library supports embedders for OpenAI, Azure OpenAI, Cohere, Mistral AI, Google Vertex AI, Ollama, and Sentence Transformers — so you can match whichever model was used to create your stored embeddings.

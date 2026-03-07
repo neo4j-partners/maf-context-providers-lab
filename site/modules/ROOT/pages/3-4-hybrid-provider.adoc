@@ -2,6 +2,8 @@
 :optional: true
 :branch: main
 
+TIP: Complete this lesson hands-on by opening `labs/lab-6-hybrid-provider.ipynb` in your Codespace.
+
 Vector search understands concepts but can miss exact terms. Fulltext search matches keywords precisely but misses semantic connections. Hybrid search runs both and combines the results, giving you semantic understanding and keyword precision in one query.
 
 == How Hybrid Search Works

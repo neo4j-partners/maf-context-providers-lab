@@ -61,6 +61,29 @@ python genai-maf-context-providers/test_environment.py
 
 You should see confirmation that your OpenAI and Neo4j connections are working.
 
+== Load Embeddings and Create Indexes
+
+[IMPORTANT]
+====
+You **must** run the setup script before starting the labs. This script loads pre-computed movie plot embeddings into your Neo4j Sandbox and creates the vector and fulltext indexes required by Labs 3 onwards. Without this step, vector and fulltext searches will fail with an "index not found" error.
+====
+
+Run the setup script:
+
+[source,bash]
+----
+python genai-maf-context-providers/setup.py
+----
+
+The script will:
+
+* Load 500 movie plot embeddings into your Neo4j database
+* Create the `moviePlots` vector index (1536 dimensions, cosine similarity)
+* Create the `moviePlotsFulltext` fulltext index
+* Wait for the indexes to come online and verify the setup
+
+You should see `Setup complete!` when it finishes.
+
 == Continue
 
 When your environment is verified, move on to the next lesson where you will create your first agent.

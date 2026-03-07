@@ -1,6 +1,8 @@
 = Graph-Enriched Retrieval
 :branch: main
 
+TIP: Complete this lesson hands-on by opening `labs/lab-4-graph-enriched.ipynb` in your Codespace.
+
 In the previous lesson, you used vector search to find relevant movies by semantic similarity. The search returned matching plot text, but your graph contains far more than text. Each movie is connected to genres, actors, and directors through typed relationships. Basic search misses all of that structure.
 
 Graph-enriched retrieval adds a Cypher traversal step after the index search. The provider finds matching movies, then walks the graph to collect genres, cast, and directors for each match. The agent receives both the relevant text and the structured metadata.

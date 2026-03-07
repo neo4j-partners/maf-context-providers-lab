@@ -2,6 +2,8 @@
 :optional: true
 :branch: main
 
+TIP: Complete this lesson hands-on by opening `labs/lab-5-fulltext-provider.ipynb` in your Codespace.
+
 Vector search finds movies by semantic similarity: "stories about machines becoming conscious" matches movies about artificial intelligence even if those exact words never appear in the plot. Fulltext search works differently. It matches on the actual words in the query. If the user asks about "Christopher Nolan," fulltext search finds plots that contain those exact terms.
 
 Fulltext search doesn't require an embedder. It uses Neo4j's built-in fulltext indexing with BM25 ranking, making it simpler to set up and faster to execute.
