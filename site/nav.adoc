@@ -1,7 +1,7 @@
 * xref:index.adoc[Self-Grounding Agents with MAF and Neo4j]
+* xref:1-2-setup.adoc[Setup Your Codespace]
 * xref:1-introduction.adoc[Introduction to Microsoft Agent Framework]
 ** xref:1-1-what-is-maf.adoc[What is the Microsoft Agent Framework?]
-** xref:1-2-setup.adoc[Setup Your Development Environment]
 ** xref:1-3-first-agent.adoc[Creating Your First Agent with Tools]
 * xref:2-context-providers.adoc[Context Providers]
 ** xref:2-1-what-are-context-providers.adoc[What Are Context Providers?]

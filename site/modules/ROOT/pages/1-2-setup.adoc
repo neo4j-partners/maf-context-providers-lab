@@ -1,63 +1,76 @@
 = Setup Your Development Environment
 
-This course uses Python, the Microsoft Agent Framework, and a Neo4j Sandbox with the recommendations dataset (movies, actors, directors, genres, and user ratings).
+In this workshop, you will use GitHub Codespaces as your development environment and a Neo4j Sandbox as your database.
 
-== Prerequisites
+== Launch GitHub Codespaces
 
-* **Python 3.10+** installed
-* An **OpenAI API key** from link:https://platform.openai.com[platform.openai.com^]
+Open the workshop repository in GitHub Codespaces:
 
-== Install Dependencies
+link:https://codespaces.new/neo4j-graphacademy/genai-maf-context-providers[image:https://github.com/codespaces/badge.svg[Open in GitHub Codespaces]^]
 
-Install the required Python packages:
+When the Codespace starts, it will automatically:
 
-[source,bash]
-----
-pip install agent-framework --pre
-pip install openai
-pip install neo4j-graphrag[openai]
-----
+* Install Python 3.12 and all required packages (including `agent-framework`, `openai`, `neo4j-graphrag`, and Jupyter)
+* Open the setup instructions and environment configuration files
 
-The `agent-framework` package includes OpenAI support via `agent_framework.openai`.
+== Create a Neo4j Sandbox
 
-== OpenAI Setup
+You will need a Neo4j instance with the **recommendations** dataset — a movie database with actors, directors, genres, and user ratings. The sandbox includes vector indexes on movie plot embeddings that you will use for semantic search in later labs.
 
-Create an API key at link:https://platform.openai.com[platform.openai.com^] if you don't have one already.
+. Go to link:https://sandbox.neo4j.com[sandbox.neo4j.com^]
+. Sign up for a free account or sign in if you already have one
+. On the next screen, you will see **Select a project**. Scroll down and choose the **Recommendations** dataset:
++
+image::recommendations.png[Select the Recommendations dataset]
++
+. Click **Create** to launch your sandbox
+. Once created, download your credentials and save them somewhere safe — you will need the **Bolt URL**, **username**, and **password** in the next step
 
-== Neo4j Setup
-
-This course uses the Neo4j Sandbox with the **recommendations** dataset, a movie database with actors, directors, genres, and user ratings. The sandbox includes vector indexes on movie plot embeddings that you will use for semantic search in later modules.
-
-Your Neo4j connection details:
-
-NEO4J_URI:: neo4j://your-neo4j-host:7687
-NEO4J_USERNAME:: neo4j
-NEO4J_PASSWORD:: your-password
-NEO4J_DATABASE:: neo4j
+IMPORTANT: Save your sandbox credentials now. You will not be able to retrieve the password later.
 
 == Configure Environment Variables
 
-Create a `.env` file with your credentials:
+In your Codespace, create a `.env` file by copying the example:
+
+[source,bash]
+----
+cp .env.example .env
+----
+
+Open the `.env` file and update it with your credentials:
 
 [source]
 ----
 OPENAI_API_KEY=sk-your-key-here
 OPENAI_RESPONSES_MODEL_ID=gpt-4o
-NEO4J_URI=neo4j://your-sandbox-ip:7687
+NEO4J_URI=neo4j+s://your-sandbox-id.databases.neo4j.io
 NEO4J_USERNAME=neo4j
-NEO4J_PASSWORD=your-password
+NEO4J_PASSWORD=your-sandbox-password
 ----
 
-NOTE: The Microsoft Agent Framework does **not** automatically load `.env` files. Use `python-dotenv` and call `load_dotenv()` at the start of your application, or set environment variables directly in your shell.
+For the **OpenAI API key**, you can either:
+
+* Use your own key from link:https://platform.openai.com[platform.openai.com^]
+* Use the credentials provided to you by the workshop instructor
+
+== Verify Your Setup
+
+Run the test environment script to verify everything is configured correctly:
+
+[source,bash]
+----
+python genai-maf-context-providers/test_environment.py
+----
+
+You should see confirmation that your OpenAI and Neo4j connections are working.
 
 == Continue
 
-When you are ready, you can move on to the next lesson where you will create your first agent.
-
+When your environment is verified, move on to the next lesson where you will create your first agent.
 
 [.summary]
 == Lesson Summary
 
-You have installed the Microsoft Agent Framework, configured your OpenAI API key, and connected to a Neo4j Sandbox with the recommendations movie dataset.
+You launched a GitHub Codespace with all required dependencies pre-installed, created a Neo4j Sandbox with the recommendations movie dataset, and configured your environment variables.
 
-In the next lesson, you will create your first agent with a tool that queries the movie graph.
+In the next lesson, you will create your first agent with a tool that queries movie data.

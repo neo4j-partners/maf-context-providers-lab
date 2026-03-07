@@ -3,6 +3,8 @@
 
 In this lesson, you will create an AI agent using the Microsoft Agent Framework and give it a tool that looks up movie information.
 
+TIP: Complete this lesson hands-on by opening `labs/lab-1-first-agent.ipynb` in your Codespace.
+
 == Create the Client
 
 The `OpenAIResponsesClient` connects to the OpenAI API. It reads `OPENAI_API_KEY` and `OPENAI_RESPONSES_MODEL_ID` from your environment variables automatically:
