@@ -39,6 +39,17 @@ Once the Codespace starts, it will automatically:
 
 NOTE: If you need to manage your Codespace or secrets — for example, to relaunch with new credentials or shut down an existing Codespace — visit link:https://github.com/codespaces[github.com/codespaces^].
 
+== Running the Notebooks
+
+Each lab in this workshop is a Jupyter notebook. To run a notebook:
+
+. Open the notebook file in the Codespace
+. In the top right corner, click **Select Kernel**
+. Choose **Python Environments**
+. Select **Python 3.12.11**
+
+You are now ready to run cells in the notebook.
+
 == Verify Your Setup
 
 Run the test environment script to verify everything is configured correctly:
