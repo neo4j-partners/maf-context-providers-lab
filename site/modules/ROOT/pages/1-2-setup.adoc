@@ -1,17 +1,6 @@
 = Setup Your Development Environment
 
-In this workshop, you will use GitHub Codespaces as your development environment and a Neo4j Sandbox as your database.
-
-== Launch GitHub Codespaces
-
-Open the workshop repository in GitHub Codespaces:
-
-link:https://codespaces.new/neo4j-graphacademy/genai-maf-context-providers[image:https://github.com/codespaces/badge.svg[Open in GitHub Codespaces]^]
-
-When the Codespace starts, it will automatically:
-
-* Install Python 3.12 and all required packages (including `agent-framework`, `openai`, `neo4j-graphrag`, and Jupyter)
-* Open the setup instructions and environment configuration files
+In this workshop, you will create a Neo4j Sandbox, then launch a GitHub Codespace with your credentials pre-configured.
 
 == Create a Neo4j Sandbox
 
@@ -28,30 +17,23 @@ image::recommendations.png[Select the Recommendations dataset]
 
 IMPORTANT: Save your sandbox credentials now. You will not be able to retrieve the password later.
 
-== Configure Environment Variables
+== Launch GitHub Codespaces
 
-In your Codespace, create a `.env` file by copying the example:
+Now that you have your Neo4j credentials, open the workshop repository in GitHub Codespaces:
 
-[source,bash]
-----
-cp .env.example .env
-----
+link:https://codespaces.new/neo4j-partners/genai-maf-context-providers[image:https://github.com/codespaces/badge.svg[Open in GitHub Codespaces]^]
 
-Open the `.env` file and update it with your credentials:
+When you launch the Codespace, you will be prompted to enter your credentials as **secrets**:
 
-[source]
-----
-OPENAI_API_KEY=sk-your-key-here
-OPENAI_RESPONSES_MODEL_ID=gpt-4o
-NEO4J_URI=neo4j+s://your-sandbox-id.databases.neo4j.io
-NEO4J_USERNAME=neo4j
-NEO4J_PASSWORD=your-sandbox-password
-----
+OPENAI_API_KEY:: Your OpenAI API key from link:https://platform.openai.com[platform.openai.com^], or the key provided by your workshop instructor
+NEO4J_URI:: The Bolt URI from your Neo4j Sandbox (e.g. `neo4j+s://xxxxx.databases.neo4j.io`)
+NEO4J_USERNAME:: Your Neo4j username (usually `neo4j`)
+NEO4J_PASSWORD:: The password from your Neo4j Sandbox
 
-For the **OpenAI API key**, you can either:
+Once the Codespace starts, it will automatically:
 
-* Use your own key from link:https://platform.openai.com[platform.openai.com^]
-* Use the credentials provided to you by the workshop instructor
+* Install Python 3.12 and all required packages (including `agent-framework`, `openai`, `neo4j-graphrag`, and Jupyter)
+* Generate your `.env` file from the secrets you provided
 
 == Verify Your Setup
 
@@ -71,6 +53,6 @@ When your environment is verified, move on to the next lesson where you will cre
 [.summary]
 == Lesson Summary
 
-You launched a GitHub Codespace with all required dependencies pre-installed, created a Neo4j Sandbox with the recommendations movie dataset, and configured your environment variables.
+You created a Neo4j Sandbox with the recommendations movie dataset, launched a GitHub Codespace with your credentials, and verified your environment is working.
 
 In the next lesson, you will create your first agent with a tool that queries movie data.

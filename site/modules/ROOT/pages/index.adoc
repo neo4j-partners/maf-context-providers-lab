@@ -23,7 +23,7 @@ Before taking this course, you should have:
 * A basic understanding of Graph Databases and Neo4j
 * Knowledge of Python and basic familiarity with async programming
 
-To complete the practical tasks within this course, you will need an link:https://platform.openai.com[OpenAI API key^].
+To complete the practical tasks within this course, you will need an link:https://platform.openai.com[OpenAI API key^]. If you are attending the **Road to NODES AI** workshop, an OpenAI API key will be provided for you.
 
 We recommend taking the following courses:
 
