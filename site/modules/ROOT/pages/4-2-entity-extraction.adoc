@@ -153,33 +153,6 @@ async def add_manual_entity():
 
 Manual extraction is useful when you want to pre-populate the memory graph with known entities before conversations begin.
 
-[.quiz]
-== Check your understanding
-
-[.question]
-== Understanding Entity Extraction
-
-What are the three stages of the `neo4j-agent-memory` entity extraction pipeline?
-
-* [ ] Tokenization, embedding, and classification
-* [ ] Parsing, indexing, and searching
-* [x] spaCy, GLiNER, and LLM fallback
-* [ ] Vector search, fulltext search, and graph traversal
-
-[TIP,role=hint]
-.Hint
-====
-Think about the three different approaches to named entity recognition: a fast rule-based tool, a specialized model, and a general-purpose language model.
-====
-
-[TIP,role=solution]
-.Solution
-====
-The correct answer is: **spaCy, GLiNER, and LLM fallback.**
-
-The extraction pipeline runs three stages in sequence: spaCy for fast rule-based NER, GLiNER for accurate model-based extraction with POLE+O schema support, and an LLM fallback for entities the first two stages missed. Results from all stages are merged using a configurable strategy (confidence, union, intersection, or cascade).
-====
-
 [.summary]
 == Lesson Summary
 

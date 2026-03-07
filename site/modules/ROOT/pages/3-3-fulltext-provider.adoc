@@ -198,33 +198,6 @@ asyncio.run(main())
 ----
 ====
 
-[.quiz]
-== Check your understanding
-
-[.question]
-== Fulltext Search Configuration
-
-What is required to use `Neo4jContextProvider` with `index_type="fulltext"`?
-
-* [ ] An embedder and a vector index
-* [ ] An OpenAI API key for query embedding
-* [x] A fulltext index in Neo4j -- no embedder needed
-* [ ] Both a fulltext index and a vector index
-
-[TIP,role=hint]
-.Hint
-====
-Think about what fulltext search does differently from vector search. Does it need to convert text into vectors?
-====
-
-[TIP,role=solution]
-.Solution
-====
-The correct answer is: **A fulltext index in Neo4j -- no embedder needed.**
-
-Fulltext search uses BM25 keyword ranking against a Neo4j fulltext index. It does not embed the query, so no embedder is required. This makes it simpler to configure and faster to execute compared to vector search, though it matches on literal keywords rather than semantic meaning.
-====
-
 [.summary]
 == Lesson Summary
 

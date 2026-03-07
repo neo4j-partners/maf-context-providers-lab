@@ -19,6 +19,8 @@ IMPORTANT: Save your sandbox credentials now. You will not be able to retrieve t
 
 == Launch GitHub Codespaces
 
+IMPORTANT: The Codespace takes **3 to 5 minutes** to fully launch and configure. Wait until the `.env` file is created before trying to run the labs. You can click on the `.env` file in the Codespace file explorer to confirm it is populated with your credentials — once you see your values there, you are ready to go.
+
 Now that you have your Neo4j credentials, open the workshop repository in GitHub Codespaces:
 
 link:https://codespaces.new/neo4j-partners/genai-maf-context-providers[image:https://github.com/codespaces/badge.svg[Open in GitHub Codespaces]^]
@@ -34,6 +36,8 @@ Once the Codespace starts, it will automatically:
 
 * Install Python 3.12 and all required packages (including `agent-framework`, `openai`, `neo4j-graphrag`, and Jupyter)
 * Generate your `.env` file from the secrets you provided
+
+NOTE: If you need to manage your Codespace or secrets — for example, to relaunch with new credentials or shut down an existing Codespace — visit link:https://github.com/codespaces[github.com/codespaces^].
 
 == Verify Your Setup
 

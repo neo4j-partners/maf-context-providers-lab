@@ -257,33 +257,6 @@ asyncio.run(main())
 ----
 ====
 
-[.quiz]
-== Check your understanding
-
-[.question]
-== Understanding the Retrieval Query
-
-What is the purpose of the `retrieval_query` parameter in `Neo4jContextProvider`?
-
-* [ ] It replaces the vector search entirely with a Cypher query
-* [ ] It creates a new index in Neo4j for faster searches
-* [x] It traverses graph relationships after index search to include structured context from related nodes
-* [ ] It filters out irrelevant results from the vector search
-
-[TIP,role=hint]
-.Hint
-====
-The retrieval query receives `node` and `score` from the index search. Think about what it does with the matched node.
-====
-
-[TIP,role=solution]
-.Solution
-====
-The correct answer is: **It traverses graph relationships after index search to include structured context from related nodes.**
-
-The `retrieval_query` is a Cypher query that runs after the vector (or fulltext) search. It receives the matched `node` and `score` from the index search, then traverses relationships to collect additional data from connected nodes. In the movie graph, this means following `IN_GENRE`, `ACTED_IN`, and `DIRECTED` relationships to include genre names, actor names, and directors alongside the matched plot text.
-====
-
 [.summary]
 == Lesson Summary
 

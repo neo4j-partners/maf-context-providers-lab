@@ -248,33 +248,6 @@ asyncio.run(main())
 ----
 ====
 
-[.quiz]
-== Check your understanding
-
-[.question]
-== Memory Context Provider
-
-What does `Neo4jMicrosoftMemory.from_memory_client()` create?
-
-* [ ] Only a vector index for semantic search
-* [ ] Only a set of callable memory tools
-* [x] A context provider and a chat message store backed by Neo4j
-* [ ] A new Neo4j database for storing memories
-
-[TIP,role=hint]
-.Hint
-====
-The unified memory interface needs to both inject context before each turn and persist conversation messages after each turn.
-====
-
-[TIP,role=solution]
-.Solution
-====
-The correct answer is: **A context provider and a chat message store backed by Neo4j.**
-
-`Neo4jMicrosoftMemory.from_memory_client()` returns an object that includes a `Neo4jContextProvider` (implementing `before_run()` and `after_run()` for automatic memory injection and extraction) and a `Neo4jChatMessageStore` (persisting conversation messages in Neo4j). Access them via `memory.context_provider` and `memory.chat_store`.
-====
-
 [.summary]
 == Lesson Summary
 

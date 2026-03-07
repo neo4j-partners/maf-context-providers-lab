@@ -95,33 +95,6 @@ The provider connects to Neo4j on entry, verifies connectivity, initializes the 
 
 The following lessons walk through each search mode in detail, starting with vector search, then fulltext, hybrid, and finally graph-enriched retrieval that combines index search with Cypher traversal.
 
-[.quiz]
-== Check your understanding
-
-[.question]
-== Neo4j Context Provider Search Modes
-
-Which search modes does `Neo4jContextProvider` support?
-
-* [ ] Only vector search
-* [ ] Vector and fulltext search
-* [x] Vector, fulltext, and hybrid search
-* [ ] Vector, fulltext, hybrid, and graph search
-
-[TIP,role=hint]
-.Hint
-====
-Think about the three values that `index_type` can take. Graph enrichment is an add-on feature via `retrieval_query`, not a separate search mode.
-====
-
-[TIP,role=solution]
-.Solution
-====
-The correct answer is: **Vector, fulltext, and hybrid search.**
-
-`Neo4jContextProvider` supports three search modes configured via the `index_type` parameter: `"vector"` for semantic similarity using embeddings, `"fulltext"` for keyword matching using BM25 ranking, and `"hybrid"` which combines both approaches. Graph-enriched retrieval is an optional enhancement available on any mode via the `retrieval_query` parameter, not a separate search mode.
-====
-
 [.summary]
 == Lesson Summary
 

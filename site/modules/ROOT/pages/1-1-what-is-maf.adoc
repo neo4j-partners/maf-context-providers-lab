@@ -73,36 +73,9 @@ In this course, you will build self-grounding agents that:
 * Traverse graph relationships for enriched context
 * Store and recall agent memories in Neo4j
 
-[.quiz]
-== Check your understanding
-
-[.question]
-== Microsoft Agent Framework Concepts
-
-What is the key difference between tools and context providers in the Microsoft Agent Framework? (Select one)
-
-* [ ] Tools run before the LLM, context providers run after
-* [x] Tools are called when the agent decides to, context providers run automatically before every invocation
-* [ ] Tools use Python functions, context providers use configuration files
-* [ ] There is no difference, they are interchangeable
-
-[TIP,role=hint]
-.Hint
-====
-Think about who decides when each mechanism runs -- the agent or the framework.
-====
-
-[TIP,role=solution]
-.Solution
-====
-The correct answer is: **Tools are called when the agent decides to, context providers run automatically before every invocation.**
-
-Tools are reactive -- the agent examines the function name and docstring and decides whether to call a tool for a given query. Context providers, on the other hand, are framework-managed and run automatically before every LLM invocation via their `before_run()` method, injecting context without the agent needing to decide.
-====
-
 [.summary]
 == Lesson Summary
 
-The Microsoft Agent Framework succeeds Semantic Kernel and AutoGen, combining both into a single framework. Its key differentiator is context providers: components that run automatically before and after every LLM call to inject and extract context. This enables self-grounding agents that are always informed by relevant data without requiring tool calls.
+The Microsoft Agent Framework succeeds Semantic Kernel and AutoGen, combining both into a single framework. Its key differentiator is context providers: components that run automatically before and after every LLM call to inject and extract context. Tools are reactive — the agent decides when to call them — while context providers are proactive, injecting relevant knowledge on every turn without the agent needing to ask. This enables self-grounding agents that are always informed by relevant data without requiring tool calls.
 
 In the next lesson, you will set up your development environment with OpenAI and Neo4j.

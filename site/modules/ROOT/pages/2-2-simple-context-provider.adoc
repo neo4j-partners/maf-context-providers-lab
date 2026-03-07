@@ -321,33 +321,6 @@ asyncio.run(main())
 ----
 ====
 
-[.quiz]
-== Check your understanding
-
-[.question]
-== Context Provider State
-
-How does a context provider persist extracted data across conversation turns?
-
-* [ ] By storing data in instance variables on the provider class
-* [ ] By writing data to a database after each turn
-* [x] By storing data in the session state dictionary using the provider's source_id as key
-* [ ] By appending data to the agent's instructions string
-
-[TIP,role=hint]
-.Hint
-====
-Remember that a single provider instance is shared across all sessions. Think about where session-specific data should be stored.
-====
-
-[TIP,role=solution]
-.Solution
-====
-The correct answer is: **By storing data in the session state dictionary using the provider's source_id as key.**
-
-Context providers use `state[self.source_id]` to store session-specific data. This state dictionary is tied to the `AgentSession` and persists across turns. Storing data in instance variables would mix state between sessions, since a single provider instance serves all sessions.
-====
-
 [.summary]
 == Lesson Summary
 

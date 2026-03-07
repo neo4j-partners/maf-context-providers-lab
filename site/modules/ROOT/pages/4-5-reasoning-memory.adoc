@@ -132,33 +132,6 @@ When `include_reasoning=True` is set on `Neo4jMicrosoftMemory`, the context prov
 
 The `find_similar_tasks` tool (from `create_memory_tools()`) gives the agent explicit access to reasoning traces when it wants to look up past approaches deliberately.
 
-[.quiz]
-== Check your understanding
-
-[.question]
-== Understanding Reasoning Traces
-
-What does reasoning memory store?
-
-* [ ] Only the final answers the agent gave to users
-* [ ] The agent's system prompt and instructions
-* [x] Traces of agent tasks, steps, tool calls, and outcomes
-* [ ] Vector embeddings of all conversation messages
-
-[TIP,role=hint]
-.Hint
-====
-Think about what an agent does when handling a task: the reasoning steps, the tools it called, and whether the task succeeded or failed.
-====
-
-[TIP,role=solution]
-.Solution
-====
-The correct answer is: **Traces of agent tasks, steps, tool calls, and outcomes.**
-
-Reasoning memory captures the full execution path of agent tasks: the task description, individual reasoning steps (thought, action, observation), tool calls (with arguments, results, status, and duration), the final outcome, and whether the task succeeded. These traces are stored with vector embeddings so the agent can find and learn from similar past tasks.
-====
-
 [.summary]
 == Lesson Summary
 

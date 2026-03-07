@@ -107,33 +107,6 @@ agent = client.as_agent(
 
 You can register multiple providers. Each runs in order before and after every invocation.
 
-[.quiz]
-== Check your understanding
-
-[.question]
-== Context Provider Lifecycle
-
-When does a context provider's `before_run()` method execute?
-
-* [ ] Only when the agent explicitly requests context
-* [ ] Once when the agent is created
-* [x] Automatically before every LLM invocation
-* [ ] Only on the first message in a session
-
-[TIP,role=hint]
-.Hint
-====
-Context providers are designed to run without the agent needing to decide -- consider when in the request lifecycle they are called.
-====
-
-[TIP,role=solution]
-.Solution
-====
-The correct answer is: **Automatically before every LLM invocation.**
-
-The `before_run()` method is called by the framework before every LLM invocation, without the agent needing to decide. This is what makes context providers different from tools -- they provide context consistently on every turn.
-====
-
 [.summary]
 == Lesson Summary
 

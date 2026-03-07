@@ -191,33 +191,6 @@ asyncio.run(main())
 ----
 ====
 
-[.quiz]
-== Check your understanding
-
-[.question]
-== Hybrid Search Requirements
-
-What does hybrid search in `Neo4jContextProvider` require compared to vector-only search?
-
-* [ ] Only a fulltext index -- no vector index needed
-* [ ] A different embedder model specifically for hybrid mode
-* [x] Both a vector index and a fulltext index, plus an embedder
-* [ ] No additional configuration -- hybrid is the default mode
-
-[TIP,role=hint]
-.Hint
-====
-Hybrid search combines two search strategies. Think about what each strategy needs to operate.
-====
-
-[TIP,role=solution]
-.Solution
-====
-The correct answer is: **Both a vector index and a fulltext index, plus an embedder.**
-
-Hybrid search runs both vector search (which requires a vector index and an embedder) and fulltext search (which requires a fulltext index) simultaneously, then combines the results. The `index_name` parameter points to the vector index, `fulltext_index_name` points to the fulltext index, and the `embedder` generates query vectors for the vector search component.
-====
-
 [.summary]
 == Lesson Summary
 

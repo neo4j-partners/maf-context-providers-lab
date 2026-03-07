@@ -278,33 +278,6 @@ asyncio.run(main())
 ----
 ====
 
-[.quiz]
-== Check your understanding
-
-[.question]
-== Memory Tools
-
-What is the difference between the memory context provider and memory tools?
-
-* [ ] The context provider stores memories while tools retrieve them
-* [ ] Tools run automatically and context providers run on demand
-* [x] The context provider injects context automatically while tools let the agent explicitly search, save, and recall
-* [ ] There is no difference -- they provide the same functionality
-
-[TIP,role=hint]
-.Hint
-====
-Consider who decides when to act. Does the framework trigger it, or does the agent choose to call it?
-====
-
-[TIP,role=solution]
-.Solution
-====
-The correct answer is: **The context provider injects context automatically while tools let the agent explicitly search, save, and recall.**
-
-The memory context provider runs on every turn via `before_run()` and `after_run()`, injecting and extracting memories without the agent's involvement (passive memory). Memory tools are callable functions the agent invokes when it decides a targeted memory operation is needed (active memory). Using both together gives the agent background context on every turn plus the ability to perform specific memory actions on demand.
-====
-
 [.summary]
 == Lesson Summary
 

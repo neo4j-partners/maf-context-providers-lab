@@ -56,33 +56,6 @@ The package provides four components for MAF integration:
 
 The next lesson covers how entities are extracted from conversations. Subsequent lessons use these components for passive memory (context provider), active memory (tools), reasoning traces, and graph algorithm integration.
 
-[.quiz]
-== Check your understanding
-
-[.question]
-== Types of Agent Memory
-
-What are the three types of agent memory provided by `neo4j-agent-memory`?
-
-* [ ] Input memory, output memory, and cache memory
-* [x] Short-term memory, long-term memory, and reasoning memory
-* [ ] Session memory, graph memory, and vector memory
-* [ ] Conversation memory, entity memory, and tool memory
-
-[TIP,role=hint]
-.Hint
-====
-Think about the different kinds of information an agent accumulates: recent conversations, extracted facts, and traces of past behavior.
-====
-
-[TIP,role=solution]
-.Solution
-====
-The correct answer is: **Short-term memory, long-term memory, and reasoning memory.**
-
-Short-term memory stores conversation messages with vector embeddings for semantic search. Long-term memory stores entities, preferences, and facts extracted from conversations using the POLE+O data model. Reasoning memory captures traces of agent behavior, including steps taken and tool calls made, so the agent can learn from past tasks.
-====
-
 [.summary]
 == Lesson Summary
 

@@ -207,33 +207,6 @@ asyncio.run(main())
 ----
 ====
 
-[.quiz]
-== Check your understanding
-
-[.question]
-== Neo4jContextProvider Behavior
-
-What does `Neo4jContextProvider` do in its `before_run()` method?
-
-* [ ] It waits for the agent to request knowledge graph data
-* [ ] It modifies the Neo4j database with new data
-* [x] It searches the Neo4j index and injects matching results as context messages
-* [ ] It creates a new vector index in Neo4j
-
-[TIP,role=hint]
-.Hint
-====
-Think about the purpose of `before_run()` -- it runs before the LLM is called and should provide relevant information.
-====
-
-[TIP,role=solution]
-.Solution
-====
-The correct answer is: **It searches the Neo4j index and injects matching results as context messages.**
-
-The `Neo4jContextProvider` implements `before_run()` to take the user's recent messages, search the configured Neo4j index (vector, fulltext, or hybrid), and inject the matching results as context messages using `context.extend_messages()`. This happens automatically before every LLM invocation.
-====
-
 [.summary]
 == Lesson Summary
 

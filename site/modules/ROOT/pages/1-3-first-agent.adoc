@@ -252,33 +252,6 @@ asyncio.run(main())
 ----
 ====
 
-[.quiz]
-== Check your understanding
-
-[.question]
-== How Agents Use Tools
-
-How does a Microsoft Agent Framework agent know when to call a tool?
-
-* [ ] Tools are called on every request automatically
-* [ ] Tools are triggered by keyword matching in the user's message
-* [x] The agent uses the function name and docstring to decide if the tool is relevant
-* [ ] Tools must be explicitly called by the developer in code
-
-[TIP,role=hint]
-.Hint
-====
-Consider what information the agent has about a tool -- it can see the function's name and its docstring.
-====
-
-[TIP,role=solution]
-.Solution
-====
-The correct answer is: **The agent uses the function name and docstring to decide if the tool is relevant.**
-
-In the Microsoft Agent Framework, tools are plain Python functions. The agent examines the function name and docstring to determine whether calling the tool would help answer the user's query. This is different from context providers, which run automatically before every invocation.
-====
-
 [.summary]
 == Lesson Summary
 

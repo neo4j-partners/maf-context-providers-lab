@@ -115,33 +115,6 @@ If Neo4j GDS is not installed (for example, on a free-tier sandbox), the integra
 
 Set `fallback_to_basic=True` (the default) to enable this behavior. Set `warn_on_fallback=True` to log warnings when fallback is used.
 
-[.quiz]
-== Check your understanding
-
-[.question]
-== GDS Integration
-
-What additional capability does the GDS integration add to agent memory tools?
-
-* [ ] Faster vector search using graph algorithms
-* [ ] Automatic entity extraction from conversations
-* [x] Finding connection paths, similar entities, and important entities using graph algorithms
-* [ ] Real-time streaming of agent responses
-
-[TIP,role=hint]
-.Hint
-====
-Think about what graph algorithms like PageRank, shortest path, and node similarity can reveal about the entity graph.
-====
-
-[TIP,role=solution]
-.Solution
-====
-The correct answer is: **Finding connection paths, similar entities, and important entities using graph algorithms.**
-
-The GDS integration adds three tools: `find_connection_path` (shortest path between entities), `find_similar_items` (entities with similar graph neighborhoods via node similarity), and `find_important_entities` (most central entities via PageRank). These use Neo4j Graph Data Science algorithms to analyze the memory graph structure, with Cypher-based fallbacks when GDS is not installed.
-====
-
 [.summary]
 == Lesson Summary
 
