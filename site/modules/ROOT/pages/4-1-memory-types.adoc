@@ -42,14 +42,9 @@ Because everything is in the same graph, memories connect to each other. An enti
 
 == The neo4j-agent-memory Package
 
-Install the package with the Microsoft Agent Framework integration:
+The MAF context provider you will use in this module is built on the `neo4j-agent-memory` library. The library handles all the underlying memory operations — storing conversations, extracting entities, managing reasoning traces — while the Microsoft Agent Framework integration layer wraps those capabilities into the `BaseContextProvider` lifecycle you learned about in Module 2.
 
-[source,bash]
-----
-pip install neo4j-agent-memory[microsoft-agent]
-----
-
-The package provides four components for MAF integration:
+The integration provides four components:
 
 * `MemoryClient` -- connects to Neo4j and exposes all three memory types
 * `Neo4jMicrosoftMemory` -- wraps the client into a unified interface for MAF agents
