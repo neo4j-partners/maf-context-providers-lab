@@ -104,7 +104,12 @@ asyncio.run(main())
 
 [source,python]
 ----
-
+query = "How is Christopher Nolan connected to Ridley Scott?"
+print(f"User: {query}\n")
+print("Answer: ", end="", flush=True)
+response = await agent.run(query, session=session)
+print(response.text)
+print()
 ----
 
 The agent uses `find_connection_path` to traverse the entity graph, finding connections through shared actors, genres, themes, or conversation mentions. The result shows the path of entities and relationships connecting the two directors.

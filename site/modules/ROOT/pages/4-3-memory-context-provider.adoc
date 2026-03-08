@@ -120,7 +120,20 @@ Pass `memory.context_provider` to the agent the same way you passed `Neo4jContex
 
 [source,python]
 ----
+client = OpenAIResponsesClient()
 
+agent = client.as_agent(
+    name="movie-memory-agent",
+    instructions=(
+        "You are a movie recommendation assistant with persistent "
+        "memory. You remember what users have told you about their "
+        "preferences, which movies you have discussed, and what "
+        "you recommended in past sessions."
+    ),
+    context_providers=[memory.context_provider],
+)
+
+session = agent.create_session()
 ----
 
 == The Memory Lifecycle
@@ -137,7 +150,16 @@ None of this requires the agent to call a tool. The framework runs the provider 
 
 [source,python]
 ----
+queries = [
+    "I really enjoy sci-fi movies, especially ones about time travel.",
+    "What did I say my favorite genre was?",
+    "Can you recommend something I might like?",
+]
 
+for query in queries:
+    print(f"\nUser: {query}")
+    response = await agent.run(query, session=session)
+    print(f"Assistant: {response.text}")
 ----
 
 Walk through what happens on each turn:
