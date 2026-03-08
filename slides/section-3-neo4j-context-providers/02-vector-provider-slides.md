@@ -41,7 +41,7 @@ Vectors are numerical representations of text encoded as high-dimensional arrays
 - "time travel adventure" and "journey through time" → vectors close together
 - "time travel adventure" and "cooking recipes" → vectors far apart
 
-This enables **semantic search** -- finding content by meaning, not keywords.
+This enables **semantic search**: finding content by meaning, not keywords.
 
 ---
 
@@ -59,7 +59,7 @@ This enables **semantic search** -- finding content by meaning, not keywords.
 5. Results injected as context before LLM call
 ```
 
-"Time travel" finds movies about temporal paradoxes, wormholes, and alternate timelines -- even without those exact words.
+"Time travel" finds movies about temporal paradoxes, wormholes, and alternate timelines, even without those exact words.
 
 ---
 
@@ -94,12 +94,12 @@ The embedder converts query text into a vector that can be compared against `plo
 
 `Neo4jContextProvider` is configured with:
 
-- **Connection details** — URI, username, and password for your Neo4j instance (read from environment variables via `Neo4jSettings`)
-- **`index_name`** — The Neo4j vector index to search (e.g., `"moviePlots"`)
-- **`index_type`** — Set to `"vector"` for semantic search via cosine similarity
-- **`embedder`** — The same embedding model used to create the stored vectors
-- **`top_k`** — Number of results to retrieve (5 balances context richness with token usage)
-- **`context_prompt`** — Text prepended to results that guides the LLM on how to use the injected data
+- **Connection details**: URI, username, and password for your Neo4j instance (read from environment variables via `Neo4jSettings`)
+- **`index_name`**: The Neo4j vector index to search (e.g., `"moviePlots"`)
+- **`index_type`**: Set to `"vector"` for semantic search via cosine similarity
+- **`embedder`**: The same embedding model used to create the stored vectors
+- **`top_k`**: Number of results to retrieve (5 balances context richness with token usage)
+- **`context_prompt`**: Text prepended to results that guides the LLM on how to use the injected data
 
 ---
 
@@ -107,9 +107,9 @@ The embedder converts query text into a vector that can be compared against `plo
 
 To use the provider, connect it to an agent:
 
-- **`async with provider`** — Opens the Neo4j connection and initializes the retriever
-- **`context_providers=[provider]`** — Registers the provider so `before_run()` runs on every turn
-- **`agent.run(query, session=session)`** — The provider automatically embeds the query, searches the index, and injects results before the LLM responds
+- **`async with provider`**: Opens the Neo4j connection and initializes the retriever
+- **`context_providers=[provider]`**: Registers the provider so `before_run()` runs on every turn
+- **`agent.run(query, session=session)`**: The provider automatically embeds the query, searches the index, and injects results before the LLM responds
 
 The agent receives relevant movie data on every turn without any explicit tool calls.
 
@@ -145,20 +145,6 @@ The agent's response is grounded in movies that actually exist in your Neo4j gra
 
 ---
 
-## Understanding Similarity Scores
-
-| Score Range | Interpretation |
-|-------------|----------------|
-| 0.95 - 1.0 | Extremely similar (near-exact match) |
-| 0.90 - 0.95 | Highly relevant |
-| 0.85 - 0.90 | Relevant |
-| 0.80 - 0.85 | Moderately relevant |
-| < 0.80 | Weak relevance |
-
-Higher scores indicate stronger semantic matches between query and stored content.
-
----
-
 ## Limitations of Vector-Only Search
 
 Vector search returns matching **text** and a similarity **score**.
@@ -180,7 +166,7 @@ In this lesson, you learned:
 - **Vector search** embeds the query and finds semantically similar content via cosine similarity
 - **Embedder models must match** between stored vectors and query vectors
 - **`Neo4jContextProvider`** with `index_type="vector"` handles embedding, search, and injection
-- **Automatic context** -- no tool calls, grounded in real graph data
-- **Limitation** -- returns text only, no structured metadata from relationships
+- **Automatic context**: no tool calls, grounded in real graph data
+- **Limitation**: returns text only, no structured metadata from relationships
 
 **Next:** Graph-enriched retrieval to add structured metadata.

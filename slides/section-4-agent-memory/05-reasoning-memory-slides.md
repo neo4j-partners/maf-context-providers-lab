@@ -64,10 +64,10 @@ Each trace gets a **vector embedding** of the task description, enabling semanti
 
 The `record_agent_trace()` function captures a completed agent execution. You provide:
 
-- **Task** — what the agent was trying to accomplish
-- **Tool calls** — each tool invocation with its name, arguments, result, status, and duration
-- **Outcome** — a description of what the agent concluded
-- **Success** — whether the task completed successfully
+- **Task**: what the agent was trying to accomplish
+- **Tool calls**: each tool invocation with its name, arguments, result, status, and duration
+- **Outcome**: a description of what the agent concluded
+- **Success**: whether the task completed successfully
 
 The function stores the full trace in Neo4j as connected nodes (trace → steps → tool calls), with a vector embedding of the task description for later semantic search.
 
@@ -89,7 +89,7 @@ The trace is stored as a hierarchy of connected nodes:
 
 For real-time agent execution, the `StreamingTraceRecorder` records traces **as they happen** rather than after completion:
 
-- Use it as an async context manager — it opens a trace on entry and finalizes it on exit
+- Use it as an async context manager that opens a trace on entry and finalizes it on exit
 - Call `start_step()` to begin a reasoning step with a thought and planned action
 - Call `record_tool_call()` each time the agent invokes a tool
 - Call `add_observation()` to record what the agent learned from the result
@@ -106,7 +106,7 @@ When the agent encounters a new task, it can search for traces from similar past
 - Returns matching traces with their task, outcome, success status, and steps
 - The agent can review what worked (or failed) before deciding on an approach
 
-This is how agents **learn from experience** — not by retraining, but by retrieving relevant past executions at inference time.
+This is how agents **learn from experience**: not by retraining, but by retrieving relevant past executions at inference time.
 
 ---
 
@@ -139,7 +139,7 @@ The agent can use this information to prefer tools with higher success rates or 
 
 **Session 1:** The agent handles *"Find sci-fi movies about time travel."* It uses `search_knowledge`, finds 3 movies, and recommends Interstellar. The trace is stored with a vector embedding of the task.
 
-**Session 2:** A new task arrives: *"Find action movies with good ratings."* Before the agent acts, `before_run()` finds the similar trace from Session 1. The agent sees that `search_knowledge` worked well for a similar movie-finding task, so it uses the same approach — and gets better results by learning from past success.
+**Session 2:** A new task arrives: *"Find action movies with good ratings."* Before the agent acts, `before_run()` finds the similar trace from Session 1. The agent sees that `search_knowledge` worked well for a similar movie-finding task, so it uses the same approach and gets better results by learning from past success.
 
 ---
 

@@ -34,7 +34,7 @@ ol > li {
 
 ## The Problem: Agents Forget
 
-Context providers from Modules 2 and 3 inject knowledge from a **static** knowledge graph -- movie plots, genres, actors.
+Context providers from Modules 2 and 3 inject knowledge from a **static** knowledge graph (movie plots, genres, actors).
 
 But the agent itself has no memory:
 - It doesn't remember what you discussed last session
@@ -63,11 +63,11 @@ Without memory:
 
 Three categories of information accumulate during agent conversations:
 
-1. **What was said** -- the conversation itself. Messages, responses, follow-ups. This history needs to persist across turns and sessions.
+1. **What was said**: the conversation itself. Messages, responses, follow-ups. This history needs to persist across turns and sessions.
 
-2. **What was learned** -- facts and preferences extracted from conversation. "The user prefers sci-fi" is structured knowledge derived from messages.
+2. **What was learned**: facts and preferences extracted from conversation. "The user prefers sci-fi" is structured knowledge derived from messages.
 
-3. **What was tried** -- the reasoning and tool calls the agent used. If an approach worked, the agent should reuse it. If it failed, avoid it.
+3. **What was tried**: the reasoning and tool calls the agent used. If an approach worked, the agent should reuse it. If it failed, avoid it.
 
 ---
 
@@ -162,7 +162,7 @@ Because everything is in the same graph, memories connect to each other:
 - Entities link to **other entities** they relate to
 - Reasoning traces connect to the **steps and tool calls** that compose them
 
-This is more than storage -- it's a **connected knowledge structure** the agent can traverse.
+This is more than storage. It's a **connected knowledge structure** the agent can traverse.
 
 ---
 
@@ -188,18 +188,18 @@ The MAF integration provides four components:
 | **Changes** | Static (updated by data pipeline) | Evolves with every interaction |
 | **Purpose** | Ground answers in domain knowledge | Remember and personalize over time |
 
-Both use context providers -- but with different data and different goals.
+Both use context providers, but with different data and different goals.
 
 ---
 
 ## Summary
 
-- **Agents are stateless by default** -- they forget everything between sessions
+- **Agents are stateless by default**: they forget everything between sessions
 - **`neo4j-agent-memory`** provides graph-native persistent memory
 - **Short-term memory**: conversation history with semantic search
 - **Long-term memory**: entities, facts (SPO triples), and preferences via POLE+O
 - **Reasoning memory**: traces of past tool usage and outcomes
 - **All memory is stored in Neo4j** as a connected graph
-- **Memory is dynamic** -- it grows with every conversation
+- **Memory is dynamic**: it grows with every conversation
 
 **Next:** How the entity extraction pipeline works.

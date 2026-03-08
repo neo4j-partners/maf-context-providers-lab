@@ -38,9 +38,9 @@ Without GDS, the agent can search entities by **name** and **embedding similarit
 
 With GDS, the agent gains **graph algorithm capabilities**:
 
-- **PageRank** -- Which entities are most important?
-- **Shortest Path** -- How are two entities connected?
-- **Node Similarity** -- Which entities are like this one?
+- **PageRank**: Which entities are most important?
+- **Shortest Path**: How are two entities connected?
+- **Node Similarity**: Which entities are like this one?
 
 These answer questions that simple lookups can't.
 
@@ -78,7 +78,7 @@ The agent calls `find_connection_path` to traverse the entity graph.
 
 Finds entities with **similar graph neighborhoods**.
 
-Two directors who share actors, genres, or themes will score as similar -- even if their names never appear together in conversation.
+Two directors who share actors, genres, or themes will score as similar, even if their names never appear together in conversation.
 
 **Use case:** "What else is like this?"
 
@@ -90,11 +90,11 @@ The agent calls `find_similar_items` to discover entities with similar relations
 
 GDS is **optional**. Enable it by passing a `GDSConfig` to `Neo4jMicrosoftMemory`:
 
-- **`enabled`** — master toggle for all GDS features
-- **`use_pagerank_for_ranking`** — when true, entity search results are ranked partly by PageRank (graph importance) in addition to embedding similarity
-- **`pagerank_weight`** — controls how much PageRank influences ranking (0.0–1.0)
+- **`enabled`**: master toggle for all GDS features
+- **`use_pagerank_for_ranking`**: when true, entity search results are ranked partly by PageRank (graph importance) in addition to embedding similarity
+- **`pagerank_weight`**: controls how much PageRank influences ranking (0.0–1.0)
 
-Everything else about the memory setup stays the same — you're just adding graph algorithm capabilities on top of the existing memory system.
+Everything else about the memory setup stays the same.
 
 ---
 
@@ -171,13 +171,13 @@ All layers work together, backed by the same Neo4j database.
 
 You have built agents with:
 
-- **Tools** -- Python functions the agent can call on demand
-- **Context Providers** -- Automatic knowledge graph retrieval before every turn
-- **Vector, fulltext, and hybrid search** -- Different retrieval strategies
-- **Graph-enriched traversal** -- Following relationships for richer context
-- **Persistent memory** -- Short-term, long-term, and reasoning memory backed by Neo4j
-- **Entity extraction** -- Automatic structured knowledge from unstructured conversation
-- **Graph algorithm analysis** -- PageRank, shortest path, and node similarity via GDS
+- **Tools**: Python functions the agent can call on demand
+- **Context Providers**: Automatic knowledge graph retrieval before every turn
+- **Vector, fulltext, and hybrid search**: Different retrieval strategies
+- **Graph-enriched traversal**: Following relationships for richer context
+- **Persistent memory**: Short-term, long-term, and reasoning memory backed by Neo4j
+- **Entity extraction**: Automatic structured knowledge from unstructured conversation
+- **Graph algorithm analysis**: PageRank, shortest path, and node similarity via GDS
 
 ---
 

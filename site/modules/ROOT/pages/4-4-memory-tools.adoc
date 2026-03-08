@@ -126,7 +126,24 @@ Pass the context provider and the tools together:
 
 [source,python]
 ----
+client = OpenAIResponsesClient()
 
+agent = client.as_agent(
+    name="movie-assistant",
+    instructions=(
+        "You are a movie recommendation assistant with persistent memory.\n\n"
+        "When a user expresses a preference, save it with the "
+        "remember_preference tool. When making recommendations, "
+        "use recall_preferences to check what the user likes "
+        "before suggesting something.\n\n"
+        "You have access to a knowledge graph of movies and "
+        "your memory of past conversations."
+    ),
+    tools=tools,
+    context_providers=[memory.context_provider],
+)
+
+session = agent.create_session()
 ----
 
 The agent now operates on two levels. Background memory arrives automatically via the context provider. Targeted memory operations happen through explicit tool calls when the agent decides they are needed.
@@ -135,7 +152,18 @@ The agent now operates on two levels. Background memory arrives automatically vi
 
 [source,python]
 ----
+queries = [
+    "I love Christopher Nolan movies and anything about space.",
+    "What are my movie preferences?",
+    "Based on what you know about me, what should I watch next?",
+]
 
+for query in queries:
+    print(f"\nUser: {query}")
+    async for update in agent.run(query, stream=True, session=session):
+        if update.text:
+            print(update.text, end="", flush=True)
+    print()
 ----
 
 Here is what happens on each turn:
@@ -150,7 +178,30 @@ After the conversation, you can inspect what the memory system has stored. Use `
 
 [source,python]
 ----
+results = await memory.search_memory(
+    query="user preferences and interests",
+    include_messages=True,
+    include_entities=True,
+    include_preferences=True,
+    limit=5,
+)
 
+print("=== Stored Memories ===\n")
+
+if results.get("preferences"):
+    print("Preferences:")
+    for pref in results["preferences"]:
+        print(f"  [{pref['category']}] {pref['preference']}")
+    print()
+
+if results.get("entities"):
+    print("Entities:")
+    for entity in results["entities"][:5]:
+        print(f"  {entity['name']} ({entity['type']})")
+    print()
+
+if results.get("messages"):
+    print(f"Messages stored: {len(results['messages'])}")
 ----
 
 This confirms that the combined context provider and tools approach has persisted preferences, extracted entities, and stored conversation messages in Neo4j.

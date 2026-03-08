@@ -36,7 +36,9 @@ ol > li {
 
 Long-term memory stores entities, preferences, and facts extracted from conversations.
 
-But how does the extraction happen?
+But how does the extraction happen, and what does it run on?
+
+The pipeline processes the **text content of individual conversation messages**, both what the user says and what the agent responds. When a message is added to short-term memory, the extraction pipeline analyzes that message text to identify entities like people, organizations, and locations. These extracted entities are then stored in long-term memory as nodes in the Neo4j graph.
 
 The `neo4j-agent-memory` package uses a **multi-stage pipeline** that combines:
 - Fast pattern matching
@@ -97,10 +99,10 @@ Each entity node stores name, type, subtype, description, confidence score, and 
 
 Extraction is configured through `MemorySettings` with an `extraction` section that controls:
 
-- **Which stages to enable** — spaCy, GLiNER, and LLM fallback can each be toggled independently
-- **Confidence threshold** — a minimum score (0.0–1.0) for storing an entity. Lower means more entities but also more noise
-- **Entity types** — limit extraction to specific POLE+O types (e.g., only PERSON and ORGANIZATION)
-- **Extractor type** — `"pipeline"` for multi-stage extraction, or `"llm"` for LLM-only
+- **Which stages to enable**: spaCy, GLiNER, and LLM fallback can each be toggled independently
+- **Confidence threshold**: a minimum score (0.0–1.0) for storing an entity. Lower means more entities but also more noise
+- **Entity types**: limit extraction to specific POLE+O types (e.g., only PERSON and ORGANIZATION)
+- **Extractor type**: `"pipeline"` for multi-stage extraction, or `"llm"` for LLM-only
 
 You'll configure these settings in the lab.
 
@@ -144,15 +146,15 @@ The package deduplicates using **embedding similarity**:
 | Between **flag** (0.85) and auto-merge | Flagged for review |
 | Below **flag** threshold | Treated as distinct entities |
 
-Resolution uses a composite strategy combining exact matching, fuzzy string matching, and semantic similarity — each with configurable thresholds.
+Resolution uses a composite strategy combining exact matching, fuzzy string matching, and semantic similarity, each with configurable thresholds.
 
 ---
 
 ## Automatic vs Manual Extraction
 
-**Automatic:** When `extract_entities=True` is set on `Neo4jMicrosoftMemory`, entity extraction runs in `after_run()` after every agent response. It runs **asynchronously** so it doesn't slow down the response to the user.
+**Automatic:** When `extract_entities=True` is set on `Neo4jMicrosoftMemory`, entity extraction runs in `after_run()` after every agent response. It processes the agent's most recent response message rather than re-analyzing the entire conversation history each time. It runs **asynchronously** so it doesn't slow down the response to the user.
 
-**Manual:** You can also pre-populate the memory graph with known entities using the `MemoryClient` directly. This is useful for seeding the graph with domain knowledge before the agent starts conversing — for example, adding key people, products, or locations that the agent should already know about.
+**Manual:** You can also pre-populate the memory graph with known entities using the `MemoryClient` directly. This is useful for seeding the graph with domain knowledge before the agent starts conversing, for example adding key people, products, or locations that the agent should already know about.
 
 ---
 
@@ -163,8 +165,8 @@ Given a message like *"I love Christopher Nolan's Inception"*:
 1. **spaCy** quickly identifies "Christopher Nolan" as a PERSON
 2. **GLiNER** confirms "Christopher Nolan" (PERSON, confidence 0.95) and also finds "Inception" (OBJECT, confidence 0.92)
 3. **LLM** skips entities already found, saving time and cost
-4. **Merge** uses the confidence strategy — keeps the highest-confidence result for each entity
-5. **Store** — both entities are saved as `:Entity` nodes in Neo4j, linked back to the source conversation
+4. **Merge** uses the confidence strategy, keeping the highest-confidence result for each entity
+5. **Store**: both entities are saved as `:Entity` nodes in Neo4j, linked back to the source conversation
 
 ---
 

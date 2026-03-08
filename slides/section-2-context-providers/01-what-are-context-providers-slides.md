@@ -37,8 +37,8 @@ ol > li {
 LLMs generate responses based on statistical likelihood, not factual verification.
 
 - Produces the most *probable* continuation, not the most *accurate*
-- Doesn't say "I don't know" — generates plausible-sounding text instead
-- Complete with fabricated details and citations
+- Never says "I don't know," generates plausible-sounding text instead
+- Fabricates details and citations
 
 **Real Example:** In 2023, US lawyers were sanctioned for submitting an LLM-generated brief with six fictitious case citations.
 
@@ -66,32 +66,32 @@ LLMs process text sequentially and treat each piece in isolation.
 - "What products are mentioned by companies that share risk factors?"
 - "How are these two companies connected through their executives?"
 
-These questions require *reasoning over relationships* — connecting entities across documents and traversing chains of connections.
+These questions require *reasoning over relationships*, connecting entities across documents and traversing chains of connections.
 
 ---
 
 ## The Solution: Providing Context
 
-All three limitations have a common solution — **providing context**.
+All three limitations have a common solution: **providing context**.
 
 When you give an LLM relevant information in its prompt:
 - It has facts to work with (reduces hallucination)
 - It can access your specific data (overcomes knowledge cutoff)
 - You can structure that information to show relationships (enables reasoning)
 
-But how do you provide that context? One approach is **tools** — but they have limits.
+But how do you provide that context? One approach is **tools**, but they have limits.
 
 ---
 
 ## The Problem with Tools Alone
 
-Tools are **reactive** -- the agent must recognize a tool is relevant and choose to call it.
+Tools are **reactive**: the agent must recognize a tool is relevant and choose to call it.
 
 - The agent may not realize the tool is relevant to a general question
 - The agent may skip the tool to answer faster
 - For every query, the agent has to reason about whether each tool applies
 
-**Example:** "Recommend something good" -- the agent has no reason to call a movie lookup tool and answers from training data alone.
+**Example:** "Recommend something good." The agent has no reason to call a movie lookup tool and answers from training data alone.
 
 ---
 
@@ -99,10 +99,7 @@ Tools are **reactive** -- the agent must recognize a tool is relevant and choose
 
 Context providers **inject relevant knowledge before every LLM call**, regardless of the query.
 
-| Mechanism | When It Runs | Who Decides |
-|-----------|-------------|-------------|
-| **Tools** | On demand | The agent decides |
-| **Context Providers** | Every invocation | Automatic |
+As you saw earlier: tools are on-demand and agent-managed, while context providers run automatically on every invocation.
 
 The agent does not decide whether to use a context provider. It always runs.
 
@@ -172,10 +169,10 @@ class MyProvider(BaseContextProvider):
 
 **`before_run()`** has two injection methods:
 
-- **`context.extend_instructions()`** -- Adds text to the agent's system prompt
+- **`context.extend_instructions()`**: Adds text to the agent's system prompt
   - Use for behavioral guidance: "The user's name is Alice"
 
-- **`context.extend_messages()`** -- Adds messages to the conversation
+- **`context.extend_messages()`**: Adds messages to the conversation
   - Use for data: search results from a knowledge graph
 
 ```python
@@ -225,7 +222,7 @@ You can register **multiple providers**. Each runs in order before and after eve
 
 ## Summary
 
-- **Tools are reactive** -- the agent must decide to call them
+- **Tools are reactive**: the agent must decide to call them
 - **Context providers run automatically** before and after every LLM invocation
 - **`before_run()`** injects instructions or messages into the context
 - **`after_run()`** extracts data and updates session state

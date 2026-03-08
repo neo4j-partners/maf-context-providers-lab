@@ -34,14 +34,11 @@ ol > li {
 
 ## Memory Follows the Same Pattern
 
-The `Neo4jContextProvider` from Module 3 injected knowledge graph data before every agent turn.
+The memory context provider works like `Neo4jContextProvider` from Module 3, but for **memories the agent has accumulated**:
 
-The memory context provider does the same thing, but for **memories the agent has accumulated**:
-
-- **Before each turn:** retrieves relevant past messages, extracted entities, and user preferences
-- **After each turn:** stores new messages and extracts entities
-
-The interface is `Neo4jMicrosoftMemory`, which wraps the memory client into a context provider.
+- **Before each turn**: retrieves relevant past messages, entities, and preferences
+- **After each turn**: stores new messages and extracts entities
+- **Interface**: `Neo4jMicrosoftMemory` wraps the memory client into a context provider
 
 ---
 
@@ -49,8 +46,8 @@ The interface is `Neo4jMicrosoftMemory`, which wraps the memory client into a co
 
 Setting up memory requires two steps:
 
-1. **Create `MemorySettings`** — provide Neo4j connection details (URI, username, password), plus any extraction or resolution configuration
-2. **Create a `MemoryClient`** — use it as an async context manager (`async with`) which automatically connects on entry and closes the connection on exit
+1. **Create `MemorySettings`**: provide Neo4j connection details (URI, username, password), plus any extraction or resolution configuration
+2. **Create a `MemoryClient`**: use it as an async context manager (`async with`) which automatically connects on entry and closes the connection on exit
 
 The `MemoryClient` is the entry point to all three memory types (short-term, long-term, reasoning) and is passed to the higher-level components you'll use next.
 
@@ -62,9 +59,9 @@ The `MemoryClient` is the entry point to all three memory types (short-term, lon
 
 You configure it with:
 
-- **`session_id`** — scopes the conversation; messages and entities are grouped by session
-- **`include_short_term`** / **`include_long_term`** / **`include_reasoning`** — toggle which memory types are injected before each turn
-- **`extract_entities`** — whether to automatically extract entities after each turn
+- **`session_id`**: scopes the conversation; messages and entities are grouped by session
+- **`include_short_term`** / **`include_long_term`** / **`include_reasoning`**: toggle which memory types are injected before each turn
+- **`extract_entities`**: whether to automatically extract entities after each turn
 
 ---
 
@@ -82,9 +79,9 @@ You configure it with:
 
 ## Attach the Context Provider
 
-Pass `memory.context_provider` to the agent in the `context_providers` list — the same way you passed `Neo4jContextProvider` in Module 3.
+Pass `memory.context_provider` to the agent in the `context_providers` list, the same way you passed `Neo4jContextProvider` in Module 3.
 
-- The agent doesn't need to know it's using memory — the context provider handles everything transparently
+- The agent doesn't need to know it's using memory. The context provider handles everything transparently.
 - You can combine it with other context providers (e.g., a knowledge graph provider and a memory provider together)
 - The agent's instructions should mention that it has memory, so the LLM knows to reference past context in its responses
 
@@ -109,14 +106,14 @@ The provider follows the same `before_run()` / `after_run()` lifecycle from Modu
 
 ## No Tool Calls Required
 
-The context provider runs **automatically on every turn**. The agent never decides to look something up or save a preference — the framework does it.
+The context provider runs **automatically on every turn**. The agent never decides to look something up or save a preference.
 
 1. User query arrives
 2. `before_run()` searches memory and injects relevant context
 3. The LLM generates a response with that memory context available
 4. `after_run()` stores the new messages and extracts entities
 
-This is **passive memory** — always working in the background, no agent decision needed.
+This is **passive memory**: always working in the background, no agent decision needed.
 
 ---
 
@@ -138,9 +135,9 @@ The agent has both conversation history and extracted preferences. It recommends
 After the conversation, you can verify what the provider stored by calling `search_memory()` with a query string.
 
 The search returns results across all memory types you request:
-- **Messages** — past conversation turns that match semantically
-- **Entities** — extracted people, objects, locations, etc.
-- **Preferences** — user preferences the system captured
+- **Messages**: past conversation turns that match semantically
+- **Entities**: extracted people, objects, locations, etc.
+- **Preferences**: user preferences the system captured
 
 This lets you confirm that `after_run()` is extracting and storing data correctly in Neo4j. You'll use this in the lab to inspect your agent's memory.
 

@@ -36,8 +36,8 @@ ol > li {
 
 Two things to set up:
 
-1. **Neo4j Sandbox** -- a hosted Neo4j instance with the recommendations movie dataset
-2. **GitHub Codespace** -- a cloud development environment with all dependencies pre-installed
+1. **Neo4j Sandbox**: a hosted Neo4j instance with the recommendations movie dataset
+2. **GitHub Codespace**: a cloud development environment with all dependencies pre-installed
 
 No local installation required.
 

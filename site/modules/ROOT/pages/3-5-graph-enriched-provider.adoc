@@ -149,7 +149,12 @@ asyncio.run(main())
 
 [source,python]
 ----
-
+query = "What are some good science fiction movies and who stars in them?"
+print(f"User: {query}\n")
+print("Answer: ", end="", flush=True)
+response = await agent.run(query, session=session)
+print(response.text)
+print()
 ----
 
 The agent now receives context that includes plot text, movie title, release year, genres, actors, and directors for each match. It can give specific answers: "The Matrix (1999), directed by Lana and Lilly Wachowski, is a sci-fi action film about..." instead of a vague summary based on training data.

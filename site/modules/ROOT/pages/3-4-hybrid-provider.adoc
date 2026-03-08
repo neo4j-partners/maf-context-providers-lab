@@ -100,7 +100,12 @@ asyncio.run(main())
 
 [source,python]
 ----
-
+query = "I'm looking for Christopher Nolan sci-fi movies about dreams"
+print(f"User: {query}\n")
+print("Answer: ", end="", flush=True)
+response = await agent.run(query, session=session)
+print(response.text)
+print()
 ----
 
 This query benefits from both search strategies:

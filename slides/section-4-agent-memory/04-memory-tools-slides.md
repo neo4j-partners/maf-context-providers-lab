@@ -34,11 +34,11 @@ ol > li {
 
 ## Passive Memory Is Not Enough
 
-The memory context provider handles memory **passively** -- it injects relevant memories before each turn and stores new ones after.
+The memory context provider handles memory **passively**: it injects relevant memories before each turn and stores new ones after.
 
 But sometimes the agent needs to take a **deliberate action**:
 
-- User says "remember that I hate horror movies" -- expects explicit storage
+- User says "remember that I hate horror movies" and expects explicit storage
 - Agent needs to search for a specific entity before answering
 - Agent wants to look up past reasoning traces for a similar task
 
@@ -79,8 +79,8 @@ The most effective setup uses **both mechanisms** together:
 
 Call `create_memory_tools(memory)` to generate the six tool instances, then pass them to the agent's `tools` list alongside the context provider.
 
-- The agent's **instructions** should tell it when to use the tools — e.g., "When a user expresses a preference, save it with `remember_preference`"
-- The tools and context provider work **together** — passive context covers the common case, tools handle targeted operations
+- The agent's **instructions** should tell it when to use the tools (e.g., "When a user expresses a preference, save it with `remember_preference`")
+- The tools and context provider work **together**: passive context covers the common case, tools handle targeted operations
 - The agent can now both **passively recall** and **actively manage** its memory
 
 ---
@@ -132,9 +132,9 @@ The agent now operates on two levels simultaneously:
 
 After the conversation, use `search_memory()` to inspect what both mechanisms have stored:
 
-- **Preferences** — explicitly saved by the agent via `remember_preference`
-- **Entities** — automatically extracted by the context provider's `after_run()`
-- **Messages** — stored by the context provider after each turn
+- **Preferences**: explicitly saved by the agent via `remember_preference`
+- **Entities**: automatically extracted by the context provider's `after_run()`
+- **Messages**: stored by the context provider after each turn
 
 This confirms that both the passive context provider and the active memory tools are persisting data in the same Neo4j graph. You'll verify this in the lab.
 
@@ -147,7 +147,7 @@ Test the interaction between passive and active memory:
 - Tell the agent you **dislike** a genre, then ask for recommendations. Does it avoid that genre?
 - Ask the agent to **remember a fact** ("The Matrix was released in 1999") and verify it later
 - **End the session**, create a new one with the same `session_id`, and check whether long-term memories persist
-- Ask the agent a question it **struggled with before** -- does it approach it differently with reasoning traces?
+- Ask the agent a question it **struggled with before**. Does it approach it differently with reasoning traces?
 
 ---
 

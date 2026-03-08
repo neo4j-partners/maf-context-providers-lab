@@ -52,7 +52,7 @@ Hybrid search runs **both** search modes in parallel on the same query:
 2. **Fulltext search** tokenizes the query and finds keyword matches
 3. **Scores are combined** into a single ranked result set
 
-A movie can rank highly on semantics, keywords, or both. Results that score well on **both** dimensions rise to the top — this is why hybrid catches what either mode alone might miss.
+A movie can rank highly on semantics, keywords, or both. Results that score well on **both** dimensions rise to the top.
 
 ---
 
@@ -89,8 +89,8 @@ Both indexes must exist in Neo4j before the provider can use them.
 Hybrid search builds on the vector provider setup with one addition:
 
 - **Set `index_type` to `"hybrid"`** instead of `"vector"`
-- **Add `fulltext_index_name`** — points to your fulltext index for keyword matching
-- **Keep `index_name` and `embedder`** — these are still needed for the vector search half
+- **Add `fulltext_index_name`**: points to your fulltext index for keyword matching
+- **Keep `index_name` and `embedder`**: still needed for the vector search half
 
 The provider runs both searches internally and merges the results before returning them. Everything else (`top_k`, `context_prompt`, connection settings) works the same.
 
@@ -104,7 +104,7 @@ The hybrid provider plugs into an agent identically to vector or fulltext:
 - The agent automatically retrieves hybrid results before each LLM call
 - No changes to agent setup, instructions, or session handling are needed
 
-All three search modes are interchangeable from the agent's perspective — the difference is entirely in how the provider retrieves and ranks results.
+All three search modes are interchangeable from the agent's perspective.
 
 ---
 
@@ -117,7 +117,7 @@ All three search modes are interchangeable from the agent's perspective — the 
 | Embedder required | Yes | No | Yes |
 | Indexes needed | 1 | 1 | 2 |
 | Latency | Medium | Low | Higher |
-| Setup complexity | Medium | Simple | Most |
+| Setup complexity | Medium | Simple | Highest |
 
 ---
 
@@ -147,9 +147,9 @@ Hybrid search supports `retrieval_query` for graph enrichment, just like the oth
 
 ## Choosing Your Search Strategy
 
-- **Fulltext** — best when queries use specific names, titles, or keywords. Simplest setup, no embedder needed.
-- **Vector** — best when queries are conceptual or exploratory ("movies about finding meaning in life"). Requires an embedder.
-- **Hybrid** — best when you expect a mix of both styles, or you're unsure how users will query. Requires both indexes and an embedder.
+- **Fulltext**: best when queries use specific names, titles, or keywords. Simplest setup, no embedder needed.
+- **Vector**: best when queries are conceptual or exploratory ("movies about finding meaning in life"). Requires an embedder.
+- **Hybrid**: best when you expect a mix of both styles, or you're unsure how users will query. Requires both indexes and an embedder.
 
 All three modes support graph enrichment via `retrieval_query`.
 

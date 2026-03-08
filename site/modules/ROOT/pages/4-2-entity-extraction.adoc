@@ -3,6 +3,8 @@
 
 Long-term memory stores entities, preferences, and facts extracted from conversations. But how does the extraction happen? The `neo4j-agent-memory` package uses a multi-stage pipeline that combines fast pattern matching with accurate model-based extraction to pull structured entities from unstructured conversation text.
 
+The pipeline processes the text content of individual conversation messages, both what the user says and what the agent responds. When a message is added to short-term memory, the extraction pipeline analyzes that message text to identify entities like people, organizations, locations, and objects. These extracted entities are then stored in long-term memory as nodes in the Neo4j graph.
+
 == The Extraction Pipeline
 
 Entity extraction runs as a three-stage pipeline. Each stage has different strengths, and the results are merged to maximize coverage and accuracy:
@@ -134,7 +136,7 @@ Each entity node stores the name, type, subtype, description, confidence score, 
 
 == Automatic vs Manual Extraction
 
-When `extract_entities=True` is set on `Neo4jMicrosoftMemory`, entity extraction runs automatically in `after_run()` after every agent response. By default, this runs asynchronously in the background so it doesn't slow down the agent's response time.
+When `extract_entities=True` is set on `Neo4jMicrosoftMemory`, entity extraction runs automatically in `after_run()` after every agent response. It processes the agent's most recent response message rather than re-analyzing the entire conversation history each time. By default, this runs asynchronously in the background so it doesn't slow down the agent's response time.
 
 You can also extract entities manually:
 

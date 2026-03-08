@@ -122,7 +122,12 @@ asyncio.run(main())
 
 [source,python]
 ----
-
+query = "Find movies about space exploration"
+print(f"User: {query}\n")
+print("Answer: ", end="", flush=True)
+response = await agent.run(query, session=session)
+print(response.text)
+print()
 ----
 
 The query "Find movies about space exploration" becomes "movies space exploration" after stop word filtering. The fulltext index finds plots containing those terms and injects them as context.

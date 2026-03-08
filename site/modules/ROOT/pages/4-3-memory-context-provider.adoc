@@ -152,7 +152,17 @@ After the conversation, verify what the provider stored by searching the memory 
 
 [source,python]
 ----
+results = await memory.search_memory(
+    query="sci-fi movies",
+    include_messages=True,
+    include_entities=True,
+    include_preferences=True,
+    limit=5,
+)
 
+print("Messages:", results.get("messages", []))
+print("Entities:", results.get("entities", []))
+print("Preferences:", results.get("preferences", []))
 ----
 
 This returns the messages, entities, and preferences that `after_run()` extracted and stored in Neo4j. You should see the conversation messages, entity nodes for "sci-fi" and "time travel," and potentially a preference record.

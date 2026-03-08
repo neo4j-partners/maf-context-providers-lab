@@ -36,10 +36,20 @@ ol > li {
 
 Neo4j provides two context provider packages for the Microsoft Agent Framework:
 
-- **`agent-framework-neo4j`** — Retrieves knowledge from Neo4j indexes (vector, fulltext, or hybrid search) and injects it before every LLM call
-- **`neo4j-agent-memory`** — Gives agents persistent memory across conversations, capturing user preferences and entity mentions in Neo4j
+- **`agent-framework-neo4j`**: Retrieves knowledge from Neo4j indexes (vector, fulltext, or hybrid search) and injects it before every LLM call
+- **`neo4j-agent-memory`**: Gives agents persistent memory across conversations, capturing user preferences and entity mentions in Neo4j
 
 This module focuses on `agent-framework-neo4j`. The next module covers `neo4j-agent-memory`.
+
+---
+
+## Beyond Retrieval: Building Knowledge Graphs
+
+The `neo4j-graphrag-python` library also provides a pipeline for **building** knowledge graphs from unstructured text:
+
+- **`SimpleKGPipeline`** automates splitting, entity extraction, embedding, and storage
+- Takes raw documents (PDFs, articles) and creates structured graph data
+- The same library you use to **query** your graph can also **construct** it
 
 ---
 

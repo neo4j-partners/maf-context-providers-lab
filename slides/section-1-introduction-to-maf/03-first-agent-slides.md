@@ -55,7 +55,7 @@ from agent_framework.openai import OpenAIResponsesClient
 client = OpenAIResponsesClient()
 ```
 
-No API key or model name in code -- it reads `OPENAI_API_KEY` and `OPENAI_RESPONSES_MODEL_ID` from your `.env` file.
+No API key or model name in code. It reads `OPENAI_API_KEY` and `OPENAI_RESPONSES_MODEL_ID` from your `.env` file.
 
 ---
 
@@ -175,7 +175,7 @@ await agent.run("What are some good sci-fi movies about time travel?")
 
 The agent **may or may not** call `get_movie_info`:
 
-- Tools are **reactive** -- the agent must choose to call them
+- Tools are **reactive**: the agent must choose to call them
 - For broad or exploratory queries, the agent often does not realize it should ask
 - This works for explicit lookups, but fails for background knowledge
 
@@ -200,17 +200,17 @@ What if you want the agent to **always** have relevant movie data, regardless of
 - Background knowledge should be available **automatically**
 - The agent should not need to "ask" for context it always needs
 
-**This is where context providers come in** -- which you will explore in the next module.
+**This is where context providers come in**, which you will explore in the next module.
 
 ---
 
 ## Summary
 
 - The `OpenAIResponsesClient` connects to OpenAI with credentials from environment variables
-- **Tools** are plain Python functions with docstrings -- no decorators needed
+- **Tools** are plain Python functions with docstrings (no decorators needed)
 - The agent uses the function **name** and **docstring** to decide when to call a tool
 - `Annotated` type hints and `Field` descriptions improve tool selection
 - Tools are **reactive**: the agent must choose to call them
 - For general queries, the agent may skip relevant tools entirely
 
-**Next:** Introduction to context providers -- MAF's mechanism for automatic context injection.
+**Next:** Introduction to context providers, MAF's mechanism for automatic context injection.

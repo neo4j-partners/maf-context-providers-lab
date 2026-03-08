@@ -85,7 +85,7 @@ The provider takes a **chat client** to use for structured extraction in `after_
 
 ---
 
-## Step 3: before_run() -- Inject Dynamic Instructions
+## Step 3: before_run()
 
 ```python
 async def before_run(self, *, context, state, **kwargs):
@@ -127,7 +127,7 @@ The **same agent** behaves differently each turn based on accumulated knowledge.
 
 ---
 
-## Step 4: after_run() -- Extract Structured Data
+## Step 4: after_run()
 
 ```python
 async def after_run(self, *, context, state, **kwargs):
@@ -151,7 +151,7 @@ First, check if extraction is needed. Skip if all data is already known.
 
 ---
 
-## after_run() -- The Extraction Call
+## after_run(): The Extraction Call
 
 ```python
     try:
@@ -258,7 +258,7 @@ The `state` dictionary is keyed by the provider's `source_id` (`"user-info-memor
 - **`before_run()`** reads state and injects dynamic instructions
 - **`after_run()`** extracts structured data using an LLM call with `response_format`
 - **Session state** persists across turns, letting the provider accumulate knowledge
-- The provider changes agent behavior **dynamically** -- no tool calls needed
+- The provider changes agent behavior **dynamically** without any tool calls
 - A single provider instance is shared; **state dict** keeps sessions isolated
 
 **Next:** Use Neo4j context providers for automatic knowledge graph retrieval.

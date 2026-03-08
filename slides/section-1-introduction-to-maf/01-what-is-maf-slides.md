@@ -32,23 +32,12 @@ ol > li {
 
 ---
 
-## History
-
-MAF is the direct successor to both **Semantic Kernel** and **AutoGen**, created by the same teams at Microsoft.
-
-| Predecessor | What MAF Takes From It |
-|-------------|----------------------|
-| **AutoGen** | Straightforward agent abstractions |
-| **Semantic Kernel** | Session-based state management, type safety, middleware, telemetry |
-
-Developers migrating from either framework have a clear upgrade path. The core patterns are familiar; the execution model is more structured.
-
----
-
 ## What is the Microsoft Agent Framework?
 
-The [Microsoft Agent Framework](https://github.com/microsoft/agent-framework) orchestrates a lifecycle around each LLM call, turning a bare model into an agent that can retrieve, reason, and act.
+The [Microsoft Agent Framework](https://github.com/microsoft/agent-framework):
 
+- Orchestrates a lifecycle around each LLM call
+- Turns a bare model into an agent that can retrieve, reason, and act
 - Multi-language: **Python** and **.NET**
 - Multi-provider: **Azure OpenAI**, **OpenAI**, **Anthropic**, **Ollama**
 - Open source on GitHub
@@ -60,7 +49,12 @@ The [Microsoft Agent Framework](https://github.com/microsoft/agent-framework) or
 
 ## Core Concepts
 
-The core concept in MAF is the **agent**. An agent follows the **ReAct** (Reasoning and Acting) pattern — it reasons about input, decides which actions to take, observes the results, and repeats until it can provide a final response.
+The core concept in MAF is the **agent**, which follows the **ReAct** (Reasoning and Acting) pattern:
+
+- Reasons about input
+- Decides which actions to take
+- Observes the results
+- Repeats until it can provide a final response
 
 The framework builds on this with four supporting concepts:
 
@@ -80,7 +74,7 @@ Tools are plain Python functions that an agent can decide to call. The agent use
 - "Tell me about Inception" --> agent calls `get_movie_info`
 - "Run this Cypher query" --> agent calls `query_database`
 
-This works well for specific actions, but poorly for background knowledge — the agent may not realize it should ask.
+This works well for specific actions, but poorly for background knowledge. The agent may not realize it should ask.
 
 ---
 
@@ -90,7 +84,7 @@ Context providers are components that can run automatically before, after, or bo
 
 - **Before** every LLM call: `before_run()` injects relevant data
 - **After** every LLM response: `after_run()` extracts and stores information
-- The agent never decides whether to use the provider -- it just receives the context
+- The agent never decides whether to use the provider. It just receives the context.
 
 ---
 
@@ -155,8 +149,8 @@ All powered by context providers that run automatically on every turn.
 - **MAF** succeeds Semantic Kernel and AutoGen, combining both into a single framework
 - Supports **Python and .NET** with multiple LLM providers
 - Built around **agents** using the **ReAct** pattern, with Tools, Context Providers, Sessions, and Workflows
-- **Tools** are reactive -- the agent decides when to call them
-- **Context providers** are proactive -- they inject knowledge on every turn automatically
+- **Tools** are reactive: the agent decides when to call them
+- **Context providers** are proactive: they inject knowledge on every turn automatically
 - This enables **self-grounding agents** that are always informed by relevant data
 
 **Next:** Set up your development environment.
