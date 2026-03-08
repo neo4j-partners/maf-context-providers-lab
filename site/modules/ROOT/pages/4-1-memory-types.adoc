@@ -1,8 +1,10 @@
 = Memory Types
 
-A user tells your agent they prefer Christopher Nolan films. Two turns later, they ask for a recommendation. The agent has no idea what they said. The conversation history is gone, the preference was never stored, and the agent suggests a random comedy.
+The context providers from Modules 2 and 3 inject pre-loaded knowledge — movie plots, genres, actors — from a graph that existed before the agent started. That knowledge is static. But agents also need to remember what happens _during_ conversations and carry that forward.
 
-The context providers from Modules 2 and 3 solve a different problem. They inject pre-loaded knowledge, movie plots, genres, actors, from a graph that existed before the agent started. That knowledge is static. Memory is what the agent learns from conversations and carries forward.
+The link:https://github.com/neo4j-labs/agent-memory[neo4j-agent-memory^] library is a graph-native memory system for AI agents. It stores conversations, builds knowledge graphs from extracted entities, and lets agents learn from their own reasoning — all backed by Neo4j. The library provides framework integrations for LangChain, Pydantic AI, OpenAI Agents, and others. In this module, you will use its Microsoft Agent Framework integration, which wraps the library's memory capabilities into MAF context providers and callable tools.
+
+Consider this scenario: a user tells your agent they prefer Christopher Nolan films. Two turns later, they ask for a recommendation. Without memory, the agent has no idea what they said. The conversation history is gone, the preference was never stored, and the agent suggests a random comedy.
 
 == What Memory Needs to Capture
 

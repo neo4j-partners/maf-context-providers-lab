@@ -2,18 +2,9 @@
 
 The context provider you built from scratch in Module 2 managed its own state and injected instructions based on simple logic. Production knowledge graph retrieval needs more than that, including index-based search, embeddings, configurable result formatting, and support for different search strategies.
 
-Neo4j provides two context provider packages for MAF. link:https://github.com/neo4j-labs/neo4j-maf-provider[`agent-framework-neo4j`^] for knowledge graph retrieval and link:https://github.com/neo4j-labs/agent-memory[`neo4j-agent-memory`^] for persistent agent memory. This module covers `agent-framework-neo4j`. The next module covers `neo4j-agent-memory`.
+The link:https://github.com/neo4j-labs/neo4j-maf-provider[`agent-framework-neo4j`^] package provides `Neo4jContextProvider`, a ready-made context provider that connects to a Neo4j database, searches an index, and injects the results before every LLM call. It extends the same `BaseContextProvider` you used earlier but handles the search, embedding, and formatting internally.
 
-The `agent-framework-neo4j` package provides `Neo4jContextProvider`, a ready-made context provider that connects to a Neo4j database, searches an index, and injects the results before every LLM call. It extends the same `BaseContextProvider` you used earlier but handles the search, embedding, and formatting internally.
-
-== Install the Package
-
-[source,bash]
-----
-pip install agent-framework-neo4j
-----
-
-The package depends on `agent-framework-core` (the MAF core library) and `neo4j-graphrag` (Neo4j's retriever library). Both are installed automatically.
+Under the hood, `agent-framework-neo4j` delegates all search operations to the link:https://github.com/neo4j/neo4j-graphrag-python[`neo4j-graphrag`^] library. The `neo4j-graphrag` package provides retriever classes -- `VectorRetriever`, `HybridRetriever`, and others -- that know how to query Neo4j vector and fulltext indexes. `Neo4jContextProvider` selects the right retriever based on your `index_type` configuration, wraps it in the MAF lifecycle, and handles the async execution. You configure the provider; `neo4j-graphrag` runs the search.
 
 == How It Works
 
@@ -51,7 +42,13 @@ The `index_type` parameter determines which search strategy the provider uses:
 | Yes
 |===
 
-Each mode uses a different retriever from the `neo4j-graphrag` library internally. You configure the mode when creating the provider and the provider handles the rest.
+Each mode maps to a retriever class from the `neo4j-graphrag` library:
+
+* `"vector"` uses `VectorRetriever` (or `VectorCypherRetriever` when a `retrieval_query` is provided)
+* `"fulltext"` uses a fulltext retriever that queries Neo4j's Lucene-based fulltext indexes
+* `"hybrid"` uses `HybridRetriever` (or `HybridCypherRetriever` with a `retrieval_query`)
+
+You configure the mode when creating the provider. `Neo4jContextProvider` creates the appropriate retriever on connection and delegates every search call to it.
 
 Each provider instance supports a single `index_type`. If you need multiple search strategies -- for example, vector search on one index and fulltext search on another -- create separate provider instances and pass them all to the agent's `context_providers` list. The agent merges the context from every provider before calling the LLM.
 
@@ -98,6 +95,6 @@ The following lessons walk through each search mode in detail, starting with vec
 [.summary]
 == Lesson Summary
 
-The `agent-framework-neo4j` package provides `Neo4jContextProvider`, which extends `BaseContextProvider` to search Neo4j indexes and inject results before every LLM call. It supports three search modes: vector (semantic similarity), fulltext (keyword matching), and hybrid (both combined). Configuration includes connection details, index name, search type, and optional graph enrichment via Cypher.
+The `agent-framework-neo4j` package provides `Neo4jContextProvider`, which extends `BaseContextProvider` to search Neo4j indexes and inject results before every LLM call. It delegates search to retriever classes from the `neo4j-graphrag` library, supporting three modes: vector (semantic similarity), fulltext (keyword matching), and hybrid (both combined). Configuration includes connection details, index name, search type, and optional graph enrichment via Cypher.
 
 In the next lesson, you will use vector search to find movies by plot similarity.
