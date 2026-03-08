@@ -2,7 +2,7 @@
 
 The context providers from Modules 2 and 3 inject pre-loaded knowledge — movie plots, genres, actors — from a graph that existed before the agent started. That knowledge is static. But agents also need to remember what happens _during_ conversations and carry that forward.
 
-The link:https://github.com/neo4j-labs/agent-memory[neo4j-agent-memory^] library is a graph-native memory system for AI agents. It stores conversations, builds knowledge graphs from extracted entities, and lets agents learn from their own reasoning — all backed by Neo4j. The library provides framework integrations for LangChain, Pydantic AI, OpenAI Agents, and others. In this module, you will use its Microsoft Agent Framework integration, which wraps the library's memory capabilities into MAF context providers and callable tools.
+The link:https://github.com/neo4j-labs/agent-memory[neo4j-agent-memory^] library is a graph-native memory system for AI agents. It stores conversations, builds knowledge graphs from extracted entities, and lets agents learn from their own reasoning, all backed by Neo4j. The library provides framework integrations for LangChain, Pydantic AI, OpenAI Agents, and others. In this module, you will use its Microsoft Agent Framework integration, which wraps the library's memory capabilities into MAF context providers and callable tools.
 
 Consider this scenario: a user tells your agent they prefer Christopher Nolan films. Two turns later, they ask for a recommendation. Without memory, the agent has no idea what they said. The conversation history is gone, the preference was never stored, and the agent suggests a random comedy.
 
@@ -42,7 +42,7 @@ Because everything is in the same graph, memories connect to each other. An enti
 
 == The neo4j-agent-memory Package
 
-The MAF context provider you will use in this module is built on the `neo4j-agent-memory` library. The library handles all the underlying memory operations — storing conversations, extracting entities, managing reasoning traces — while the Microsoft Agent Framework integration layer wraps those capabilities into the `BaseContextProvider` lifecycle you learned about in Module 2.
+The MAF context provider you will use in this module is built on the `neo4j-agent-memory` library. The library handles all the underlying memory operations (storing conversations, extracting entities, managing reasoning traces) while the Microsoft Agent Framework integration layer wraps those capabilities into the `BaseContextProvider` lifecycle you learned about in Module 2.
 
 The integration provides four components:
 

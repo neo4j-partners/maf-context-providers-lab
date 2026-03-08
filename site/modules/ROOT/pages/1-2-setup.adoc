@@ -13,13 +13,13 @@ You will need a Neo4j instance with the **recommendations** dataset — a movie 
 image::recommendations.png[Select the Recommendations dataset]
 +
 . Click **Create** to launch your sandbox
-. Once created, download your credentials and save them somewhere safe — you will need the **Bolt URL**, **username**, and **password** in the next step
+. Once created, download your credentials and save them somewhere safe. You will need the **Bolt URL**, **username**, and **password** in the next step
 
 IMPORTANT: Save your sandbox credentials now. You will not be able to retrieve the password later.
 
 == Launch GitHub Codespaces
 
-IMPORTANT: The Codespace takes **3 to 5 minutes** to fully launch and configure. Wait until the `.env` file is created before trying to run the labs. You can click on the `.env` file in the Codespace file explorer to confirm it is populated with your credentials — once you see your values there, you are ready to go.
+IMPORTANT: The Codespace takes **3 to 5 minutes** to fully launch and configure. Wait until the `.env` file is created before trying to run the labs. You can click on the `.env` file in the Codespace file explorer to confirm it is populated with your credentials. Once you see your values there, you are ready to go.
 
 Now that you have your Neo4j credentials, open the workshop repository in GitHub Codespaces:
 
@@ -37,7 +37,7 @@ Once the Codespace starts, it will automatically:
 * Install Python 3.12 and all required packages (including `agent-framework`, `openai`, `neo4j-graphrag`, and Jupyter)
 * Generate your `.env` file from the secrets you provided
 
-NOTE: If you need to manage your Codespace or secrets — for example, to relaunch with new credentials or shut down an existing Codespace — visit link:https://github.com/codespaces[github.com/codespaces^].
+NOTE: If you need to manage your Codespace or secrets (for example, to relaunch with new credentials or shut down an existing Codespace), visit link:https://github.com/codespaces[github.com/codespaces^].
 
 == Running the Notebooks
 
