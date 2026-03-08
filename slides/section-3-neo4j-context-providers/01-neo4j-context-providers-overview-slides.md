@@ -32,29 +32,50 @@ ol > li {
 
 ---
 
-## From Custom to Ready-Made
+## Neo4j Context Providers for MAF
 
-In Module 2, you built a context provider from scratch using `BaseContextProvider`.
+Neo4j provides two context provider packages for the Microsoft Agent Framework:
 
-`Neo4jContextProvider` from the `agent-framework-neo4j` package does the heavy lifting for you:
-- Connects to a Neo4j database
-- Searches an index (vector, fulltext, or hybrid)
-- Formats and injects results before every LLM call
+- **`agent-framework-neo4j`** — Retrieves knowledge from Neo4j indexes (vector, fulltext, or hybrid search) and injects it before every LLM call
+- **`neo4j-agent-memory`** — Gives agents persistent memory across conversations, capturing user preferences and entity mentions in Neo4j
 
-**Same `BaseContextProvider` base class. Production-grade search built in.**
+This module focuses on `agent-framework-neo4j`. The next module covers `neo4j-agent-memory`.
 
 ---
 
-## Powered by neo4j-graphrag-python
+## Neo4jContextProvider
 
-`Neo4jContextProvider` delegates all search to the `neo4j-graphrag-python` library.
+`Neo4jContextProvider` from the `agent-framework-neo4j` package:
 
-**Retriever classes provided by neo4j-graphrag:**
-- `VectorRetriever` / `VectorCypherRetriever`
-- `HybridRetriever` / `HybridCypherRetriever`
-- Fulltext retriever for Lucene-based indexes
+- Connects to a Neo4j database and searches an index (vector, fulltext, or hybrid)
+- Injects matching results before every LLM call via `before_run()`
+- Delegates all search to `neo4j-graphrag-python` retriever classes (`VectorRetriever`, `HybridRetriever`, etc.)
 
 You configure the provider; `neo4j-graphrag` runs the search.
+
+---
+
+## Three Search Modes
+
+`Neo4jContextProvider` supports three search modes via the `index_type` parameter:
+
+| Mode | How It Works | Best For | Embedder? |
+|------|-------------|----------|-----------|
+| **`vector`** | Cosine similarity on embeddings | Semantic similarity | Yes |
+| **`fulltext`** | BM25 ranking on tokenized text | Keyword matching | No |
+| **`hybrid`** | Runs both, combines scores | Best of both worlds | Yes |
+
+---
+
+## When to Use Each Mode
+
+| Mode | Best For | Example Query |
+|------|----------|---------------|
+| **Vector** | Conceptual, exploratory questions | "Movies about unlikely friendships" |
+| **Fulltext** | Specific names, titles, exact terms | "Christopher Nolan Batman" |
+| **Hybrid** | Mixed conceptual and keyword queries | "Christopher Nolan sci-fi movies about dreams" |
+
+**Vector** understands meaning. **Fulltext** matches keywords. **Hybrid** combines both.
 
 ---
 
@@ -78,33 +99,9 @@ The LLM sees this context alongside the user's question.
 
 ---
 
-## Three Search Modes
-
-The `index_type` parameter determines the search strategy:
-
-| Mode | How It Works | Best For | Embedder? |
-|------|-------------|----------|-----------|
-| **`vector`** | Cosine similarity on embeddings | Semantic similarity | Yes |
-| **`fulltext`** | BM25 ranking on tokenized text | Keyword matching | No |
-| **`hybrid`** | Runs both, combines scores | Best of both worlds | Yes |
-
----
-
-## When to Use Each Mode
-
-| Mode | Best For | Example Query |
-|------|----------|---------------|
-| **Vector** | Conceptual, exploratory questions | "Movies about unlikely friendships" |
-| **Fulltext** | Specific names, titles, exact terms | "Christopher Nolan Batman" |
-| **Hybrid** | Mixed conceptual and keyword queries | "Christopher Nolan sci-fi movies about dreams" |
-
-**Vector** understands meaning. **Fulltext** matches keywords. **Hybrid** combines both.
-
----
-
 ## Retriever Selection Logic
 
-The provider automatically selects the right retriever based on your configuration:
+The provider selects the retriever based on your `index_type` and `retrieval_query` configuration:
 
 | index_type | retrieval_query | Retriever Used |
 |------------|-----------------|----------------|

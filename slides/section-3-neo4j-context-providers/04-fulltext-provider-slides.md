@@ -61,17 +61,10 @@ Fulltext search is the better choice when:
 
 Fulltext search uses Neo4j's built-in **Lucene-based fulltext indexing** with **BM25 ranking**.
 
-```
-1. User: "Find movies about space exploration"
-       ↓
-2. Stop words filtered: "movies space exploration"
-       ↓
-3. Remaining terms tokenized and searched against fulltext index
-       ↓
-4. Results ranked by BM25 score (term frequency + document length)
-       ↓
-5. Top results injected as context
-```
+1. The user's query is preprocessed — common stop words ("what", "the", "is") are filtered out
+2. Remaining terms are tokenized and matched against the fulltext index
+3. Results are ranked by BM25 score — weighing term frequency, rarity, and document length
+4. Top results are injected as context for the LLM
 
 ---
 
@@ -103,27 +96,12 @@ This indexes the `plot` property of `Movie` nodes for fulltext search.
 
 ## Configure the Provider
 
-```python
-from agent_framework_neo4j import Neo4jContextProvider, Neo4jSettings
+Setting up a fulltext provider differs from vector search in two ways:
 
-neo4j_settings = Neo4jSettings()
+- **Set `index_type` to `"fulltext"`** and point `index_name` to your fulltext index
+- **No `embedder` parameter** — fulltext search works directly on text, so there's no embedding step
 
-provider = Neo4jContextProvider(
-    uri=neo4j_settings.uri,
-    username=neo4j_settings.username,
-    password=neo4j_settings.get_password(),
-    index_name=neo4j_settings.fulltext_index_name,
-    index_type="fulltext",
-    top_k=5,
-    context_prompt=(
-        "## Knowledge Graph Context\n"
-        "Use the following information from the knowledge graph "
-        "to answer questions about movies:"
-    ),
-)
-```
-
-**No embedder parameter.** That's the key difference from vector search.
+Everything else (`top_k`, `context_prompt`, connection settings) works the same as vector search. The simpler setup also means lower latency since no embedding API call is needed.
 
 ---
 
@@ -143,46 +121,23 @@ Words like "what," "the," "is," and "about" add noise to fulltext queries.
 
 ## Disabling Stop Word Filtering
 
-If you need the raw query passed through:
+By default, the provider removes common words like "the", "is", and "about" before searching. This improves results for most queries.
 
-```python
-provider = Neo4jContextProvider(
-    uri=neo4j_settings.uri,
-    username=neo4j_settings.username,
-    password=neo4j_settings.get_password(),
-    index_name=neo4j_settings.fulltext_index_name,
-    index_type="fulltext",
-    filter_stop_words=False,  # Pass raw query to index
-    top_k=5,
-)
-```
+To disable this, set `filter_stop_words=False` on the provider. This passes the raw query directly to the index.
 
-Useful when stop words are meaningful in your domain.
+**When you'd want this:** domains where stop words carry meaning — for example, searching for a band name like "The Who" or a movie titled "It".
 
 ---
 
-## Run the Agent
+## Using the Provider with an Agent
 
-```python
-async def main():
-    async with provider:
-        client = OpenAIResponsesClient()
+Once configured, the fulltext provider plugs into an agent the same way as any other context provider:
 
-        agent = client.as_agent(
-            name="fulltext-agent",
-            instructions=(
-                "You are a helpful assistant that answers questions "
-                "about movies using the provided knowledge graph context."
-            ),
-            context_providers=[provider],
-        )
+- Pass it in the `context_providers` list when creating the agent
+- The agent automatically retrieves fulltext results before each LLM call
+- No changes to agent setup, instructions, or session handling are needed
 
-        session = agent.create_session()
-        response = await agent.run(
-            "Find movies about space exploration", session=session
-        )
-        print(response.text)
-```
+The provider is interchangeable — you can swap between vector, fulltext, and hybrid without changing your agent code.
 
 ---
 
@@ -203,16 +158,9 @@ async def main():
 
 Fulltext search also supports `retrieval_query` for graph enrichment:
 
-```python
-provider = Neo4jContextProvider(
-    index_name="moviePlotsFulltext",
-    index_type="fulltext",
-    retrieval_query=RETRIEVAL_QUERY,  # Same Cypher as vector mode
-    top_k=5,
-)
-```
-
-The retrieval query receives `node` and `score` from the fulltext search, then traverses relationships the same way.
+- Add the same `retrieval_query` parameter you'd use with vector search
+- The query receives `node` and `score` from the fulltext results, then traverses relationships the same way
+- The exact same Cypher works regardless of search mode — the only difference is how the initial `node` and `score` are produced
 
 ---
 

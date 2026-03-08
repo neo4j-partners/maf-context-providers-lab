@@ -92,63 +92,26 @@ The embedder converts query text into a vector that can be compared against `plo
 
 ## Configure the Provider
 
-```python
-from agent_framework_neo4j import Neo4jContextProvider, Neo4jSettings
+`Neo4jContextProvider` is configured with:
 
-neo4j_settings = Neo4jSettings()
-
-provider = Neo4jContextProvider(
-    uri=neo4j_settings.uri,
-    username=neo4j_settings.username,
-    password=neo4j_settings.get_password(),
-    index_name=neo4j_settings.vector_index_name,
-    index_type="vector",
-    embedder=embedder,
-    top_k=5,
-    context_prompt=(
-        "## Semantic Search Results\n"
-        "Use the following semantically relevant movie plots "
-        "from the knowledge graph to answer questions:"
-    ),
-)
-```
+- **Connection details** — URI, username, and password for your Neo4j instance (read from environment variables via `Neo4jSettings`)
+- **`index_name`** — The Neo4j vector index to search (e.g., `"moviePlots"`)
+- **`index_type`** — Set to `"vector"` for semantic search via cosine similarity
+- **`embedder`** — The same embedding model used to create the stored vectors
+- **`top_k`** — Number of results to retrieve (5 balances context richness with token usage)
+- **`context_prompt`** — Text prepended to results that guides the LLM on how to use the injected data
 
 ---
 
-## Key Parameters
+## Configure and Run the Agent
 
-| Parameter | Value | Purpose |
-|-----------|-------|---------|
-| `index_name` | `"moviePlots"` | Neo4j vector index to search |
-| `index_type` | `"vector"` | Semantic search via cosine similarity |
-| `embedder` | `OpenAIEmbeddings` | Generates query vectors |
-| `top_k` | `5` | Balance between context richness and token usage |
-| `context_prompt` | Custom text | Guides the LLM on how to use injected data |
+To use the provider, connect it to an agent:
 
----
+- **`async with provider`** — Opens the Neo4j connection and initializes the retriever
+- **`context_providers=[provider]`** — Registers the provider so `before_run()` runs on every turn
+- **`agent.run(query, session=session)`** — The provider automatically embeds the query, searches the index, and injects results before the LLM responds
 
-## Run the Agent
-
-```python
-async def main():
-    async with provider:
-        client = OpenAIResponsesClient()
-
-        agent = client.as_agent(
-            name="vector-agent",
-            instructions=(
-                "You are a helpful assistant that answers questions "
-                "about movies using the provided semantic search context."
-            ),
-            context_providers=[provider],
-        )
-
-        session = agent.create_session()
-        response = await agent.run(
-            "Find me movies about time travel", session=session
-        )
-        print(response.text)
-```
+The agent receives relevant movie data on every turn without any explicit tool calls.
 
 ---
 

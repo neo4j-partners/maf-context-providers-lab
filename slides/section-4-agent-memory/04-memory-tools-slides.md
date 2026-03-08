@@ -77,25 +77,11 @@ The most effective setup uses **both mechanisms** together:
 
 ## Creating Memory Tools
 
-```python
-# Create callable memory tools
-tools = create_memory_tools(memory)
+Call `create_memory_tools(memory)` to generate the six tool instances, then pass them to the agent's `tools` list alongside the context provider.
 
-agent = client.as_agent(
-    name="movie-assistant",
-    instructions=(
-        "You are a movie recommendation assistant with persistent memory.\n\n"
-        "When a user expresses a preference, save it with the "
-        "remember_preference tool. When making recommendations, "
-        "use recall_preferences to check what the user likes "
-        "before suggesting something."
-    ),
-    tools=tools,
-    context_providers=[memory.context_provider],
-)
-```
-
-The agent can now both **passively recall** and **actively manage** its memory.
+- The agent's **instructions** should tell it when to use the tools — e.g., "When a user expresses a preference, save it with `remember_preference`"
+- The tools and context provider work **together** — passive context covers the common case, tools handle targeted operations
+- The agent can now both **passively recall** and **actively manage** its memory
 
 ---
 
@@ -115,23 +101,14 @@ The agent can now both **passively recall** and **actively manage** its memory.
 
 ## How the Combined Pattern Works
 
-```
-Turn 1: "I love Christopher Nolan movies and anything about space."
-    --> Context provider after_run(): saves message, extracts entities
-    --> Agent calls: remember_preference("directors", "Christopher Nolan")
-    --> Agent calls: remember_preference("themes", "space")
+**Turn 1:** *"I love Christopher Nolan movies and anything about space."*
+The context provider saves the message and extracts entities in the background. The agent **also** explicitly calls `remember_preference` to store "Christopher Nolan" under directors and "space" under themes.
 
-Turn 2: "What are my movie preferences?"
-    --> Context provider before_run(): injects relevant past messages
-    --> Agent calls: recall_preferences("movies")
-    --> Reports both passive context and explicit preferences
+**Turn 2:** *"What are my movie preferences?"*
+The context provider injects relevant past messages automatically. The agent **also** calls `recall_preferences` to retrieve the explicit preferences it saved. It reports both.
 
-Turn 3: "Based on what you know about me, what should I watch next?"
-    --> Context provider before_run(): injects memories as background
-    --> Agent calls: search_knowledge("Christopher Nolan movies")
-    --> Agent calls: recall_preferences("themes")
-    --> Generates grounded recommendation
-```
+**Turn 3:** *"Based on what you know about me, what should I watch next?"*
+The context provider injects memories as background context. The agent calls `search_knowledge` and `recall_preferences` to gather targeted information, then generates a grounded recommendation.
 
 ---
 
@@ -153,23 +130,13 @@ The agent now operates on two levels simultaneously:
 
 ## Verifying Stored Memories
 
-After the conversation, inspect what the memory system has stored:
+After the conversation, use `search_memory()` to inspect what both mechanisms have stored:
 
-```python
-results = await memory.search_memory(
-    query="user preferences and interests",
-    include_messages=True,
-    include_entities=True,
-    include_preferences=True,
-    limit=5,
-)
+- **Preferences** — explicitly saved by the agent via `remember_preference`
+- **Entities** — automatically extracted by the context provider's `after_run()`
+- **Messages** — stored by the context provider after each turn
 
-print("Preferences:", results.get("preferences", []))
-print("Entities:", results.get("entities", []))
-print(f"Messages stored: {len(results.get('messages', []))}")
-```
-
-Confirms that both the context provider and tools have persisted data in Neo4j.
+This confirms that both the passive context provider and the active memory tools are persisting data in the same Neo4j graph. You'll verify this in the lab.
 
 ---
 

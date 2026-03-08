@@ -32,6 +32,57 @@ ol > li {
 
 ---
 
+## Hallucination: Confident But Wrong
+
+LLMs generate responses based on statistical likelihood, not factual verification.
+
+- Produces the most *probable* continuation, not the most *accurate*
+- Doesn't say "I don't know" — generates plausible-sounding text instead
+- Complete with fabricated details and citations
+
+**Real Example:** In 2023, US lawyers were sanctioned for submitting an LLM-generated brief with six fictitious case citations.
+
+---
+
+## Knowledge Cutoff: No Access to Your Data
+
+LLMs are trained at a specific point in time on publicly available data.
+
+**They don't know:**
+- Recent events after their training cutoff
+- Your company's documents, databases, or internal knowledge
+- Real-time data: current prices, live statistics, changing conditions
+
+**The Risk:** Ask about your Q3 results or last week's board meeting, and the LLM may still generate a confident (and wrong) response.
+
+---
+
+## Relationship Blindness: Can't Connect the Dots
+
+LLMs process text sequentially and treat each piece in isolation.
+
+**Questions they struggle with:**
+- "Which asset managers own companies facing cybersecurity risks?"
+- "What products are mentioned by companies that share risk factors?"
+- "How are these two companies connected through their executives?"
+
+These questions require *reasoning over relationships* — connecting entities across documents and traversing chains of connections.
+
+---
+
+## The Solution: Providing Context
+
+All three limitations have a common solution — **providing context**.
+
+When you give an LLM relevant information in its prompt:
+- It has facts to work with (reduces hallucination)
+- It can access your specific data (overcomes knowledge cutoff)
+- You can structure that information to show relationships (enables reasoning)
+
+But how do you provide that context? One approach is **tools** — but they have limits.
+
+---
+
 ## The Problem with Tools Alone
 
 Tools are **reactive** -- the agent must recognize a tool is relevant and choose to call it.
@@ -169,19 +220,6 @@ agent = client.as_agent(
 ```
 
 You can register **multiple providers**. Each runs in order before and after every invocation.
-
----
-
-## Tools vs. Context Providers
-
-| | Tools | Context Providers |
-|---|-------|-------------------|
-| **Trigger** | Agent chooses to call | Runs automatically every turn |
-| **Best for** | Specific actions (lookup, calculate) | Background knowledge, personalization |
-| **Risk** | Agent may skip the call | Always injects context |
-| **Example** | "Search for movie X" | "User prefers sci-fi" |
-
-Use **tools** for on-demand actions. Use **context providers** for knowledge that should always be present.
 
 ---
 

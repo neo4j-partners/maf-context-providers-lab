@@ -88,25 +88,13 @@ The agent calls `find_similar_items` to discover entities with similar relations
 
 ## Configuring GDS Integration
 
-GDS is **optional**. Enable it through `Neo4jMicrosoftMemory`:
+GDS is **optional**. Enable it by passing a `GDSConfig` to `Neo4jMicrosoftMemory`:
 
-```python
-from neo4j_agent_memory.integrations.microsoft_agent import GDSConfig
+- **`enabled`** — master toggle for all GDS features
+- **`use_pagerank_for_ranking`** — when true, entity search results are ranked partly by PageRank (graph importance) in addition to embedding similarity
+- **`pagerank_weight`** — controls how much PageRank influences ranking (0.0–1.0)
 
-memory = Neo4jMicrosoftMemory.from_memory_client(
-    memory_client=memory_client,
-    session_id="movie-gds-session",
-    include_short_term=True,
-    include_long_term=True,
-    include_reasoning=True,
-    extract_entities=True,
-    gds_config=GDSConfig(
-        enabled=True,
-        use_pagerank_for_ranking=True,
-        pagerank_weight=0.3,
-    ),
-)
-```
+Everything else about the memory setup stays the same — you're just adding graph algorithm capabilities on top of the existing memory system.
 
 ---
 
@@ -125,11 +113,7 @@ Higher `pagerank_weight` values favor well-connected entities in search results.
 
 ## GDS Tools
 
-When GDS is enabled, `create_memory_tools()` generates **additional tools**:
-
-```python
-tools = create_memory_tools(memory, include_gds_tools=True)
-```
+When GDS is enabled, passing `include_gds_tools=True` to `create_memory_tools()` generates three **additional tools**:
 
 | Tool | Purpose |
 |------|---------|
@@ -137,29 +121,19 @@ tools = create_memory_tools(memory, include_gds_tools=True)
 | **`find_similar_items`** | Entities with similar graph neighborhoods |
 | **`find_important_entities`** | Most central entities by PageRank |
 
-These work alongside the six standard memory tools.
+These work alongside the six standard memory tools. The agent decides when to call them based on the user's question.
 
 ---
 
 ## Example: Using GDS Tools
 
-```python
-agent = client.as_agent(
-    name="movie-gds-agent",
-    instructions=(
-        "You are a movie assistant with access to a knowledge graph. "
-        "You can find connections between entities, discover similar "
-        "items, and identify the most important topics in conversations."
-    ),
-    tools=tools,
-    context_providers=[memory.context_provider],
-)
+Consider a question like *"How is Christopher Nolan connected to Ridley Scott?"*
 
-query = "How is Christopher Nolan connected to Ridley Scott?"
-response = await agent.run(query, session=session)
-```
+- The agent recognizes this as a connection question and calls `find_connection_path`
+- The tool traverses the entity graph and finds paths through shared actors, genres, themes, or conversation mentions
+- The agent explains the connection to the user in natural language
 
-The agent uses `find_connection_path` to traverse the entity graph and find connections through shared actors, genres, themes, or conversation mentions.
+The agent's instructions should mention its graph algorithm capabilities so the LLM knows these tools are available. The same pattern works for importance questions (`find_important_entities`) and similarity questions (`find_similar_items`).
 
 ---
 

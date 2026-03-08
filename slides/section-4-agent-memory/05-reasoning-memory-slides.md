@@ -62,126 +62,63 @@ Each trace gets a **vector embedding** of the task description, enabling semanti
 
 ## Recording Traces
 
-The `record_agent_trace()` function captures a completed agent execution:
+The `record_agent_trace()` function captures a completed agent execution. You provide:
 
-```python
-from neo4j_agent_memory.integrations.microsoft_agent import (
-    record_agent_trace,
-)
+- **Task** — what the agent was trying to accomplish
+- **Tool calls** — each tool invocation with its name, arguments, result, status, and duration
+- **Outcome** — a description of what the agent concluded
+- **Success** — whether the task completed successfully
 
-trace = await record_agent_trace(
-    memory=memory,
-    messages=[],
-    task="Find sci-fi movies about time travel",
-    tool_calls=[
-        {
-            "name": "search_knowledge",
-            "arguments": {"query": "time travel sci-fi"},
-            "result": ["Interstellar", "The Matrix", "Back to the Future"],
-            "status": "success",
-            "duration_ms": 150,
-        }
-    ],
-    outcome="Recommended Interstellar based on user preference for Nolan films",
-    success=True,
-)
-```
+The function stores the full trace in Neo4j as connected nodes (trace → steps → tool calls), with a vector embedding of the task description for later semantic search.
 
 ---
 
 ## How Traces Are Stored in Neo4j
 
-The trace is stored as connected nodes:
+The trace is stored as a hierarchy of connected nodes:
 
-```
-(ReasoningTrace)
-    |
-    +--[:HAS_STEP]-->(ReasoningStep)
-    |                     |
-    |               [:USES_TOOL]-->(ToolCall)
-    |
-    +--[:IN_SESSION]-->(Session)
-```
-
-- The trace links to its steps
-- Each step links to its tool calls
-- The entire structure connects to the session where it occurred
-- Each trace gets a vector embedding for semantic search
+- A **ReasoningTrace** node holds the task description, outcome, and success status
+- It links to individual **ReasoningStep** nodes via `HAS_STEP` relationships
+- Each step links to its **ToolCall** nodes via `USES_TOOL` relationships
+- The entire structure connects to the **Session** where it occurred
+- Each trace gets a **vector embedding** of its task description, enabling semantic search for similar past tasks
 
 ---
 
 ## Streaming Trace Recording
 
-For real-time agent execution, the `StreamingTraceRecorder` context manager records traces as they happen:
+For real-time agent execution, the `StreamingTraceRecorder` records traces **as they happen** rather than after completion:
 
-```python
-from neo4j_agent_memory.memory.reasoning import StreamingTraceRecorder
+- Use it as an async context manager — it opens a trace on entry and finalizes it on exit
+- Call `start_step()` to begin a reasoning step with a thought and planned action
+- Call `record_tool_call()` each time the agent invokes a tool
+- Call `add_observation()` to record what the agent learned from the result
 
-async with StreamingTraceRecorder(
-    memory_client.reasoning,
-    session_id="user-123",
-    task="Recommend a movie for the user",
-) as recorder:
-    step = await recorder.start_step(
-        thought="User likes Christopher Nolan. Check preferences.",
-        action="recall_preferences",
-    )
-    await recorder.record_tool_call(
-        "recall_preferences",
-        {"topic": "movies"},
-        result={"preferences": ["Christopher Nolan", "sci-fi"]},
-    )
-    await recorder.add_observation(
-        "User prefers Christopher Nolan and sci-fi. Recommending Interstellar."
-    )
-```
+This is useful when you want to capture the agent's reasoning process step by step, rather than reconstructing it after the fact.
 
 ---
 
 ## Finding Similar Traces
 
-When the agent encounters a new task, it searches for traces from similar past tasks:
+When the agent encounters a new task, it can search for traces from similar past tasks using `get_similar_traces()`.
 
-```python
-from neo4j_agent_memory.integrations.microsoft_agent import (
-    get_similar_traces,
-)
+- The function embeds the new task description and performs a **vector similarity search** against stored traces
+- Returns matching traces with their task, outcome, success status, and steps
+- The agent can review what worked (or failed) before deciding on an approach
 
-traces = await get_similar_traces(
-    memory=memory,
-    task="Find action movies with good ratings",
-    limit=3,
-)
-
-for trace in traces:
-    print(f"Task: {trace.task}")
-    print(f"Outcome: {trace.outcome}")
-    print(f"Success: {trace.success}")
-    print(f"Steps: {len(trace.steps)}")
-```
-
-Uses vector embedding of the task description to find **semantically similar** past traces.
+This is how agents **learn from experience** — not by retraining, but by retrieving relevant past executions at inference time.
 
 ---
 
 ## Tool Statistics
 
-Reasoning memory tracks **aggregate statistics** about tool usage:
+Reasoning memory tracks **aggregate statistics** about tool usage across all recorded traces. Calling `get_tool_stats()` reveals:
 
-```python
-stats = await memory_client.reasoning.get_tool_stats()
+- Which tools work **reliably** (high success rate)
+- Which tools are **slow** (high average duration)
+- Which tools **fail often** (low success rate)
 
-for tool in stats:
-    print(f"{tool.name}: {tool.success_rate:.0%} success, "
-          f"avg {tool.avg_duration_ms}ms")
-```
-
-This reveals:
-- Which tools work **reliably**
-- Which tools are **slow**
-- Which tools **fail often**
-
-The agent can use this information to prefer tools with higher success rates.
+The agent can use this information to prefer tools with higher success rates or to flag unreliable tools for investigation. Over time, this builds a performance profile of every tool in the agent's toolkit.
 
 ---
 
@@ -200,20 +137,9 @@ The agent can use this information to prefer tools with higher success rates.
 
 ## Reasoning Memory in Action
 
-```
-Session 1:
-    Task: "Find sci-fi movies about time travel"
-    Steps: search_knowledge("time travel sci-fi") --> found 3 movies
-    Outcome: Recommended Interstellar (SUCCESS)
-    --> Trace stored with vector embedding
+**Session 1:** The agent handles *"Find sci-fi movies about time travel."* It uses `search_knowledge`, finds 3 movies, and recommends Interstellar. The trace is stored with a vector embedding of the task.
 
-Session 2:
-    Task: "Find action movies with good ratings"
-    --> before_run() finds similar trace from Session 1
-    --> Agent sees that search_knowledge worked well
-    --> Uses same approach: search_knowledge("action movies ratings")
-    --> Gets better results by learning from past success
-```
+**Session 2:** A new task arrives: *"Find action movies with good ratings."* Before the agent acts, `before_run()` finds the similar trace from Session 1. The agent sees that `search_knowledge` worked well for a similar movie-finding task, so it uses the same approach — and gets better results by learning from past success.
 
 ---
 

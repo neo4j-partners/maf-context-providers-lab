@@ -93,27 +93,16 @@ Each entity node stores name, type, subtype, description, confidence score, and 
 
 ---
 
-## Configuring Extraction with MemorySettings
+## Configuring Extraction
 
-```python
-settings = MemorySettings(
-    neo4j={
-        "uri": os.environ["NEO4J_URI"],
-        "username": os.environ["NEO4J_USERNAME"],
-        "password": SecretStr(os.environ["NEO4J_PASSWORD"]),
-    },
-    extraction={
-        "extractor_type": "pipeline",
-        "enable_spacy": True,
-        "enable_gliner": True,
-        "enable_llm_fallback": True,
-        "confidence_threshold": 0.5,
-        "entity_types": [
-            "PERSON", "ORGANIZATION", "LOCATION", "EVENT", "OBJECT"
-        ],
-    },
-)
-```
+Extraction is configured through `MemorySettings` with an `extraction` section that controls:
+
+- **Which stages to enable** — spaCy, GLiNER, and LLM fallback can each be toggled independently
+- **Confidence threshold** — a minimum score (0.0–1.0) for storing an entity. Lower means more entities but also more noise
+- **Entity types** — limit extraction to specific POLE+O types (e.g., only PERSON and ORGANIZATION)
+- **Extractor type** — `"pipeline"` for multi-stage extraction, or `"llm"` for LLM-only
+
+You'll configure these settings in the lab.
 
 ---
 
@@ -155,56 +144,27 @@ The package deduplicates using **embedding similarity**:
 | Between **flag** (0.85) and auto-merge | Flagged for review |
 | Below **flag** threshold | Treated as distinct entities |
 
-```python
-resolution={
-    "strategy": "composite",
-    "exact_threshold": 1.0,
-    "fuzzy_threshold": 0.85,
-    "semantic_threshold": 0.8,
-}
-```
+Resolution uses a composite strategy combining exact matching, fuzzy string matching, and semantic similarity — each with configurable thresholds.
 
 ---
 
 ## Automatic vs Manual Extraction
 
-**Automatic:** When `extract_entities=True` is set on `Neo4jMicrosoftMemory`, entity extraction runs in `after_run()` after every agent response. Runs **asynchronously** so it doesn't slow responses.
+**Automatic:** When `extract_entities=True` is set on `Neo4jMicrosoftMemory`, entity extraction runs in `after_run()` after every agent response. It runs **asynchronously** so it doesn't slow down the response to the user.
 
-**Manual:** Pre-populate the memory graph with known entities:
-
-```python
-async with MemoryClient(settings) as memory_client:
-    entity = await memory_client.long_term.add_entity(
-        name="Inception",
-        entity_type="OBJECT",
-        description="2010 science fiction film directed by Christopher Nolan",
-    )
-```
+**Manual:** You can also pre-populate the memory graph with known entities using the `MemoryClient` directly. This is useful for seeding the graph with domain knowledge before the agent starts conversing — for example, adding key people, products, or locations that the agent should already know about.
 
 ---
 
 ## The Full Pipeline in Action
 
-```
-User: "I love Christopher Nolan's Inception"
-                    |
-        +-----------+-----------+
-        v           v           v
-      spaCy      GLiNER       LLM
-   "Christopher  "Christopher  (skips already
-    Nolan"        Nolan"        found entities)
-   (PERSON)      (PERSON,
-                  conf: 0.95)
-        +-----+-----+
-              v
-        Merge (confidence strategy)
-              v
-    "Christopher Nolan" (PERSON, 0.95)
-    "Inception" (OBJECT, 0.92)
-              v
-    Store in Neo4j as :Entity nodes
-    Link to source conversation
-```
+Given a message like *"I love Christopher Nolan's Inception"*:
+
+1. **spaCy** quickly identifies "Christopher Nolan" as a PERSON
+2. **GLiNER** confirms "Christopher Nolan" (PERSON, confidence 0.95) and also finds "Inception" (OBJECT, confidence 0.92)
+3. **LLM** skips entities already found, saving time and cost
+4. **Merge** uses the confidence strategy — keeps the highest-confidence result for each entity
+5. **Store** — both entities are saved as `:Entity` nodes in Neo4j, linked back to the source conversation
 
 ---
 

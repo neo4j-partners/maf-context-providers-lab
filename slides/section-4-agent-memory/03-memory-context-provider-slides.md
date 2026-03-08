@@ -47,40 +47,24 @@ The interface is `Neo4jMicrosoftMemory`, which wraps the memory client into a co
 
 ## Configure Memory Settings
 
-Connect to Neo4j and create a memory client:
+Setting up memory requires two steps:
 
-```python
-settings = MemorySettings(
-    neo4j={
-        "uri": os.environ["NEO4J_URI"],
-        "username": os.environ["NEO4J_USERNAME"],
-        "password": SecretStr(os.environ["NEO4J_PASSWORD"]),
-    },
-)
+1. **Create `MemorySettings`** — provide Neo4j connection details (URI, username, password), plus any extraction or resolution configuration
+2. **Create a `MemoryClient`** — use it as an async context manager (`async with`) which automatically connects on entry and closes the connection on exit
 
-async with MemoryClient(settings) as memory_client:
-    # memory_client is now connected to Neo4j
-    ...
-```
-
-The `async with` block automatically connects on entry and closes the connection on exit.
+The `MemoryClient` is the entry point to all three memory types (short-term, long-term, reasoning) and is passed to the higher-level components you'll use next.
 
 ---
 
 ## Create the Unified Memory
 
-`Neo4jMicrosoftMemory.from_memory_client()` returns an object that provides both a context provider and a chat message store:
+`Neo4jMicrosoftMemory.from_memory_client()` wraps the client into a unified interface that provides both a context provider and a chat message store.
 
-```python
-memory = Neo4jMicrosoftMemory.from_memory_client(
-    memory_client=memory_client,
-    session_id=session_id,
-    include_short_term=True,
-    include_long_term=True,
-    include_reasoning=True,
-    extract_entities=True,
-)
-```
+You configure it with:
+
+- **`session_id`** — scopes the conversation; messages and entities are grouped by session
+- **`include_short_term`** / **`include_long_term`** / **`include_reasoning`** — toggle which memory types are injected before each turn
+- **`extract_entities`** — whether to automatically extract entities after each turn
 
 ---
 
@@ -98,20 +82,11 @@ memory = Neo4jMicrosoftMemory.from_memory_client(
 
 ## Attach the Context Provider
 
-Pass `memory.context_provider` to the agent the same way you passed `Neo4jContextProvider` in Module 3:
+Pass `memory.context_provider` to the agent in the `context_providers` list — the same way you passed `Neo4jContextProvider` in Module 3.
 
-```python
-agent = client.as_agent(
-    name="movie-memory-agent",
-    instructions=(
-        "You are a movie recommendation assistant with persistent "
-        "memory. You remember what users have told you about their "
-        "preferences, which movies you have discussed, and what "
-        "you recommended in past sessions."
-    ),
-    context_providers=[memory.context_provider],
-)
-```
+- The agent doesn't need to know it's using memory — the context provider handles everything transparently
+- You can combine it with other context providers (e.g., a knowledge graph provider and a memory provider together)
+- The agent's instructions should mention that it has memory, so the LLM knows to reference past context in its responses
 
 ---
 
@@ -134,58 +109,40 @@ The provider follows the same `before_run()` / `after_run()` lifecycle from Modu
 
 ## No Tool Calls Required
 
-The context provider runs **automatically on every turn**.
+The context provider runs **automatically on every turn**. The agent never decides to look something up or save a preference — the framework does it.
 
-The agent never decides to look something up or save a preference. The framework does it.
+1. User query arrives
+2. `before_run()` searches memory and injects relevant context
+3. The LLM generates a response with that memory context available
+4. `after_run()` stores the new messages and extracts entities
 
-```
-User query arrives
-    --> before_run() searches memory, injects context
-        --> LLM generates response with memory context
-            --> after_run() stores messages, extracts entities
-```
-
-This is **passive memory** -- always working in the background.
+This is **passive memory** — always working in the background, no agent decision needed.
 
 ---
 
 ## Multi-Turn Conversation Example
 
-```python
-queries = [
-    "I really enjoy sci-fi movies, especially ones about time travel.",
-    "What did I say my favorite genre was?",
-    "Can you recommend something I might like?",
-]
-```
+**Turn 1:** *"I really enjoy sci-fi movies, especially ones about time travel."*
+`after_run()` saves the message and extracts "sci-fi" and "time travel" as entities.
 
-**Turn 1:** User states a preference. `after_run()` saves the message and extracts "sci-fi" and "time travel" as entities.
+**Turn 2:** *"What did I say my favorite genre was?"*
+`before_run()` retrieves the previous message via semantic search and injects it as context. The agent answers accurately.
 
-**Turn 2:** User asks what they said. `before_run()` retrieves the previous message via semantic search and injects it as context. The agent answers accurately.
-
-**Turn 3:** The agent has both conversation history and extracted preferences. It recommends based on what the user actually said.
+**Turn 3:** *"Can you recommend something I might like?"*
+The agent has both conversation history and extracted preferences. It recommends based on what the user actually said.
 
 ---
 
 ## Inspecting Stored Memories
 
-After the conversation, verify what the provider stored:
+After the conversation, you can verify what the provider stored by calling `search_memory()` with a query string.
 
-```python
-results = await memory.search_memory(
-    query="sci-fi movies",
-    include_messages=True,
-    include_entities=True,
-    include_preferences=True,
-    limit=5,
-)
+The search returns results across all memory types you request:
+- **Messages** — past conversation turns that match semantically
+- **Entities** — extracted people, objects, locations, etc.
+- **Preferences** — user preferences the system captured
 
-print("Messages:", results.get("messages", []))
-print("Entities:", results.get("entities", []))
-print("Preferences:", results.get("preferences", []))
-```
-
-This returns messages, entity nodes, and preferences that `after_run()` extracted and stored in Neo4j.
+This lets you confirm that `after_run()` is extracting and storing data correctly in Neo4j. You'll use this in the lab to inspect your agent's memory.
 
 ---
 

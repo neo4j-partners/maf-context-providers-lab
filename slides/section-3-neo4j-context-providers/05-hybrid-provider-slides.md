@@ -46,19 +46,13 @@ ol > li {
 
 ## How Hybrid Search Works
 
-```
-1. User: "Christopher Nolan sci-fi movies about dreams"
-       ↓
-2. Vector search: embed query → find semantically similar plots
-       ↓
-3. Fulltext search: tokenize query → find keyword matches
-       ↓
-4. Combine scores from both searches
-       ↓
-5. Single ranked result set injected as context
-```
+Hybrid search runs **both** search modes in parallel on the same query:
 
-A movie can rank highly on semantics, keywords, or both. Results scoring well on both dimensions rise to the top.
+1. **Vector search** embeds the query and finds semantically similar content
+2. **Fulltext search** tokenizes the query and finds keyword matches
+3. **Scores are combined** into a single ranked result set
+
+A movie can rank highly on semantics, keywords, or both. Results that score well on **both** dimensions rise to the top — this is why hybrid catches what either mode alone might miss.
 
 ---
 
@@ -92,53 +86,25 @@ Both indexes must exist in Neo4j before the provider can use them.
 
 ## Configure the Provider
 
-```python
-from agent_framework_neo4j import Neo4jContextProvider, Neo4jSettings
-from neo4j_graphrag.embeddings.openai import OpenAIEmbeddings
+Hybrid search builds on the vector provider setup with one addition:
 
-neo4j_settings = Neo4jSettings()
-embedder = OpenAIEmbeddings(model="text-embedding-ada-002")
+- **Set `index_type` to `"hybrid"`** instead of `"vector"`
+- **Add `fulltext_index_name`** — points to your fulltext index for keyword matching
+- **Keep `index_name` and `embedder`** — these are still needed for the vector search half
 
-provider = Neo4jContextProvider(
-    uri=neo4j_settings.uri,
-    username=neo4j_settings.username,
-    password=neo4j_settings.get_password(),
-    index_name=neo4j_settings.vector_index_name,
-    index_type="hybrid",
-    fulltext_index_name=neo4j_settings.fulltext_index_name,
-    embedder=embedder,
-    top_k=5,
-)
-```
-
-The key addition: `fulltext_index_name` alongside the vector `index_name`.
+The provider runs both searches internally and merges the results before returning them. Everything else (`top_k`, `context_prompt`, connection settings) works the same.
 
 ---
 
-## Run the Agent
+## Using the Provider with an Agent
 
-```python
-async def main():
-    async with provider:
-        client = OpenAIResponsesClient()
+The hybrid provider plugs into an agent identically to vector or fulltext:
 
-        agent = client.as_agent(
-            name="movie-hybrid-agent",
-            instructions=(
-                "You are a movie recommendation assistant. "
-                "Answer questions using the movie data "
-                "provided in your context."
-            ),
-            context_providers=[provider],
-        )
+- Pass it in the `context_providers` list when creating the agent
+- The agent automatically retrieves hybrid results before each LLM call
+- No changes to agent setup, instructions, or session handling are needed
 
-        session = agent.create_session()
-        response = await agent.run(
-            "Christopher Nolan sci-fi movies about dreams",
-            session=session,
-        )
-        print(response.text)
-```
+All three search modes are interchangeable from the agent's perspective — the difference is entirely in how the provider retrieves and ranks results.
 
 ---
 
@@ -170,32 +136,20 @@ Hybrid is the most versatile but uses more resources than either mode alone.
 
 ## Graph Enrichment with Hybrid
 
-Hybrid search supports `retrieval_query` for graph enrichment:
+Hybrid search supports `retrieval_query` for graph enrichment, just like the other modes:
 
-```python
-provider = Neo4jContextProvider(
-    index_name=neo4j_settings.vector_index_name,
-    index_type="hybrid",
-    fulltext_index_name=neo4j_settings.fulltext_index_name,
-    embedder=embedder,
-    retrieval_query=RETRIEVAL_QUERY,  # Cypher traversal
-    top_k=5,
-)
-```
-
-When provided, the provider uses `HybridCypherRetriever` instead of `HybridRetriever`. The retrieval query receives `node` and `score` from the combined results.
+- Add the `retrieval_query` parameter with your Cypher traversal query
+- The query receives `node` and `score` from the **combined** hybrid results
+- The provider automatically switches to `HybridCypherRetriever` under the hood
+- The same retrieval query Cypher works across all three search modes
 
 ---
 
 ## Choosing Your Search Strategy
 
-```
-Do you need semantic understanding?
-├── No  → Fulltext (simplest setup)
-├── Yes → Do you also need keyword precision?
-│   ├── No  → Vector (semantic only)
-│   └── Yes → Hybrid (both combined)
-```
+- **Fulltext** — best when queries use specific names, titles, or keywords. Simplest setup, no embedder needed.
+- **Vector** — best when queries are conceptual or exploratory ("movies about finding meaning in life"). Requires an embedder.
+- **Hybrid** — best when you expect a mix of both styles, or you're unsure how users will query. Requires both indexes and an embedder.
 
 All three modes support graph enrichment via `retrieval_query`.
 

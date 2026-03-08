@@ -48,64 +48,41 @@ But your graph contains far more:
 
 ## The Two-Step Process
 
-```
-Step 1: Index Search
-    Query → find matching movies → ranked by relevance
-        ↓
-    Returns: node (matched movie) + score
+**Step 1 — Index Search**
+- Your query is matched against the index (vector, fulltext, or hybrid)
+- Returns matched nodes ranked by relevance, each with a similarity `score`
 
-Step 2: Graph Traversal (retrieval_query)
-    For each matched node, execute Cypher
-        ↓
-    Traverse relationships: movie → genres, actors, directors
-        ↓
-    Returns: enriched context with structured metadata
-```
+**Step 2 — Graph Traversal (retrieval_query)**
+- For each matched node, the provider runs your Cypher `retrieval_query`
+- The query traverses outward from the matched node — following relationships to collect genres, actors, directors, or whatever your graph contains
+- Returns enriched context combining the original text with structured metadata
 
-The movie is the **anchor** -- you traverse outward from what search found.
+The matched node is the **anchor** — you traverse outward from what search found.
 
 ---
 
 ## The retrieval_query Parameter
 
-Adding a `retrieval_query` enables graph enrichment:
+The `retrieval_query` is a Cypher query that runs **after** the index search completes:
 
-```python
-provider = Neo4jContextProvider(
-    index_name="moviePlots",
-    index_type="vector",
-    embedder=embedder,
-    retrieval_query=RETRIEVAL_QUERY,  # Cypher for traversal
-    top_k=5,
-)
-```
-
-When set, the provider uses `VectorCypherRetriever` instead of `VectorRetriever`.
+- It receives each matched `node` and its similarity `score` from the search step
+- It defines what graph data to traverse and return — relationships, properties, aggregated lists
+- It transforms raw search hits into enriched context before sending to the LLM
+- Without it, the provider returns only the text property of matched nodes
+- With it, the provider switches to a Cypher-aware retriever (`VectorCypherRetriever` or `HybridCypherRetriever`) that executes your query for each result
 
 ---
 
-## Example Retrieval Query
+## How a Retrieval Query Works
 
-```cypher
-MATCH (node)-[:IN_GENRE]->(g:Genre)
-WITH node, score, collect(DISTINCT g.name) AS genres
-OPTIONAL MATCH (p:Person)-[:ACTED_IN]->(node)
-WITH node, score, genres, collect(DISTINCT p.name)[0..5] AS actors
-OPTIONAL MATCH (d:Person)-[:DIRECTED]->(node)
-WITH node, score, genres, actors, collect(DISTINCT d.name) AS directors
-WHERE score IS NOT NULL
-RETURN
-    node.plot AS text,
-    score,
-    node.title AS title,
-    node.released AS released,
-    genres,
-    actors,
-    directors
-ORDER BY score DESC
-```
+Starting from each matched `node` (with its `score` from the index search), the query:
 
-`node` and `score` come from the index search. The rest is graph traversal.
+1. **Traverses relationships** — follows paths like `Movie → IN_GENRE → Genre` to collect connected data
+2. **Aggregates results** — gathers related values into lists (e.g., all genre names, actor names)
+3. **Controls size** — limits collected lists (e.g., top 5 actors) to keep context manageable
+4. **Returns structured output** — must include at least `text` and `score`, plus any additional fields you want the LLM to see
+
+You'll write the full Cypher for this in the lab.
 
 ---
 
@@ -160,43 +137,25 @@ The LLM now has structured context alongside the text.
 
 ## Why OPTIONAL MATCH Matters
 
-**Without OPTIONAL MATCH:**
-```cypher
-MATCH (p:Person)-[:ACTED_IN]->(node)
-```
-Only returns movies that have actors in the graph. Movies without actor data are dropped.
+When traversing relationships in your retrieval query:
 
-**With OPTIONAL MATCH:**
-```cypher
-OPTIONAL MATCH (p:Person)-[:ACTED_IN]->(node)
-```
-Returns all matched movies; actor list is empty if none exist.
+- **`MATCH`** requires the relationship to exist — if a movie has no actors in the graph, that movie is **dropped entirely** from the results
+- **`OPTIONAL MATCH`** keeps every matched node — if the relationship doesn't exist, the collected list is simply empty
 
-**Use OPTIONAL MATCH** for complete results.
+This matters because your index search already found relevant results. You don't want the graph traversal step to silently remove them just because one relationship is missing.
+
+**Rule of thumb:** use `OPTIONAL MATCH` for any relationship that might not exist on every node.
 
 ---
 
 ## Configure the Provider
 
-```python
-provider = Neo4jContextProvider(
-    uri=neo4j_settings.uri,
-    username=neo4j_settings.username,
-    password=neo4j_settings.get_password(),
-    index_name=neo4j_settings.vector_index_name,
-    index_type="vector",
-    retrieval_query=RETRIEVAL_QUERY,
-    embedder=embedder,
-    top_k=5,
-    context_prompt=(
-        "## Graph-Enriched Movie Context\n"
-        "The following combines semantic search with graph traversal "
-        "to provide movie, actor, genre, and director context:"
-    ),
-)
-```
+To add graph enrichment to an existing provider, you only change one thing:
 
-The only difference from basic vector search is `retrieval_query`.
+- **Add `retrieval_query`** — pass your Cypher query as a string parameter
+- Everything else (`index_name`, `index_type`, `embedder`, `top_k`, `context_prompt`) stays the same as basic vector search
+
+The provider detects that `retrieval_query` is set and automatically switches to the Cypher-aware retriever under the hood. No other configuration changes are needed.
 
 ---
 

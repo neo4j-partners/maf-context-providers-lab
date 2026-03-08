@@ -145,23 +145,11 @@ Stores **traces of past agent behavior** for learning.
 
 All three memory types live in the same Neo4j database as graph structures:
 
-```
-(Conversation)--[:HAS_MESSAGE]-->(Message)
-                                    |
-                    +---------------+---------------+
-                    v               v               v
-              [:MENTIONS]    [:EXTRACTED_FROM]  [:INITIATED_BY]
-                    v               v               v
-               (Entity)         (Entity)    (ReasoningTrace)
-                    |                           |
-              [:RELATED_TO]              [:HAS_STEP]
-                    v                           v
-               (Entity)              (ReasoningStep)
-                                            |
-                                      [:USES_TOOL]
-                                            v
-                                        (ToolCall)
-```
+- **Conversations** contain linked **Message** nodes (short-term memory)
+- Messages link to **Entity** nodes that were mentioned or extracted from them (long-term memory)
+- Entities link to **other entities** they relate to, forming a knowledge graph
+- **ReasoningTrace** nodes connect to their individual **steps** and **tool calls** (reasoning memory)
+- Everything connects back to the **session** where it occurred
 
 ---
 
