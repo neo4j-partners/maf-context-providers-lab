@@ -79,3 +79,5 @@ In this course, you will build self-grounding agents that:
 The Microsoft Agent Framework succeeds Semantic Kernel and AutoGen, combining both into a single framework. Its key differentiator is context providers: components that run automatically before and after every LLM call to inject and extract context. Tools are reactive — the agent decides when to call them — while context providers are proactive, injecting relevant knowledge on every turn without the agent needing to ask. This enables self-grounding agents that are always informed by relevant data without requiring tool calls.
 
 In the next lesson, you will set up your development environment with OpenAI and Neo4j.
+
+xref:1-3-first-agent.adoc[Next Page ->]

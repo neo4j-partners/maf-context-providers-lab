@@ -199,3 +199,5 @@ asyncio.run(main())
 Hybrid search combines vector and fulltext search by running both and merging the results. It requires a vector index, a fulltext index, and an embedder. This mode catches both semantic and keyword matches, making it the most versatile option when users mix conceptual and specific queries.
 
 In the next module, you will give agents persistent memory using the `neo4j-agent-memory` package.
+
+xref:4-agent-memory.adoc[Next Page ->]

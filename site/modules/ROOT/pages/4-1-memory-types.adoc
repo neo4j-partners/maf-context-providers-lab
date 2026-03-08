@@ -22,11 +22,11 @@ The `neo4j-agent-memory` package maps these three categories to distinct memory 
 
 === Short-Term Memory
 
-Conversation messages stored as linked nodes in Neo4j. Each message gets a vector embedding, so the agent can do semantic search across past conversations, not just retrieve the last N messages. If a user mentioned "Blade Runner" three sessions ago, short-term memory can surface that conversation when the topic comes up again.
+Conversation messages are stored as linked nodes in Neo4j. Each message gets a vector embedding, so the agent can do semantic search across past conversations, not just retrieve the last N messages. If a user mentioned "Blade Runner" three sessions ago, short-term memory can surface that conversation when the topic comes up again.
 
 === Long-Term Memory
 
-Entities, preferences, and facts extracted from conversations using the POLE+O data model (Person, Object, Location, Event, Organization). When a user says "I love Christopher Nolan films," long-term memory stores that as a preference. When the agent discusses "Inception," it stores the movie as an entity linked to its director, genre, and the conversation where it was mentioned.
+Entities, preferences, and facts are extracted from conversations using the POLE+O data model (Person, Object, Location, Event, Organization). When a user says "I love Christopher Nolan films," long-term memory stores that as a preference. When the agent discusses "Inception," it stores the movie as an entity linked to its director, genre, and the conversation where it was mentioned.
 
 This extraction happens automatically. Over time, the agent builds a graph of knowledge about each user and the topics they discuss.
 
@@ -59,3 +59,5 @@ The next lesson covers how entities are extracted from conversations. Subsequent
 The `neo4j-agent-memory` package provides three memory types: short-term (conversation history with semantic search), long-term (entities, preferences, and facts in the POLE+O model), and reasoning (traces of past agent behavior). All are stored as connected graph structures in Neo4j.
 
 In the next lesson, you will learn how the multi-stage entity extraction pipeline turns unstructured conversation text into structured graph entities.
+
+xref:4-2-entity-extraction.adoc[Next Page ->]

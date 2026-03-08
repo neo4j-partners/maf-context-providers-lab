@@ -140,3 +140,5 @@ The `find_similar_tasks` tool (from `create_memory_tools()`) gives the agent exp
 Reasoning memory records agent execution traces including tasks, steps, tool calls, and outcomes. These traces are stored with vector embeddings so the agent can find similar past tasks using semantic search. The agent can learn from past successes and failures, either through automatic context injection or explicit tool calls.
 
 In the next lesson, you will explore optional graph algorithm integration for advanced entity analysis.
+
+xref:4-6-gds-integration.adoc[Next Page ->]

@@ -286,3 +286,5 @@ asyncio.run(main())
 Memory tools give the agent explicit control over search, save, and recall operations, while the context provider continues to handle background memory injection automatically. The combined pattern covers both passive context (always available) and active operations (agent-directed).
 
 In the next lesson, you will explore reasoning memory to capture and learn from past agent executions.
+
+xref:4-5-reasoning-memory.adoc[Next Page ->]

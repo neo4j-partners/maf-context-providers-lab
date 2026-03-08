@@ -4,7 +4,11 @@ The context provider you built from scratch in Module 2 managed its own state an
 
 The link:https://github.com/neo4j-labs/neo4j-maf-provider[`agent-framework-neo4j`^] package provides `Neo4jContextProvider`, a ready-made context provider that connects to a Neo4j database, searches an index, and injects the results before every LLM call. It extends the same `BaseContextProvider` you used earlier but handles the search, embedding, and formatting internally.
 
-Under the hood, `agent-framework-neo4j` delegates all search operations to the link:https://github.com/neo4j/neo4j-graphrag-python[`neo4j-graphrag`^] library. The `neo4j-graphrag` package provides retriever classes -- `VectorRetriever`, `HybridRetriever`, and others -- that know how to query Neo4j vector and fulltext indexes. `Neo4jContextProvider` selects the right retriever based on your `index_type` configuration, wraps it in the MAF lifecycle, and handles the async execution. You configure the provider; `neo4j-graphrag` runs the search.
+All retrieval is powered by the link:https://github.com/neo4j/neo4j-graphrag-python[`neo4j-graphrag-python`^] library — Neo4j's official Python package for building retrieval-augmented generation (RAG) pipelines. The `neo4j-graphrag` package provides retriever classes -- `VectorRetriever`, `HybridRetriever`, `VectorCypherRetriever`, and others -- that know how to query Neo4j vector and fulltext indexes and optionally enrich results with graph traversals. `Neo4jContextProvider` selects the right retriever based on your `index_type` configuration, wraps it in the MAF lifecycle, and handles the async execution. You configure the provider; `neo4j-graphrag` runs the search.
+
+Beyond retrieval, `neo4j-graphrag-python` also provides a complete pipeline for _building_ knowledge graphs from unstructured text. Its `SimpleKGPipeline` automates the end-to-end process: splitting documents into chunks, using an LLM to extract entities and relationships guided by a schema, computing vector embeddings for semantic search, and storing everything in Neo4j. It even handles entity resolution to merge duplicates across the graph. This means the same library you use to query your knowledge graph can also construct it — taking raw PDFs, articles, or other text and turning them into the structured graph data that your retrievers search against.
+
+For full details on the retriever classes, knowledge graph construction pipelines, and other capabilities, see the link:https://neo4j.com/docs/neo4j-graphrag-python/current/[neo4j-graphrag-python documentation^].
 
 == How It Works
 
@@ -42,13 +46,13 @@ The `index_type` parameter determines which search strategy the provider uses:
 | Yes
 |===
 
-Each mode maps to a retriever class from the `neo4j-graphrag` library:
+Each mode maps to a retriever class from the link:https://neo4j.com/docs/neo4j-graphrag-python/current/[`neo4j-graphrag-python`^] library:
 
-* `"vector"` uses `VectorRetriever` (or `VectorCypherRetriever` when a `retrieval_query` is provided)
+* `"vector"` uses link:https://neo4j.com/docs/neo4j-graphrag-python/current/retrievers.html[`VectorRetriever`^] (or `VectorCypherRetriever` when a `retrieval_query` is provided)
 * `"fulltext"` uses a fulltext retriever that queries Neo4j's Lucene-based fulltext indexes
-* `"hybrid"` uses `HybridRetriever` (or `HybridCypherRetriever` with a `retrieval_query`)
+* `"hybrid"` uses link:https://neo4j.com/docs/neo4j-graphrag-python/current/retrievers.html[`HybridRetriever`^] (or `HybridCypherRetriever` with a `retrieval_query`)
 
-You configure the mode when creating the provider. `Neo4jContextProvider` creates the appropriate retriever on connection and delegates every search call to it.
+You configure the mode when creating the provider. `Neo4jContextProvider` creates the appropriate `neo4j-graphrag` retriever on connection and delegates every search call to it.
 
 Each provider instance supports a single `index_type`. If you need multiple search strategies -- for example, vector search on one index and fulltext search on another -- create separate provider instances and pass them all to the agent's `context_providers` list. The agent merges the context from every provider before calling the LLM.
 
@@ -88,6 +92,12 @@ async with provider:
 
 The provider connects to Neo4j on entry, verifies connectivity, initializes the appropriate retriever, and closes the connection on exit.
 
+== Learn More
+
+* link:https://github.com/neo4j/neo4j-graphrag-python[neo4j-graphrag-python on GitHub^] — Source code, examples, and issue tracker
+* link:https://neo4j.com/docs/neo4j-graphrag-python/current/[neo4j-graphrag-python documentation^] — Full API reference, retriever guides, and embedder configuration
+* link:https://github.com/neo4j-labs/neo4j-maf-provider[agent-framework-neo4j on GitHub^] — The MAF context provider that wraps `neo4j-graphrag` retrievers
+
 == What Comes Next
 
 The following lessons walk through each search mode in detail, starting with vector search, then fulltext, hybrid, and finally graph-enriched retrieval that combines index search with Cypher traversal.
@@ -95,6 +105,8 @@ The following lessons walk through each search mode in detail, starting with vec
 [.summary]
 == Lesson Summary
 
-The `agent-framework-neo4j` package provides `Neo4jContextProvider`, which extends `BaseContextProvider` to search Neo4j indexes and inject results before every LLM call. It delegates search to retriever classes from the `neo4j-graphrag` library, supporting three modes: vector (semantic similarity), fulltext (keyword matching), and hybrid (both combined). Configuration includes connection details, index name, search type, and optional graph enrichment via Cypher.
+The `agent-framework-neo4j` package provides `Neo4jContextProvider`, which extends `BaseContextProvider` to search Neo4j indexes and inject results before every LLM call. It delegates search to retriever classes from the link:https://neo4j.com/docs/neo4j-graphrag-python/current/[`neo4j-graphrag-python`^] library, supporting three modes: vector (semantic similarity), fulltext (keyword matching), and hybrid (both combined). Configuration includes connection details, index name, search type, and optional graph enrichment via Cypher.
 
 In the next lesson, you will use vector search to find movies by plot similarity.
+
+xref:3-2-vector-provider.adoc[Next Page ->]

@@ -115,9 +115,7 @@ Notice that `before_run()` reads from `state` and `after_run()` writes to it. Th
 
 == Use the Provider
 
-Create an agent with the provider and run a multi-turn conversation:
-
-Create the agent with the provider:
+Create the agent with the provider and run a multi-turn conversation:
 
 [source,python]
 ----
@@ -134,9 +132,12 @@ async def main():
     )
 
     session = agent.create_session()
-    # end::agent[]
+----
 
-    # tag::run[]
+Run a multi-turn conversation and inspect the extracted state:
+
+[source,python]
+----
     queries = [
         "Hello, what is the square root of 9?",
         "My name is Alex and I am 30 years old",
@@ -155,17 +156,8 @@ async def main():
     )
     print(f"Extracted Name: {user_info.name}")
     print(f"Extracted Age: {user_info.age}")
-    # end::run[]
 
 asyncio.run(main())
-
-----
-
-Run a multi-turn conversation and inspect the extracted state:
-
-[source,python]
-----
-
 ----
 
 Here is what happens on each turn:
@@ -174,7 +166,7 @@ Here is what happens on each turn:
 2. **Turn 2** -- The user provides their name and age. `after_run()` extracts "Alex" and 30 using structured LLM output and stores both in state.
 3. **Turn 3** -- `before_run()` finds both values in state and injects "The user's name is Alex. The user's age is 30." The agent answers the math question and addresses the user by name.
 
-After the conversation, the state inspection confirms the extracted values. The context provider changed the agent's behavior dynamically on each turn, without any tool call.
+After the conversation, inspecting the state confirms the extracted values. The context provider changed the agent's behavior dynamically on each turn, without any tool call.
 
 [%collapsible]
 .Click to see the complete code
@@ -329,3 +321,5 @@ asyncio.run(main())
 The `UserInfoMemory` provider uses `before_run()` to inject dynamic instructions and `after_run()` to extract structured data from conversations. State persists across turns in the session's `state` dictionary, letting the provider accumulate knowledge as the conversation progresses.
 
 In the next module, you will use `Neo4jContextProvider` from the `agent-framework-neo4j` package to inject knowledge graph context using vector, fulltext, and hybrid search.
+
+xref:3-neo4j-context-providers.adoc[Next Page ->]

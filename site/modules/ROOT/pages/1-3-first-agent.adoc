@@ -126,13 +126,6 @@ asyncio.run(main())
 
 == Run with Streaming
 
-Run the agent and stream the response:
-
-[source,python]
-----
-
-----
-
 When you run this, the agent will:
 
 1. Receive the query "Tell me about Inception"
@@ -258,3 +251,5 @@ asyncio.run(main())
 You created an agent with a `get_movie_info` tool that looks up movie information. The agent uses the function name and docstring to decide when to call the tool.
 
 The limitation: tools are reactive. The agent must decide to call them, which means it might skip relevant context for general queries. The next module introduces context providers, MAF's mechanism for automatic context injection on every turn.
+
+xref:2-context-providers.adoc[Next Page ->]

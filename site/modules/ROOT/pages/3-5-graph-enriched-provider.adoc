@@ -267,3 +267,5 @@ Adding a `retrieval_query` to `Neo4jContextProvider` combines any search mode wi
 The next two lessons cover fulltext and hybrid search as optional alternatives to vector search. If you want to continue to agent memory, you can skip ahead to the next module.
 
 In the next optional lesson, you will use fulltext search for keyword matching without an embedder.
+
+xref:3-3-fulltext-provider.adoc[Next Page ->]

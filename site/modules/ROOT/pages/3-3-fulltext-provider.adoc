@@ -125,7 +125,7 @@ asyncio.run(main())
 
 ----
 
-The query "Tell me about movies with Keanu Reeves" becomes "movies Keanu Reeves" after stop word filtering. The fulltext index finds plots containing those terms and injects them as context.
+The query "Find movies about space exploration" becomes "movies space exploration" after stop word filtering. The fulltext index finds plots containing those terms and injects them as context.
 
 == Vector vs Fulltext
 
@@ -206,3 +206,5 @@ asyncio.run(main())
 Fulltext search with `Neo4jContextProvider` uses `index_type="fulltext"` to match queries against a Neo4j fulltext index using BM25 ranking. It doesn't require an embedder, filters stop words by default, and works best for keyword-based queries with specific names or terms.
 
 In the next optional lesson, you will combine vector and fulltext search using hybrid mode.
+
+xref:3-4-hybrid-provider.adoc[Next Page ->]

@@ -94,3 +94,5 @@ When your environment is verified, move on to the next lesson where you will cre
 You created a Neo4j Sandbox with the recommendations movie dataset, launched a GitHub Codespace with your credentials, and verified your environment is working.
 
 In the next lesson, you will create your first agent with a tool that queries movie data.
+
+xref:1-introduction.adoc[Next Page ->]

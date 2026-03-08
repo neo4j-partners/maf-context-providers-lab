@@ -113,3 +113,5 @@ You can register multiple providers. Each runs in order before and after every i
 Context providers run automatically before and after every LLM invocation using `before_run()` and `after_run()`. They can inject instructions or messages into the conversation, and store session-specific state in the `state` dictionary. Unlike tools, the agent does not decide whether to use them.
 
 In the next lesson, you will build a context provider from scratch.
+
+xref:2-2-simple-context-provider.adoc[Next Page ->]
