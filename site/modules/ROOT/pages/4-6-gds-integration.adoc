@@ -1,5 +1,7 @@
-= Graph Algorithm Integration
+= Graph Algorithm Integration (Optional)
 :branch: main
+
+NOTE: This lesson is optional. It covers Neo4j Graph Data Science (GDS) integration, which requires GDS to be installed on your Neo4j instance. You can skip this lesson without affecting the rest of the course.
 
 The memory graph stores entities, relationships, conversations, and reasoning traces as connected nodes. Graph algorithms can analyze this structure to answer questions that simple lookups can't: Which entities are most central to the user's interests? What is the shortest connection path between two entities? Which entities are similar based on their graph neighborhood?
 

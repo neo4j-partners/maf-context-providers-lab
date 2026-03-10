@@ -18,4 +18,4 @@
 ** xref:4-3-memory-context-provider.adoc[Memory as a Context Provider]
 ** xref:4-4-memory-tools.adoc[Combining Context Providers with Memory Tools]
 ** xref:4-5-reasoning-memory.adoc[Reasoning Memory]
-** xref:4-6-gds-integration.adoc[Graph Algorithm Integration]
+** xref:4-6-gds-integration.adoc[Graph Algorithm Integration (Optional)]
