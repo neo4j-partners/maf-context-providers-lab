@@ -239,7 +239,7 @@ load_dotenv()
 
 from pydantic import SecretStr
 
-from agent_framework.openai import OpenAIResponsesClient
+from llm_provider import get_client, get_provider
 
 from neo4j_agent_memory import MemoryClient, MemorySettings
 from neo4j_agent_memory.integrations.microsoft_agent import (
@@ -248,11 +248,20 @@ from neo4j_agent_memory.integrations.microsoft_agent import (
 )
 
 # Configure memory settings
+if get_provider() == "azure":
+    llm_model = os.getenv("AZURE_OPENAI_RESPONSES_DEPLOYMENT_NAME", "gpt-5-mini")
+else:
+    llm_model = os.getenv("OPENAI_RESPONSES_MODEL_ID", "gpt-5-mini")
+
 settings = MemorySettings(
     neo4j={
         "uri": os.environ["NEO4J_URI"],
         "username": os.environ["NEO4J_USERNAME"],
         "password": SecretStr(os.environ["NEO4J_PASSWORD"]),
+    },
+    extraction={
+        "enable_gliner": False,  # GLiNER disabled: downloads ~500MB model from HuggingFace, impractical in a workshop
+        "llm_model": llm_model,
     },
 )
 
@@ -278,7 +287,7 @@ async def main():
         # end::tools[]
 
         # tag::agent[]
-        client = OpenAIResponsesClient()
+        client = get_client()
 
         agent = client.as_agent(
             name="movie-assistant",

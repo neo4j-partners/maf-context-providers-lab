@@ -23,6 +23,13 @@ The extraction behavior is configured through `MemorySettings`:
 
 [source,python]
 ----
+from llm_provider import get_provider
+
+if get_provider() == "azure":
+    llm_model = os.getenv("AZURE_OPENAI_RESPONSES_DEPLOYMENT_NAME", "gpt-5-mini")
+else:
+    llm_model = os.getenv("OPENAI_RESPONSES_MODEL_ID", "gpt-5-mini")
+
 settings = MemorySettings(
     neo4j={
         "uri": os.environ["NEO4J_URI"],
@@ -32,9 +39,10 @@ settings = MemorySettings(
     extraction={
         "extractor_type": "pipeline",
         "enable_spacy": True,
-        "enable_gliner": True,
+        "enable_gliner": False,  # Disabled: downloads ~500MB model from HuggingFace, impractical in a workshop
         "enable_llm_fallback": True,
         "confidence_threshold": 0.5,
+        "llm_model": llm_model,
         "entity_types": [
             "PERSON", "ORGANIZATION", "LOCATION", "EVENT", "OBJECT"
         ],
@@ -43,11 +51,14 @@ settings = MemorySettings(
 
 ----
 
+NOTE: GLiNER is disabled in this workshop because it downloads a ~500MB model from HuggingFace on first use, which is impractical with many participants on shared network bandwidth. The pipeline still works well with spaCy + LLM fallback. In production, you can enable GLiNER for improved extraction accuracy.
+
 NOTE: `MemorySettings` also supports automatic environment variable loading with the `NAM_` prefix (e.g., `NAM_NEO4J__URI`). The explicit configuration shown here reuses the same `NEO4J_URI`, `NEO4J_USERNAME`, and `NEO4J_PASSWORD` environment variables used by the Neo4j context provider lessons.
 
 Key parameters:
 
 * **`extractor_type`** -- Set to `"pipeline"` for the multi-stage approach. Can also be `"llm"` for LLM-only extraction.
+* **`llm_model`** -- The model used by the LLM fallback stage. Reads from the same environment variable (`OPENAI_RESPONSES_MODEL_ID` or `AZURE_OPENAI_RESPONSES_DEPLOYMENT_NAME`) as the rest of the solutions to stay consistent.
 * **`enable_spacy`**, **`enable_gliner`**, **`enable_llm_fallback`** -- Toggle individual pipeline stages.
 * **`confidence_threshold`** -- Minimum confidence score (0.0 to 1.0) for an entity to be stored. Lower values capture more entities but with more noise.
 * **`entity_types`** -- The POLE+O types to extract. Limits extraction to these categories.
