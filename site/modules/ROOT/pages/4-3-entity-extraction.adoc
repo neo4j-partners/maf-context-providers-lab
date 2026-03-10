@@ -1,7 +1,7 @@
 = Entity Extraction Pipeline
 :branch: main
 
-TIP: Complete this lesson hands-on by opening `labs/lab-7-entity-extraction.ipynb` in your Codespace.
+TIP: Complete this lesson hands-on by opening `labs/lab-8-entity-extraction.ipynb` in your Codespace.
 
 Long-term memory stores entities, preferences, and facts extracted from conversations. But how does the extraction happen? The `neo4j-agent-memory` package uses a multi-stage pipeline that combines fast pattern matching with accurate model-based extraction to pull structured entities from unstructured conversation text.
 
