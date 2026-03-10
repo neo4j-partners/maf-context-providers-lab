@@ -13,14 +13,6 @@ Connect to Neo4j and create a memory client:
 
 [source,python]
 ----
-# Configure memory settings with Neo4j connection
-from llm_provider import get_provider
-
-if get_provider() == "azure":
-    llm_model = os.getenv("AZURE_OPENAI_RESPONSES_DEPLOYMENT_NAME", "gpt-5-mini")
-else:
-    llm_model = os.getenv("OPENAI_RESPONSES_MODEL_ID", "gpt-5-mini")
-
 settings = MemorySettings(
     neo4j={
         "uri": os.environ["NEO4J_URI"],
@@ -29,13 +21,13 @@ settings = MemorySettings(
     },
     extraction={
         "enable_gliner": False,  # GLiNER disabled: downloads ~500MB model from HuggingFace, impractical in a workshop
-        "llm_model": llm_model,
+        "llm_model": os.getenv("OPENAI_RESPONSES_MODEL_ID", "gpt-5-mini"),
     },
 )
 
 ----
 
-The `llm_model` setting tells the extraction pipeline which model to use for LLM-based entity extraction. Without it, the library defaults to `gpt-4o-mini`, which may not match your deployment. Reading from the same environment variable as the rest of the solutions keeps things consistent.
+The `llm_model` setting tells the extraction pipeline which model to use for LLM-based entity extraction. Without it, the library defaults to `gpt-4o-mini`, which may not match your deployment.
 
 NOTE: `MemorySettings` also supports automatic environment variable loading with the `NAM_` prefix (e.g., `NAM_NEO4J__URI`). The explicit configuration shown here reuses the same `NEO4J_URI`, `NEO4J_USERNAME`, and `NEO4J_PASSWORD` environment variables used by the Neo4j context provider lessons.
 
@@ -152,6 +144,8 @@ agent = client.as_agent(
 
 session = agent.create_session()
 ----
+
+NOTE: The lab notebooks use a `get_client()` wrapper from `llm_provider` that switches between `OpenAIResponsesClient` and `AzureOpenAIResponsesClient` based on your environment. The lessons use `OpenAIResponsesClient` directly for clarity.
 
 == The Memory Lifecycle
 
