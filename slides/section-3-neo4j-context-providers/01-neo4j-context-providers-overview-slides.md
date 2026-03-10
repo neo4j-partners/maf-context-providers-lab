@@ -83,7 +83,7 @@ You configure the provider; `neo4j-graphrag` runs the search.
 |------|----------|---------------|
 | **Vector** | Conceptual, exploratory questions | "Movies about unlikely friendships" |
 | **Fulltext** | Specific names, titles, exact terms | "Christopher Nolan Batman" |
-| **Hybrid** | Mixed conceptual and keyword queries | "Christopher Nolan sci-fi movies about dreams" |
+| **Hybrid** | Mixed conceptual and keyword queries | "Find movies about dream-sharing technology" |
 
 **Vector** understands meaning. **Fulltext** matches keywords. **Hybrid** combines both.
 

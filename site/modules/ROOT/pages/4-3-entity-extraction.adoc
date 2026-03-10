@@ -173,6 +173,6 @@ Manual extraction is useful when you want to pre-populate the memory graph with 
 
 The `neo4j-agent-memory` extraction pipeline uses three stages (spaCy, GLiNER, LLM) to extract structured entities from conversation text. Results are merged using configurable strategies and deduplicated using embedding similarity. Extracted entities become labeled nodes in Neo4j linked to their source conversations.
 
-In the next lesson, you will use `Neo4jMicrosoftMemory` as a context provider to inject memories into agent conversations automatically.
+In the next lesson, you will add memory tools that give the agent explicit control over its memory, combining passive injection with active search, save, and recall operations.
 
-xref:4-3-memory-context-provider.adoc[Next Page ->]
+xref:4-4-memory-tools.adoc[Next Page ->]

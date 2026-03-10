@@ -3,7 +3,7 @@
 
 TIP: Complete this lesson hands-on by opening `labs/lab-8-memory-provider.ipynb` in your Codespace.
 
-The `Neo4jContextProvider` from Module 3 injected knowledge graph data before every agent turn. The memory context provider does the same thing, but for memories the agent has accumulated during conversations. Before each turn, it retrieves relevant past messages, extracted entities, and user preferences. After each turn, it stores new messages and extracts entities using the pipeline from the previous lesson.
+The `Neo4jContextProvider` from Module 3 injected knowledge graph data before every agent turn. The memory context provider does the same thing, but for memories the agent has accumulated during conversations. Before each turn, it retrieves relevant past messages, extracted entities, and user preferences. After each turn, it stores new messages and extracts entities automatically.
 
 The interface is `Neo4jMicrosoftMemory`, which wraps the memory client into a context provider and chat message store.
 
@@ -219,7 +219,7 @@ load_dotenv()
 
 from pydantic import SecretStr
 
-from llm_provider import get_client, get_provider
+from agent_framework.openai import OpenAIResponsesClient
 
 from neo4j_agent_memory import MemoryClient, MemorySettings
 from neo4j_agent_memory.integrations.microsoft_agent import (
@@ -227,11 +227,6 @@ from neo4j_agent_memory.integrations.microsoft_agent import (
 )
 
 # Configure memory settings with Neo4j connection
-if get_provider() == "azure":
-    llm_model = os.getenv("AZURE_OPENAI_RESPONSES_DEPLOYMENT_NAME", "gpt-5-mini")
-else:
-    llm_model = os.getenv("OPENAI_RESPONSES_MODEL_ID", "gpt-5-mini")
-
 settings = MemorySettings(
     neo4j={
         "uri": os.environ["NEO4J_URI"],
@@ -240,7 +235,7 @@ settings = MemorySettings(
     },
     extraction={
         "enable_gliner": False,  # GLiNER disabled: downloads ~500MB model from HuggingFace, impractical in a workshop
-        "llm_model": llm_model,
+        "llm_model": os.getenv("OPENAI_RESPONSES_MODEL_ID", "gpt-5-mini"),
     },
 )
 
@@ -263,7 +258,7 @@ async def main():
         # end::memory[]
 
         # tag::agent[]
-        client = get_client()
+        client = OpenAIResponsesClient()
 
         agent = client.as_agent(
             name="movie-memory-agent",
@@ -318,6 +313,6 @@ asyncio.run(main())
 
 `Neo4jMicrosoftMemory` provides a context provider that retrieves relevant memories in `before_run()` and stores new messages and extracted entities in `after_run()`. The agent gets persistent memory across turns and sessions without calling any tools.
 
-In the next lesson, you will add memory tools that give the agent explicit control over its memory, combining passive injection with active search, save, and recall operations.
+In the next lesson, you will learn how the multi-stage entity extraction pipeline turns unstructured conversation text into the structured graph entities that this context provider retrieves.
 
-xref:4-4-memory-tools.adoc[Next Page ->]
+xref:4-3-entity-extraction.adoc[Next Page ->]

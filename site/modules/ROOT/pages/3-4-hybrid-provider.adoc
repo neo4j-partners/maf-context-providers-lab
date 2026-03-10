@@ -86,7 +86,7 @@ async def main():
         # end::agent[]
 
         # tag::run[]
-        query = "I'm looking for Christopher Nolan sci-fi movies about dreams"
+        query = "Find movies about dream-sharing technology"
         print(f"User: {query}\n")
         print("Answer: ", end="", flush=True)
         response = await agent.run(query, session=session)
@@ -100,7 +100,7 @@ asyncio.run(main())
 
 [source,python]
 ----
-query = "I'm looking for Christopher Nolan sci-fi movies about dreams"
+query = "Find movies about dream-sharing technology"
 print(f"User: {query}\n")
 print("Answer: ", end="", flush=True)
 response = await agent.run(query, session=session)
@@ -110,8 +110,8 @@ print()
 
 This query benefits from both search strategies:
 
-* **Vector search** finds movies semantically related to "sci-fi movies about dreams" even if those exact words don't appear in the plot
-* **Fulltext search** finds plots containing "Christopher Nolan" and "dreams" as literal terms
+* **Fulltext search** finds plots containing "dream-sharing" and "technology" as literal terms, matching Inception's plot directly
+* **Vector search** finds movies semantically related to dream and technology concepts, even if those exact words don't appear in the plot
 
 Hybrid combines both result sets. A movie like Inception ranks highly because it matches on both dimensions.
 
@@ -185,7 +185,7 @@ async def main():
         # end::agent[]
 
         # tag::run[]
-        query = "I'm looking for Christopher Nolan sci-fi movies about dreams"
+        query = "Find movies about dream-sharing technology"
         print(f"User: {query}\n")
         print("Answer: ", end="", flush=True)
         response = await agent.run(query, session=session)

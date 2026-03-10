@@ -51,13 +51,13 @@ The integration provides four components:
 * `Neo4jContextProvider` (memory variant) -- implements `before_run()`/`after_run()` for automatic memory injection and extraction
 * `create_memory_tools()` -- generates callable tools for explicit memory operations
 
-The next lesson covers how entities are extracted from conversations. Subsequent lessons use these components for passive memory (context provider), active memory (tools), reasoning traces, and graph algorithm integration.
+The next lesson uses these components to build a memory context provider. Subsequent lessons cover entity extraction, active memory tools, reasoning traces, and graph algorithm integration.
 
 [.summary]
 == Lesson Summary
 
 The `neo4j-agent-memory` package provides three memory types: short-term (conversation history with semantic search), long-term (entities, preferences, and facts in the POLE+O model), and reasoning (traces of past agent behavior). All are stored as connected graph structures in Neo4j.
 
-In the next lesson, you will learn how the multi-stage entity extraction pipeline turns unstructured conversation text into structured graph entities.
+In the next lesson, you will use `Neo4jMicrosoftMemory` as a context provider to give your agent persistent memory across turns and sessions.
 
-xref:4-2-entity-extraction.adoc[Next Page ->]
+xref:4-2-memory-context-provider.adoc[Next Page ->]

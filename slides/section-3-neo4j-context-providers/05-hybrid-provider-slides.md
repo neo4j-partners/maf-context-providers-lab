@@ -35,7 +35,7 @@ ol > li {
 ## The Problem with One Search Mode
 
 **Vector search** understands concepts but can miss exact terms:
-- "Christopher Nolan" might return movies with similar themes, not Nolan's films
+- "dream-sharing technology" might not surface if the model focuses on broader themes
 
 **Fulltext search** matches keywords but misses semantic connections:
 - "feel-good movies about unlikely friendships" only matches those exact words
@@ -58,12 +58,12 @@ A movie can rank highly on semantics, keywords, or both. Results that score well
 
 ## Why Inception Ranks #1
 
-Query: "Christopher Nolan sci-fi movies about dreams"
+Query: "Find movies about dream-sharing technology"
 
 | Search Mode | What It Finds |
 |------------|---------------|
-| **Vector** | Movies semantically related to "sci-fi about dreams" |
-| **Fulltext** | Plots containing "Christopher Nolan" and "dreams" |
+| **Fulltext** | Plots containing "dream-sharing" and "technology" as literal terms |
+| **Vector** | Movies semantically related to dreams and technology concepts |
 | **Hybrid** | Inception matches on **both** dimensions |
 
 Hybrid catches what either mode alone might miss.

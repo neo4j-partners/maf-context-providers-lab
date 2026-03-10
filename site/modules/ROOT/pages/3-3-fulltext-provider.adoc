@@ -105,16 +105,13 @@ async def main():
         )
 
         session = agent.create_session()
-        # end::agent[]
 
-        # tag::run[]
-        query = "Find movies about space exploration"
+        query = "Christopher Nolan Batman"
         print(f"User: {query}\n")
         print("Answer: ", end="", flush=True)
         response = await agent.run(query, session=session)
         print(response.text)
         print()
-        # end::run[]
 
 asyncio.run(main())
 
@@ -122,7 +119,7 @@ asyncio.run(main())
 
 [source,python]
 ----
-query = "Find movies about space exploration"
+query = "Christopher Nolan Batman"
 print(f"User: {query}\n")
 print("Answer: ", end="", flush=True)
 response = await agent.run(query, session=session)
@@ -130,7 +127,7 @@ print(response.text)
 print()
 ----
 
-The query "Find movies about space exploration" becomes "movies space exploration" after stop word filtering. The fulltext index finds plots containing those terms and injects them as context.
+The query "Christopher Nolan Batman" contains specific names and terms that match literally in movie plots — exactly where fulltext search excels.
 
 == Vector vs Fulltext
 
@@ -192,7 +189,7 @@ async def main():
         # end::agent[]
 
         # tag::run[]
-        query = "Find movies about space exploration"
+        query = "Christopher Nolan Batman"
         print(f"User: {query}\n")
         print("Answer: ", end="", flush=True)
         response = await agent.run(query, session=session)
