@@ -187,7 +187,7 @@ from neo4j_graphrag.embeddings.openai import OpenAIEmbeddings
 neo4j_settings = Neo4jSettings()
 
 # Create embedder
-embedder = OpenAIEmbeddings(model="text-embedding-ada-002")
+embedder = OpenAIEmbeddings(model="text-embedding-3-small")
 
 # Graph-enriched retrieval query
 # Appended after vector search: YIELD node, score

@@ -7,7 +7,7 @@ TIP: If you haven't already, run `python genai-maf-context-providers/setup.py` t
 
 In the previous lesson, you saw the `Neo4jContextProvider` architecture and its three search modes. In this lesson, you will build your first self-grounding agent using vector search. The provider embeds the user's query (converts it into a numerical vector that captures its semantic meaning), then searches a Neo4j vector index for the most similar stored vectors and injects matching results before every LLM call. The agent is grounded in real graph data automatically.
 
-IMPORTANT: The data in your Neo4j database must be embedded using the same model and dimensions as the embedder used for search. If your stored vectors were created with `text-embedding-ada-002` (1536 dimensions), the query embedder must also use `text-embedding-ada-002`. Mismatched models or dimensions will return poor or no results. The `neo4j-graphrag` library supports embedders for OpenAI, Azure OpenAI, Cohere, Mistral AI, Google Vertex AI, Ollama, and Sentence Transformers — so you can match whichever model was used to create your stored embeddings.
+IMPORTANT: The data in your Neo4j database must be embedded using the same model and dimensions as the embedder used for search. If your stored vectors were created with `text-embedding-3-small` (1536 dimensions), the query embedder must also use `text-embedding-3-small`. Mismatched models or dimensions will return poor or no results. The `neo4j-graphrag` library supports embedders for OpenAI, Azure OpenAI, Cohere, Mistral AI, Google Vertex AI, Ollama, and Sentence Transformers — so you can match whichever model was used to create your stored embeddings.
 
 
 == How Neo4jContextProvider Works
@@ -29,7 +29,7 @@ Vector search needs an embedder to convert text into vector representations. The
 ----
 # Create embedder for converting queries to vectors
 # Uses OPENAI_API_KEY from environment automatically
-embedder = OpenAIEmbeddings(model="text-embedding-ada-002")
+embedder = OpenAIEmbeddings(model="text-embedding-3-small")
 
 ----
 
@@ -72,7 +72,7 @@ Key parameters:
 
 * **`index_name`** -- The name of the Neo4j vector index. `Neo4jSettings` reads this from the `NEO4J_VECTOR_INDEX_NAME` environment variable.
 * **`index_type`** -- Set to `"vector"` for semantic search against plot embeddings.
-* **`embedder`** -- Generates query vectors using the same model (text-embedding-ada-002) that created the stored embeddings.
+* **`embedder`** -- Generates query vectors using the same model (text-embedding-3-small) that created the stored embeddings.
 * **`top_k`** -- Number of results to retrieve. Five gives a good balance between context richness and token usage.
 * **`context_prompt`** -- Text prepended to search results to guide the LLM on how to use the injected data.
 
@@ -160,7 +160,7 @@ neo4j_settings = Neo4jSettings()
 
 # Create embedder for converting queries to vectors
 # Uses OPENAI_API_KEY from environment automatically
-embedder = OpenAIEmbeddings(model="text-embedding-ada-002")
+embedder = OpenAIEmbeddings(model="text-embedding-3-small")
 
 # Create context provider with vector search
 provider = Neo4jContextProvider(

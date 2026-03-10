@@ -1,7 +1,7 @@
 = Reasoning Memory
 :branch: main
 
-TIP: Complete this lesson hands-on by opening `labs/lab-9-reasoning-memory.ipynb` in your Codespace.
+TIP: Complete this lesson hands-on by opening `labs/lab-10-reasoning-memory.ipynb` in your Codespace.
 
 Short-term memory captures what was said. Long-term memory captures what was learned. Reasoning memory captures what the agent did and whether it worked. When the agent encounters a similar task later, it can retrieve past reasoning traces to reuse successful strategies and avoid approaches that failed.
 

@@ -1,7 +1,7 @@
 = Combining Context Providers with Memory Tools
 :branch: main
 
-TIP: Complete this lesson hands-on by opening `labs/lab-8-memory-tools.ipynb` in your Codespace.
+TIP: Complete this lesson hands-on by opening `labs/lab-9-memory-tools.ipynb` in your Codespace.
 
 The memory context provider from the previous lesson handles memory passively. It injects relevant memories before each turn and stores new ones after. The agent never decides to look something up or save a preference; the framework does it automatically.
 
@@ -25,7 +25,10 @@ Passive context covers the common case. Active tools handle the specific case.
 [source,python]
 ----
 async def main():
-    async with MemoryClient(settings) as memory_client:
+    memory_client = MemoryClient(settings)
+    await memory_client.connect()
+
+    try:
         # Create unified memory interface
         memory = Neo4jMicrosoftMemory.from_memory_client(
             memory_client=memory_client,
@@ -49,10 +52,13 @@ async def main():
             name="movie-assistant",
             instructions=(
                 "You are a movie recommendation assistant with persistent memory.\n\n"
-                "When a user expresses a preference, save it with the "
-                "remember_preference tool. When making recommendations, "
-                "use recall_preferences to check what the user likes "
-                "before suggesting something.\n\n"
+                "IMPORTANT: You MUST call the remember_preference tool every time "
+                "a user states a preference, favorite, or interest. Do NOT just "
+                "acknowledge it verbally — you must actually invoke the tool to "
+                "persist it. For example, if a user says they love sci-fi, call "
+                "remember_preference with category='genre' and preference='loves sci-fi'.\n\n"
+                "When making recommendations, use recall_preferences to check "
+                "what the user likes before suggesting something.\n\n"
                 "You have access to a knowledge graph of movies and "
                 "your memory of past conversations."
             ),
@@ -80,7 +86,7 @@ async def main():
 
         # tag::verify[]
         results = await memory.search_memory(
-            query="user preferences and interests",
+            query="Christopher Nolan movies space",
             include_messages=True,
             include_entities=True,
             include_preferences=True,
@@ -104,6 +110,8 @@ async def main():
         if results.get("messages"):
             print(f"Messages stored: {len(results['messages'])}")
         # end::verify[]
+    finally:
+        await memory_client.close()
 
 asyncio.run(main())
 
@@ -122,7 +130,7 @@ The agent uses these the same way it uses any tool: by examining the function na
 
 == Create the Agent with Both
 
-Pass the context provider and the tools together:
+Pass the context provider and the tools together. Notice the explicit, prescriptive instructions -- without these, the LLM may acknowledge a preference verbally but skip calling the `remember_preference` tool, so the preference is never persisted:
 
 [source,python]
 ----
@@ -132,10 +140,13 @@ agent = client.as_agent(
     name="movie-assistant",
     instructions=(
         "You are a movie recommendation assistant with persistent memory.\n\n"
-        "When a user expresses a preference, save it with the "
-        "remember_preference tool. When making recommendations, "
-        "use recall_preferences to check what the user likes "
-        "before suggesting something.\n\n"
+        "IMPORTANT: You MUST call the remember_preference tool every time "
+        "a user states a preference, favorite, or interest. Do NOT just "
+        "acknowledge it verbally — you must actually invoke the tool to "
+        "persist it. For example, if a user says they love sci-fi, call "
+        "remember_preference with category='genre' and preference='loves sci-fi'.\n\n"
+        "When making recommendations, use recall_preferences to check "
+        "what the user likes before suggesting something.\n\n"
         "You have access to a knowledge graph of movies and "
         "your memory of past conversations."
     ),
@@ -179,7 +190,7 @@ After the conversation, you can inspect what the memory system has stored. Use `
 [source,python]
 ----
 results = await memory.search_memory(
-    query="user preferences and interests",
+    query="Christopher Nolan movies space",
     include_messages=True,
     include_entities=True,
     include_preferences=True,
@@ -246,7 +257,10 @@ settings = MemorySettings(
 )
 
 async def main():
-    async with MemoryClient(settings) as memory_client:
+    memory_client = MemoryClient(settings)
+    await memory_client.connect()
+
+    try:
         # Create unified memory interface
         memory = Neo4jMicrosoftMemory.from_memory_client(
             memory_client=memory_client,
@@ -270,10 +284,13 @@ async def main():
             name="movie-assistant",
             instructions=(
                 "You are a movie recommendation assistant with persistent memory.\n\n"
-                "When a user expresses a preference, save it with the "
-                "remember_preference tool. When making recommendations, "
-                "use recall_preferences to check what the user likes "
-                "before suggesting something.\n\n"
+                "IMPORTANT: You MUST call the remember_preference tool every time "
+                "a user states a preference, favorite, or interest. Do NOT just "
+                "acknowledge it verbally — you must actually invoke the tool to "
+                "persist it. For example, if a user says they love sci-fi, call "
+                "remember_preference with category='genre' and preference='loves sci-fi'.\n\n"
+                "When making recommendations, use recall_preferences to check "
+                "what the user likes before suggesting something.\n\n"
                 "You have access to a knowledge graph of movies and "
                 "your memory of past conversations."
             ),
@@ -301,7 +318,7 @@ async def main():
 
         # tag::verify[]
         results = await memory.search_memory(
-            query="user preferences and interests",
+            query="Christopher Nolan movies space",
             include_messages=True,
             include_entities=True,
             include_preferences=True,
@@ -325,6 +342,8 @@ async def main():
         if results.get("messages"):
             print(f"Messages stored: {len(results['messages'])}")
         # end::verify[]
+    finally:
+        await memory_client.close()
 
 asyncio.run(main())
 

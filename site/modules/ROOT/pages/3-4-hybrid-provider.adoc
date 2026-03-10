@@ -38,7 +38,7 @@ neo4j_settings = Neo4jSettings()
 [source,python]
 ----
 # Create embedder for converting queries to vectors
-embedder = OpenAIEmbeddings(model="text-embedding-ada-002")
+embedder = OpenAIEmbeddings(model="text-embedding-3-small")
 
 ----
 
@@ -149,7 +149,7 @@ from neo4j_graphrag.embeddings.openai import OpenAIEmbeddings
 neo4j_settings = Neo4jSettings()
 
 # Create embedder for converting queries to vectors
-embedder = OpenAIEmbeddings(model="text-embedding-ada-002")
+embedder = OpenAIEmbeddings(model="text-embedding-3-small")
 
 # Create context provider with hybrid search
 provider = Neo4jContextProvider(
