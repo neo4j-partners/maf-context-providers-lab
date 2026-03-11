@@ -81,7 +81,7 @@ You will be prompted to enter four **secrets**:
 | Secret | Value |
 |--------|-------|
 | `OPENAI_API_KEY` | Your OpenAI API key (or provided by instructor) |
-| `NEO4J_URI` | Bolt URI from your sandbox (e.g. `neo4j+s://xxxxx.databases.neo4j.io`) |
+| `NEO4J_URI` | Bolt URI from your sandbox (e.g. `bolt://xx.xx.xx.xx:7687`). AuraDB users will have a `neo4j+s://` URI instead. |
 | `NEO4J_USERNAME` | Your Neo4j username (usually `neo4j`) |
 | `NEO4J_PASSWORD` | Password from your sandbox |
 

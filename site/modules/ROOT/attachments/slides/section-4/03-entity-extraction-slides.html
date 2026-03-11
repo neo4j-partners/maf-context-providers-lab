@@ -13,15 +13,12 @@
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="2" data-paginate="true" data-theme="default" lang="en-US" data-marpit-pagination="2" style="--paginate:true;--theme:default;" data-marpit-pagination-total="12">
 <h2 id="from-unstructured-text-to-structured-graph">From Unstructured Text to Structured Graph</h2>
-<p><strong>Long-term memory:</strong> Stores entities, preferences, and facts extracted from conversations</p>
-<p><strong>Extraction pipeline:</strong> Processes individual conversation messages (both user and agent) to identify entities like people, organizations, and locations, then stores them as nodes in the Neo4j graph</p>
-<p>** Uses a multi-stage pipeline that combines:</p>
 <ul>
-<li>Fast pattern matching</li>
-<li>Model-based extraction</li>
-<li>LLM fallback</li>
+<li><strong>Long-term memory</strong>: stores entities, preferences, and facts extracted from conversations</li>
+<li><strong>Extraction pipeline</strong>: processes conversation messages to identify entities and store them as Neo4j nodes</li>
+<li><strong>Multi-stage approach</strong>: combines fast pattern matching, model-based extraction, and LLM fallback</li>
+<li><strong>Results are merged</strong> to maximize coverage and accuracy</li>
 </ul>
-<p>Results are merged to maximize <strong>coverage</strong> and <strong>accuracy</strong>.</p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="3" data-paginate="true" data-theme="default" lang="en-US" data-marpit-pagination="3" style="--paginate:true;--theme:default;" data-marpit-pagination-total="12">
 <h2 id="the-three-stage-pipeline">The Three-Stage Pipeline</h2>
@@ -142,12 +139,12 @@
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="6" data-paginate="true" data-theme="default" lang="en-US" data-marpit-pagination="6" style="--paginate:true;--theme:default;" data-marpit-pagination-total="12">
 <h2 id="configuring-extraction">Configuring Extraction</h2>
-<p>Extraction is configured through <code>MemorySettings</code> with an <code>extraction</code> section that controls:</p>
+<p>Configured through <code>MemorySettings</code> with an <code>extraction</code> section:</p>
 <ul>
-<li><strong>Which stages to enable</strong>: spaCy, GLiNER, and LLM fallback can each be toggled independently</li>
-<li><strong>Confidence threshold</strong>: a minimum score (0.0–1.0) for storing an entity. Lower means more entities but also more noise</li>
-<li><strong>Entity types</strong>: limit extraction to specific POLE+O types (e.g., only PERSON and ORGANIZATION)</li>
-<li><strong>Extractor type</strong>: <code>&quot;pipeline&quot;</code> for multi-stage extraction, or <code>&quot;llm&quot;</code> for LLM-only</li>
+<li><strong>Stages</strong>: spaCy, GLiNER, and LLM fallback can each be toggled independently</li>
+<li><strong>Confidence threshold</strong>: minimum score (0.0–1.0) for storing an entity</li>
+<li><strong>Entity types</strong>: limit extraction to specific POLE+O types</li>
+<li><strong>Extractor type</strong>: <code>&quot;pipeline&quot;</code> for multi-stage, or <code>&quot;llm&quot;</code> for LLM-only</li>
 </ul>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="7" data-paginate="true" data-theme="default" lang="en-US" data-marpit-pagination="7" style="--paginate:true;--theme:default;" data-marpit-pagination-total="12">
@@ -224,31 +221,13 @@
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="9" data-paginate="true" data-theme="default" lang="en-US" data-marpit-pagination="9" style="--paginate:true;--theme:default;" data-marpit-pagination-total="12">
 <h2 id="entity-deduplication">Entity Deduplication</h2>
-<p>The same entity may be mentioned in different ways: &quot;Christopher Nolan,&quot; &quot;Nolan,&quot; &quot;the director of Inception.&quot;</p>
-<p>The package deduplicates using <strong>embedding similarity</strong>:</p>
-<table>
-<thead>
-<tr>
-<th>Threshold</th>
-<th>Behavior</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Above <strong>auto-merge</strong> (0.95)</td>
-<td>Merged automatically</td>
-</tr>
-<tr>
-<td>Between <strong>flag</strong> (0.85) and auto-merge</td>
-<td>Flagged for review</td>
-</tr>
-<tr>
-<td>Below <strong>flag</strong> threshold</td>
-<td>Treated as distinct entities</td>
-</tr>
-</tbody>
-</table>
-<p>Resolution uses a composite strategy combining exact matching, fuzzy string matching, and semantic similarity, each with configurable thresholds.</p>
+<p>The same entity may be mentioned differently: &quot;Christopher Nolan,&quot; &quot;Nolan,&quot; &quot;the director of Inception.&quot;</p>
+<ul>
+<li><strong>Auto-merge (0.95+)</strong>: merged automatically</li>
+<li><strong>Flag (0.85–0.95)</strong>: flagged for review</li>
+<li><strong>Below threshold</strong>: treated as distinct entities</li>
+<li><strong>Resolution strategy</strong>: combines exact matching, fuzzy string matching, and semantic similarity</li>
+</ul>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="10" data-paginate="true" data-theme="default" lang="en-US" data-marpit-pagination="10" style="--paginate:true;--theme:default;" data-marpit-pagination-total="12">
 <h2 id="automatic-vs-manual-extraction">Automatic vs Manual Extraction</h2>

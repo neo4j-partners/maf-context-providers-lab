@@ -28,7 +28,9 @@ link:https://codespaces.new/neo4j-partners/genai-maf-context-providers[image:htt
 When you launch the Codespace, you will be prompted to enter your credentials as **secrets**:
 
 OPENAI_API_KEY:: Your OpenAI API key from link:https://platform.openai.com[platform.openai.com^], or the key provided by your workshop instructor
-NEO4J_URI:: The Bolt URI from your Neo4j Sandbox (e.g. `neo4j+s://xxxxx.databases.neo4j.io`)
+NEO4J_URI:: The Bolt URI from your Neo4j Sandbox (e.g. `bolt://xx.xx.xx.xx:7687`)
++
+NOTE: Both `bolt://` and `neo4j+s://` URI schemes work with the Neo4j driver. The Sandbox provides a `bolt://` URI. If you are using Neo4j AuraDB, you will have a `neo4j+s://` URI instead.
 NEO4J_USERNAME:: Your Neo4j username (usually `neo4j`)
 NEO4J_PASSWORD:: The password from your Neo4j Sandbox
 

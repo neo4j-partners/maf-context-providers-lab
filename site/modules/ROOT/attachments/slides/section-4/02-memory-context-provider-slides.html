@@ -31,12 +31,19 @@
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="4" data-paginate="true" data-theme="default" lang="en-US" data-marpit-pagination="4" style="--paginate:true;--theme:default;" data-marpit-pagination-total="11">
 <h2 id="create-the-unified-memory">Create the Unified Memory</h2>
-<p><code>Neo4jMicrosoftMemory.from_memory_client()</code> wraps the client into a unified interface that provides both a context provider and a chat message store.</p>
-<p>You configure it with:</p>
 <ul>
-<li><strong><code>session_id</code></strong>: scopes the conversation; messages and entities are grouped by session</li>
-<li><strong><code>include_short_term</code></strong> / <strong><code>include_long_term</code></strong> / <strong><code>include_reasoning</code></strong>: toggle which memory types are injected before each turn</li>
-<li><strong><code>extract_entities</code></strong>: whether to automatically extract entities after each turn</li>
+<li>
+<p><code>Neo4jMicrosoftMemory.from_memory_client()</code> wraps the client into a unified interface</p>
+</li>
+<li>
+<p><strong><code>session_id</code></strong>: scopes the conversation; messages and entities are grouped by session</p>
+</li>
+<li>
+<p><strong><code>include_short_term</code></strong> / <strong><code>include_long_term</code></strong> / <strong><code>include_reasoning</code></strong>: toggle which memory types are injected before each turn</p>
+</li>
+<li>
+<p><strong><code>extract_entities</code></strong>: whether to automatically extract entities after each turn</p>
+</li>
 </ul>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="5" data-paginate="true" data-theme="default" lang="en-US" data-marpit-pagination="5" style="--paginate:true;--theme:default;" data-marpit-pagination-total="11">
@@ -74,8 +81,8 @@
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="6" data-paginate="true" data-theme="default" lang="en-US" data-marpit-pagination="6" style="--paginate:true;--theme:default;" data-marpit-pagination-total="11">
 <h2 id="attach-the-context-provider">Attach the Context Provider</h2>
-<p>Pass <code>memory.context_provider</code> to the agent in the <code>context_providers</code> list, the same way you passed <code>Neo4jContextProvider</code> in Module 3.</p>
 <ul>
+<li><strong>Configuration</strong>: same as any other context provider</li>
 <li><strong>Transparent</strong>: the agent doesn't need to know it's using memory</li>
 <li><strong>Composable</strong>: combine with other context providers (e.g., knowledge graph + memory together)</li>
 <li><strong>Instructions</strong>: tell the agent it has memory so the LLM references past context in responses</li>

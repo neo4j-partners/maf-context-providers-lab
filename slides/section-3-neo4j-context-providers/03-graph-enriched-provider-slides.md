@@ -104,6 +104,17 @@ RETURN node.plot AS text, score,
 ORDER BY score DESC
 ```
 
+<!--
+High-level flow of this query:
+- Start from the matched movie node (provided by the index search along with its score)
+- First MATCH walks IN_GENRE relationships to collect genre names
+- OPTIONAL MATCH finds Person nodes that ACTED_IN this movie — OPTIONAL because not every movie may have actor data in the graph
+- collect(DISTINCT p.name)[0..5] gathers actor names into a list, then slices to the first 5 — the [0..5] is Cypher list slicing (start index inclusive, end index exclusive), which caps context size so you don't send 50 actors to the LLM
+- Second OPTIONAL MATCH does the same for directors
+- RETURN produces the columns the retriever expects: text and score are required, the rest are extra metadata
+- ORDER BY score DESC keeps the most relevant matches first
+-->
+
 ---
 
 ## What the Query Collects

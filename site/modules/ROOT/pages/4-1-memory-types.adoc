@@ -16,7 +16,7 @@ Three categories of information accumulate during agent conversations:
 
 == Three Memory Types
 
-The `neo4j-agent-memory` package maps these three categories to distinct memory types, all backed by Neo4j.
+The `neo4j-agent-memory` package maps these three categories to distinct memory types — short-term (conversation history), long-term (extracted knowledge), and reasoning (agent execution traces) — all backed by Neo4j.
 
 === Short-Term Memory
 
@@ -28,9 +28,19 @@ Entities, preferences, and facts are extracted from conversations using the POLE
 
 This extraction happens automatically. Over time, the agent builds a graph of knowledge about each user and the topics they discuss.
 
+=== The ReAct Pattern: Reason + Act
+
+Agents don't execute a single action and stop. They loop through a cycle known as ReAct (Reason + Act):
+
+* **Reason** -- observe the current state (user input, tool results, conversation history) and decide what to do next
+* **Act** -- execute an action: call a tool, query an API, or generate a response
+* **Observe** -- examine the result and feed it back into the next reasoning step
+
+The agent repeats this loop until the task is complete. Each pass produces a trace — what the agent reasoned, what it did, and what came back.
+
 === Reasoning Memory
 
-Traces of what the agent did and whether it worked. Each trace records the task, the steps taken, the tools called, and the outcome. When the agent encounters a similar task later, it can retrieve those traces and reuse strategies that succeeded or avoid approaches that failed.
+Reasoning memory captures those traces. Each trace records the task, the steps taken, the tools called, and the outcome. When the agent encounters a similar task later, it can retrieve those traces and reuse strategies that succeeded or avoid approaches that failed.
 
 == How Neo4j Stores It
 

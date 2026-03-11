@@ -61,6 +61,7 @@ Three categories of information accumulate during agent conversations:
 The `neo4j-agent-memory` library is a **graph-native memory system** for AI agents.
 
 - **Storage**: conversations, knowledge graphs, and reasoning traces, all backed by Neo4j
+- **Three memory types**: short-term (conversation history), long-term (extracted knowledge), and reasoning (agent execution traces)
 - **Framework integrations**: LangChain, Pydantic AI, OpenAI Agents, and MAF
 - **MAF integration**: wraps memory into context providers and callable tools
 
@@ -96,6 +97,22 @@ Stores **structured knowledge** extracted from conversations using the POLE+O da
 
 ---
 
+## The ReAct Pattern: Reason + Act
+
+Agents don't execute a single action — they loop through a cycle known as ReAct (Reason + Act):
+
+- **Reason**: observe the current state (user input, tool results, conversation history) and decide what to do next
+- **Act**: execute an action — call a tool, query an API, or generate a response
+- **Observe**: examine the result and feed it back into the next reasoning step
+
+The agent repeats this loop until the task is complete. Each pass produces a trace — what the agent reasoned, what it did, and what came back.
+
+<!--
+The next slide — reasoning memory — captures exactly these traces. Each time an agent loops through reason, act, and observe, it records which tools it called, what parameters it used, what came back, and whether the task succeeded or failed. Storing these traces means the agent can look up what it tried last time it encountered a similar task and learn from past experience rather than starting from scratch.
+-->
+
+---
+
 ## Reasoning Memory
 
 Stores **traces of past agent behavior** for learning.
@@ -110,6 +127,18 @@ Stores **traces of past agent behavior** for learning.
 - Retrieve past traces when encountering a similar task
 - Learn from what worked and what failed
 - Track tool reliability and performance over time
+
+<!--
+This maps directly to the agent lifecycle, often called the ReAct (Reason + Act) pattern:
+
+1. **Reason** — the agent observes the current state (user input, environment, tool results) and decides what to do next
+2. **Act** — the agent executes an action (calls a tool, makes an API request, generates a response)
+3. **Observe** — the agent sees the result of that action and feeds it back into the next reasoning step
+
+The agent loops through Reason → Act → Observe until it decides the task is complete.
+
+Reasoning memory captures this entire loop: the task that triggered it, each reasoning step the agent took, which tools it called (with parameters and results), and whether the overall task succeeded or failed. It's essentially a recording of the ReAct cycle so the agent can replay and learn from past attempts when it encounters a similar task later.
+-->
 
 ---
 
