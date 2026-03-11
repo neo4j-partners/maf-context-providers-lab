@@ -57,7 +57,7 @@ But your graph contains far more:
 - Traverses outward from the matched node, following relationships to collect genres, actors, and directors
 - Returns enriched context combining the original text with structured metadata
 
-- The matched node is the **anchor** — you traverse outward from what search found
+- The matched node is the **anchor**; you traverse outward from what search found
 
 ---
 
@@ -169,16 +169,6 @@ Graph enrichment is not limited to vector search:
 | `fulltext` | Fulltext retriever | Fulltext retriever |
 
 The same `retrieval_query` Cypher works across modes. It always receives `node` and `score`.
-
----
-
-## Experiment Ideas
-
-- Add `node.imdbRating` to the RETURN clause to include ratings
-- Change the actor limit from 5 to 3 or 10
-- Modify `top_k` to retrieve more or fewer matches
-- Update the `context_prompt` to prioritize higher-rated movies
-- Add `node.revenue` or `node.budget` for financial context
 
 ---
 

@@ -35,13 +35,15 @@ Convert dense prose into definition lists (bold term + definition) or bullet poi
 ### 02-vector-provider-slides.md
 
 - **"What is Vector Search?"** (lines ~37, 44): Opening definition and closing enablement sentence are prose. Convert to definition list.
-- **"Embeddings Must Match"** (line ~76): Trailing sentence listing supported embedders. Convert to bullet list.
+- **"Embeddings Must Match"** (line ~76): no table. just summarize embedding models create different embeddings so they are not compatabile.
+- **Create an Embedder** - explain that configures the embedding model to use 
 - **"Configure the Provider"** (lines ~101-102): Last two bullets contain multi-sentence explanations. Simplify.
+- **Configure and Run the Agent**  to much details. needs to be plain english.    Registers the provider so before_run() runs on every turn. The provider automatically embeds the query, searches the index, and injects results before the LLM responds
+The agent receives relevant movie data on every turn without any explicit tool calls.
 - **"With vs Without Context"** (lines ~138-144): Both comparison blocks are prose. Convert to definition list entries with bullets.
 
 ### 03-graph-enriched-provider-slides.md
 
-- **"Why Search Alone Isn't Enough"** (line ~45): Trailing bold conclusion. Convert to bullet.
 - **"The Two-Step Process"** (line ~60): Trailing sentence "The matched node is the anchor..." should be a bullet.
 - **"Why OPTIONAL MATCH Matters"** (lines ~146-148): Two trailing prose paragraphs (importance explanation + rule of thumb). Convert to bullets.
 

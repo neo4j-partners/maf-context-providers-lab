@@ -142,7 +142,11 @@ Each entity node stores the name, type, subtype, description, confidence score, 
 
 == Automatic vs Manual Extraction
 
-When `extract_entities=True` is set on `Neo4jMicrosoftMemory`, entity extraction runs automatically in `after_run()` after every agent response. It processes the agent's most recent response message rather than re-analyzing the entire conversation history each time. By default, this runs asynchronously in the background so it doesn't slow down the agent's response time.
+Automatic extraction runs in `after_run()` after every agent response:
+
+* Processes the agent's most recent response, not the full conversation history
+* **Async by default** -- runs as a background task, doesn't block the next turn
+* Sync and offline batch modes also available
 
 You can also extract entities manually:
 

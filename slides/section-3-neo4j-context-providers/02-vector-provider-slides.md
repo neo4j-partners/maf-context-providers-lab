@@ -34,7 +34,7 @@ ol > li {
 
 ## What is Vector Search?
 
-**Vectors:** Numerical representations of text encoded as high-dimensional arrays (often 1,536 dimensions)
+**Vectors:** Numerical representations of text encoded as high-dimensional arrays
 
 **Key property:** Similar meanings produce similar vectors
 
@@ -65,13 +65,7 @@ ol > li {
 
 ## Embeddings Must Match
 
-The query embedder must use the **same model and dimensions** as the stored embeddings.
-
-| Stored Embeddings | Query Embedder | Result |
-|-------------------|----------------|--------|
-| `text-embedding-ada-002` (1536d) | `text-embedding-ada-002` (1536d) | Works |
-| `text-embedding-ada-002` (1536d) | `text-embedding-3-small` (1536d) | Poor results |
-| `text-embedding-ada-002` (1536d) | Any model (768d) | Fails |
+**Critical:** The query embedder must use the **same model and dimensions** as the stored embeddings — different models produce incompatible vectors
 
 **Supported embedders in neo4j-graphrag:**
 - OpenAI, Azure OpenAI, Cohere, Mistral AI, Google Vertex AI, Ollama, Sentence Transformers
@@ -80,14 +74,14 @@ The query embedder must use the **same model and dimensions** as the stored embe
 
 ## Create an Embedder
 
+Configures the embedding model the provider will use to convert query text into vectors:
+
 ```python
 from neo4j_graphrag.embeddings.openai import OpenAIEmbeddings
 
 # Uses OPENAI_API_KEY from environment automatically
 embedder = OpenAIEmbeddings(model="text-embedding-ada-002")
 ```
-
-The embedder converts query text into a vector that can be compared against `plotEmbedding` vectors stored on Movie nodes.
 
 ---
 
@@ -106,13 +100,9 @@ The embedder converts query text into a vector that can be compared against `plo
 
 ## Configure and Run the Agent
 
-To use the provider, connect it to an agent:
+**Registration:** Pass the provider in `context_providers` so `before_run()` runs on every turn
 
-- **`async with provider`**: Opens the Neo4j connection and initializes the retriever
-- **`context_providers=[provider]`**: Registers the provider so `before_run()` runs on every turn
-- **`agent.run(query, session=session)`**: The provider automatically embeds the query, searches the index, and injects results before the LLM responds
-
-The agent receives relevant movie data on every turn without any explicit tool calls.
+**Automatic:** The provider embeds the query, searches the index, and injects results before the LLM responds — no explicit tool calls needed
 
 ---
 
@@ -136,25 +126,11 @@ The agent receives relevant movie data on every turn without any explicit tool c
 
 ## With vs Without Context
 
-**Without the context provider:** Agent answers from training data — mentions well-known movies but has no access to your specific database
+**Without the context provider:** Agent answers from training data. Mentions well-known movies but has no access to your specific database.
 
-**With the context provider:** Agent response is grounded in movies that actually exist in your Neo4j graph — can reference specific plots and less obvious films that match semantically
+**With the context provider:** Agent response is grounded in movies that actually exist in your Neo4j graph. Can reference specific plots and less obvious films that match semantically.
 
 **Core value:** Consistent, automatic knowledge retrieval on every turn
-
----
-
-## Limitations of Vector-Only Search
-
-Vector search returns matching **text** and a similarity **score**.
-
-It does **not** include:
-- Movie title or release year
-- Genres the movie belongs to
-- Actors who appeared in it
-- Directors
-
-**That metadata lives in the graph.** Graph-enriched retrieval traverses these relationships after search.
 
 ---
 
@@ -166,6 +142,5 @@ In this lesson, you learned:
 - **Embedder models must match** between stored vectors and query vectors
 - **`Neo4jContextProvider`** with `index_type="vector"` handles embedding, search, and injection
 - **Automatic context**: no tool calls, grounded in real graph data
-- **Limitation**: returns text only, no structured metadata from relationships
 
 **Next:** Graph-enriched retrieval to add structured metadata.

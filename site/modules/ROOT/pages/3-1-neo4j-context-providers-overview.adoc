@@ -43,8 +43,6 @@ The `index_type` parameter determines which search strategy the provider uses:
 | Combines both
 |===
 
-**Graph-enhanced** enriches any mode with related knowledge from the graph.
-
 Each mode maps to a retriever class from the link:https://neo4j.com/docs/neo4j-graphrag-python/current/[`neo4j-graphrag-python`^] library:
 
 * `"vector"` uses link:https://neo4j.com/docs/neo4j-graphrag-python/current/retrievers.html[`VectorRetriever`^] (or `VectorCypherRetriever` when a `retrieval_query` is provided)
@@ -53,11 +51,21 @@ Each mode maps to a retriever class from the link:https://neo4j.com/docs/neo4j-g
 
 You configure the mode when creating the provider. `Neo4jContextProvider` creates the appropriate `neo4j-graphrag` retriever on connection and delegates every search call to it.
 
-Each provider instance supports a single `index_type`. If you need multiple search strategies -- for example, vector search on one index and fulltext search on another -- create separate provider instances and pass them all to the agent's `context_providers` list. The agent merges the context from every provider before calling the LLM.
+Each provider instance supports a single `index_type`. If you need multiple search strategies, for example vector search on one index and fulltext search on another, create separate provider instances and pass them all to the agent's `context_providers` list. The agent merges the context from every provider before calling the LLM.
 
-== Configuration Options
+== Graph-Enhanced Search
 
-All three modes share these core parameters:
+Any search mode can be graph-enhanced by adding a `retrieval_query`. This layers graph traversal on top of the initial index search:
+
+* **Initial search** performs vector, fulltext, or hybrid search as configured
+* **Graph traversal** executes a Cypher query from each result to follow connections
+* **Richer context** returns related entities, relationships, and metadata alongside the matched text
+
+Without graph enrichment, you get isolated text chunks. With graph enrichment, you get text chunks plus structured knowledge from the graph.
+
+Graph enrichment is what separates GraphRAG from standard vector RAG. The dedicated graph-enriched retrieval lesson covers this in detail.
+
+== Key Parameters
 
 * **`uri`**, **`username`**, **`password`** -- Neo4j connection details. Falls back to `NEO4J_URI`, `NEO4J_USERNAME`, `NEO4J_PASSWORD` environment variables if not provided.
 * **`index_name`** -- The name of the Neo4j index to query. Required.
@@ -65,43 +73,10 @@ All three modes share these core parameters:
 * **`top_k`** -- Number of results to retrieve. Defaults to 5.
 * **`context_prompt`** -- Text prepended to search results to guide the LLM.
 * **`message_history_count`** -- Number of recent messages to include in the search query. Defaults to 10.
-
-Mode-specific parameters:
-
 * **`embedder`** -- Required for `"vector"` and `"hybrid"` modes. An object implementing the `neo4j-graphrag` `Embedder` interface.
 * **`fulltext_index_name`** -- Required for `"hybrid"` mode. The name of the fulltext index to combine with vector search.
 * **`filter_stop_words`** -- For `"fulltext"` mode. Removes common words (articles, prepositions, question words) before searching. Defaults to `True`.
 * **`retrieval_query`** -- Optional Cypher query for graph enrichment after index search. Works with all three modes.
-
-== Graph-Enhanced Search
-
-Any search mode can be **graph-enhanced** by adding a `retrieval_query`. This layers graph traversal on top of the initial index search:
-
-* **Initial search** -- Performs vector, fulltext, or hybrid search as configured
-* **Graph traversal** -- Executes a Cypher query from each result to follow connections
-* **Richer context** -- Returns related entities, relationships, and metadata alongside the matched text
-
-Without graph enrichment, you get isolated text chunks. With graph enrichment, you get text chunks plus structured knowledge from the graph.
-
-Graph enrichment is what separates GraphRAG from standard vector RAG. The dedicated graph-enriched retrieval lesson covers this in detail.
-
-== Async Context Manager
-
-The provider manages its Neo4j connection as an async context manager. Use `async with` to ensure the connection is properly opened and closed:
-
-[source,python]
-----
-async with provider:
-    agent = client.as_agent(
-        name="my-agent",
-        instructions="...",
-        context_providers=[provider],
-    )
-    session = agent.create_session()
-    response = await agent.run("query", session=session)
-----
-
-The provider connects to Neo4j on entry, verifies connectivity, initializes the appropriate retriever, and closes the connection on exit.
 
 == Learn More
 
