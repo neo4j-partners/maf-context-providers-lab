@@ -28,13 +28,15 @@ ol > li {
 </style>
 
 
-# Combining Context Providers with Memory Tools
+# Memory Tools
 
 ---
 
-## Passive Memory Is Not Enough
+## Passive Memory
 
-The memory context provider handles memory **passively**: it injects relevant memories before each turn and stores new ones after.
+The memory context provider handles memory **passively** — it injects relevant memories before each turn and stores new ones after.
+
+This covers the common case: the agent automatically has context from prior conversations without any explicit action.
 
 But sometimes the agent needs to take a **deliberate action**:
 
@@ -46,23 +48,32 @@ But sometimes the agent needs to take a **deliberate action**:
 
 ---
 
-## The Combined Pattern
+## Agent Memory Also Provides Tools
 
-The most effective setup uses **both mechanisms** together:
+In addition to the context provider, the agent memory module provides **tools** — functions the agent can call on demand to actively manage its memory.
 
-| Mechanism | Role | When It Runs |
-|-----------|------|-------------|
-| **Context Provider** | Background memory | Automatically every turn |
-| **Memory Tools** | Targeted operations | When the agent decides |
+The context provider runs automatically every turn. Tools run only when the agent **decides** to use them.
 
-- Passive context covers the **common case**
-- Active tools handle the **specific case**
+This means the agent gets two complementary mechanisms:
+
+- **Context provider**: background memory that just works
+- **Memory tools**: targeted operations the agent controls
+
+---
+
+## What Are Tools?
+
+In the Microsoft Agent Framework, a **tool** is a callable function exposed to the LLM. When the agent decides it needs to perform an action — search a database, save a preference, look up an entity — it calls a tool.
+
+Tools are defined as `FunctionTool` instances and passed to the agent's `tools` list. The LLM sees the tool's name, description, and parameters, and can invoke it during a conversation turn.
+
+Memory tools work the same way as any other agent tool — the only difference is they operate on the agent's memory store.
 
 ---
 
 ## The Six Memory Tools
 
-`create_memory_tools()` generates callable `FunctionTool` instances:
+`create_memory_tools()` generates six callable `FunctionTool` instances:
 
 | Tool | Purpose |
 |------|---------|
@@ -80,7 +91,7 @@ The most effective setup uses **both mechanisms** together:
 Call `create_memory_tools(memory)` to generate the six tool instances, then pass them to the agent's `tools` list alongside the context provider.
 
 - The agent's **instructions** should tell it when to use the tools (e.g., "When a user expresses a preference, save it with `remember_preference`")
-- The tools and context provider work **together**: passive context covers the common case, tools handle targeted operations
+- The tools operate on the **same memory store** as the context provider
 - The agent can now both **passively recall** and **actively manage** its memory
 
 ---
@@ -99,13 +110,15 @@ Call `create_memory_tools(memory)` to generate the six tool instances, then pass
 
 ---
 
-## How the Combined Pattern Works
+## The Combined Pattern
+
+The most effective setup uses **both mechanisms** together.
 
 **Turn 1:** *"I love Christopher Nolan movies and anything about space."*
 The context provider saves the message and extracts entities in the background. The agent **also** explicitly calls `remember_preference` to store "Christopher Nolan" under directors and "space" under themes.
 
 **Turn 2:** *"What are my movie preferences?"*
-The context provider injects relevant past messages automatically. The agent **also** calls `recall_preferences` to retrieve the explicit preferences it saved. It reports both.
+The context provider injects relevant past messages automatically. The agent **also** calls `recall_preferences` to retrieve the explicit preferences it saved.
 
 **Turn 3:** *"Based on what you know about me, what should I watch next?"*
 The context provider injects memories as background context. The agent calls `search_knowledge` and `recall_preferences` to gather targeted information, then generates a grounded recommendation.
@@ -128,35 +141,13 @@ The agent now operates on two levels simultaneously:
 
 ---
 
-## Verifying Stored Memories
-
-After the conversation, use `search_memory()` to inspect what both mechanisms have stored:
-
-- **Preferences**: explicitly saved by the agent via `remember_preference`
-- **Entities**: automatically extracted by the context provider's `after_run()`
-- **Messages**: stored by the context provider after each turn
-
-This confirms that both the passive context provider and the active memory tools are persisting data in the same Neo4j graph. You'll verify this in the lab.
-
----
-
-## Experiment Ideas
-
-Test the interaction between passive and active memory:
-
-- Tell the agent you **dislike** a genre, then ask for recommendations. Does it avoid that genre?
-- Ask the agent to **remember a fact** ("The Matrix was released in 1999") and verify it later
-- **End the session**, create a new one with the same `session_id`, and check whether long-term memories persist
-- Ask the agent a question it **struggled with before**. Does it approach it differently with reasoning traces?
-
----
-
 ## Summary
 
-- **Memory tools** give the agent explicit control over search, save, and recall
-- **Context provider** continues to handle background memory injection automatically
-- The **combined pattern** covers both passive context (always available) and active operations (agent-directed)
+- The memory context provider handles **passive** memory automatically
+- In addition, agent memory provides **tools** for targeted operations
+- Tools are callable functions the agent invokes on demand
 - Six tools: `search_memory`, `remember_preference`, `recall_preferences`, `search_knowledge`, `remember_fact`, `find_similar_tasks`
+- The **combined pattern** uses both: passive context for the common case, active tools for specific operations
 - Both mechanisms persist data in the same Neo4j graph
 
 **Next:** Reasoning memory for learning from past executions.

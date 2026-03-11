@@ -1,24 +1,34 @@
-= Combining Context Providers with Memory Tools
+= Memory Tools
 :branch: main
 
 TIP: Complete this lesson hands-on by opening `labs/lab-9-memory-tools.ipynb` in your Codespace.
+
+== Passive Memory
 
 The memory context provider from xref:4-2-memory-context-provider.adoc[Lesson 4-2] handles memory passively. It injects relevant memories before each turn and stores new ones after. The agent never decides to look something up or save a preference; the framework does it automatically.
 
 That works well for general context, but sometimes the agent needs to take a deliberate action. A user says "remember that I hate horror movies" and expects the agent to explicitly store that preference. Or the agent needs to search for a specific entity in the knowledge graph before answering. Passive injection alone can't handle these cases because the agent has no way to trigger a targeted memory operation.
 
-Memory tools solve this. They give the agent callable functions for searching, saving, and recalling memories on demand.
+== Agent Memory Also Provides Tools
 
-== The Combined Pattern
+In addition to the context provider, the agent memory module provides **tools** — functions the agent can call on demand to actively manage its memory.
 
-The most effective setup uses both mechanisms together:
+The context provider runs automatically every turn. Tools run only when the agent decides to use them.
 
-* The **context provider** handles background memory. Every turn, the agent automatically receives relevant past messages, preferences, and entities. No tool call needed.
-* **Memory tools** handle targeted operations. The agent decides when to explicitly save a preference, search for a specific entity, or look up past reasoning traces.
+This means the agent gets two complementary mechanisms:
 
-Passive context covers the common case. Active tools handle the specific case.
+* **Context provider** — background memory that just works
+* **Memory tools** — targeted operations the agent controls
 
-== Create Memory Tools
+== What Are Tools?
+
+In the Microsoft Agent Framework, a **tool** is a callable function exposed to the LLM. When the agent decides it needs to perform an action — search a database, save a preference, look up an entity — it calls a tool.
+
+Tools are defined as `FunctionTool` instances and passed to the agent's `tools` list. The LLM sees the tool's name, description, and parameters, and can invoke it during a conversation turn.
+
+Memory tools work the same way as any other agent tool — the only difference is they operate on the agent's memory store.
+
+== The Six Memory Tools
 
 `create_memory_tools()` generates callable `FunctionTool` instances bound to your memory instance:
 
@@ -128,9 +138,36 @@ This produces six tools:
 
 The agent uses these the same way it uses any tool: by examining the function name and description, then deciding whether to call one based on the user's query.
 
-== Create the Agent with Both
+== Context Provider vs Memory Tools
 
-Pass the context provider and the tools together. Notice the explicit, prescriptive instructions -- without these, the LLM may acknowledge a preference verbally but skip calling the `remember_preference` tool, so the preference is never persisted:
+The two mechanisms serve different roles:
+
+[cols="1,2,2", options="header"]
+|===
+| Aspect | Context Provider | Memory Tools
+
+| **Invocation**
+| Automatic every turn
+| Agent decides when
+
+| **Direction**
+| Recall and store
+| Search, save, recall on demand
+
+| **User visibility**
+| Transparent
+| Visible in agent reasoning
+
+| **Control**
+| Framework-managed
+| Agent-managed
+|===
+
+The context provider says "I automatically remember relevant things." Memory tools say "I can explicitly search, save, and recall."
+
+== The Combined Pattern
+
+The most effective setup uses both mechanisms together. Pass the context provider and the tools to the agent. Notice the explicit, prescriptive instructions -- without these, the LLM may acknowledge a preference verbally but skip calling the `remember_preference` tool, so the preference is never persisted:
 
 [source,python]
 ----
@@ -157,7 +194,7 @@ agent = client.as_agent(
 session = agent.create_session()
 ----
 
-The agent now operates on two levels. Background memory arrives automatically via the context provider. Targeted memory operations happen through explicit tool calls when the agent decides they are needed.
+The agent now operates on two levels simultaneously. Background memory arrives automatically via the context provider. Targeted memory operations happen through explicit tool calls when the agent decides they are needed.
 
 == Run a Conversation
 
@@ -357,7 +394,7 @@ asyncio.run(main())
 [.summary]
 == Lesson Summary
 
-Memory tools give the agent explicit control over search, save, and recall operations, while the context provider continues to handle background memory injection automatically. The combined pattern covers both passive context (always available) and active operations (agent-directed).
+The memory context provider handles passive memory automatically. In addition, agent memory provides tools for targeted operations. Tools are callable functions the agent invokes on demand. The combined pattern uses both: passive context for the common case, active tools for specific operations. Both mechanisms persist data in the same Neo4j graph.
 
 In the next lesson, you will explore reasoning memory to capture and learn from past agent executions.
 
