@@ -98,29 +98,16 @@ async def main():
         )
 
         session = agent.create_session()
-        # end::agent[]
 
-        # tag::run[]
         query = "Find me movies about time travel"
         print(f"User: {query}\n")
         print("Answer: ", end="", flush=True)
         response = await agent.run(query, session=session)
         print(response.text)
         print()
-        # end::run[]
 
 asyncio.run(main())
 
-----
-
-[source,python]
-----
-query = "Find me movies about time travel"
-print(f"User: {query}\n")
-print("Answer: ", end="", flush=True)
-response = await agent.run(query, session=session)
-print(response.text)
-print()
 ----
 
 When the agent receives "What are some good movies about time travel?":
@@ -194,16 +181,13 @@ async def main():
         )
 
         session = agent.create_session()
-        # end::agent[]
 
-        # tag::run[]
         query = "Find me movies about time travel"
         print(f"User: {query}\n")
         print("Answer: ", end="", flush=True)
         response = await agent.run(query, session=session)
         print(response.text)
         print()
-        # end::run[]
 
 asyncio.run(main())
 

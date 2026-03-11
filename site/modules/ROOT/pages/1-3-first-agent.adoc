@@ -108,9 +108,8 @@ async def main():
         ),
         tools=[get_movie_info],
     )
-    # end::agent[]
 
-    # tag::run[]
+
     query = "Tell me about Inception"
     print(f"User: {query}\n")
     print("Answer: ", end="", flush=True)
@@ -118,7 +117,6 @@ async def main():
         if update.text:
             print(update.text, end="", flush=True)
     print()
-    # end::run[]
 
 asyncio.run(main())
 
@@ -228,9 +226,8 @@ async def main():
         ),
         tools=[get_movie_info],
     )
-    # end::agent[]
 
-    # tag::run[]
+
     query = "Tell me about Inception"
     print(f"User: {query}\n")
     print("Answer: ", end="", flush=True)
@@ -238,7 +235,6 @@ async def main():
         if update.text:
             print(update.text, end="", flush=True)
     print()
-    # end::run[]
 
 asyncio.run(main())
 

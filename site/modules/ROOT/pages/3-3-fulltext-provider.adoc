@@ -4,9 +4,9 @@
 
 TIP: Complete this lesson hands-on by opening `labs/lab-5-fulltext-provider.ipynb` in your Codespace.
 
-Vector search finds movies by semantic similarity: "stories about machines becoming conscious" matches movies about artificial intelligence even if those exact words never appear in the plot. Fulltext search works differently. It matches on the actual words in the query. If the user asks about "Christopher Nolan," fulltext search finds plots that contain those exact terms.
+Neo4j fulltext search uses built-in Lucene indexes to match queries against text stored in node properties. It tokenizes the text into individual terms and ranks matches using BM25 scoring, with no embedder or external API required. Neo4j fulltext indexes support different Lucene analyzers that control how text is tokenized. The default analyzer lowercases text, removes common stop words, and splits on word boundaries.
 
-Fulltext search doesn't require an embedder. It uses Neo4j's built-in fulltext indexing with BM25 ranking, making it simpler to set up and faster to execute.
+Where vector search finds content by semantic similarity ("stories about machines becoming conscious" matches movies about AI), fulltext search matches on the actual words in the query. "Christopher Nolan" finds plots containing those exact terms.
 
 == When to Use Fulltext Search
 
@@ -117,16 +117,6 @@ asyncio.run(main())
 
 ----
 
-[source,python]
-----
-query = "Christopher Nolan Batman"
-print(f"User: {query}\n")
-print("Answer: ", end="", flush=True)
-response = await agent.run(query, session=session)
-print(response.text)
-print()
-----
-
 The query "Christopher Nolan Batman" contains specific names and terms that match literally in movie plots — exactly where fulltext search excels.
 
 [%collapsible]
@@ -177,16 +167,13 @@ async def main():
         )
 
         session = agent.create_session()
-        # end::agent[]
 
-        # tag::run[]
         query = "Christopher Nolan Batman"
         print(f"User: {query}\n")
         print("Answer: ", end="", flush=True)
         response = await agent.run(query, session=session)
         print(response.text)
         print()
-        # end::run[]
 
 asyncio.run(main())
 

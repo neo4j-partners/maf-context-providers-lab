@@ -283,9 +283,7 @@ async def main():
     )
 
     session = agent.create_session()
-    # end::agent[]
 
-    # tag::run[]
     queries = [
         "Hello, what is the square root of 9?",
         "My name is Alex and I am 30 years old",
@@ -304,7 +302,6 @@ async def main():
     )
     print(f"Extracted Name: {user_info.name}")
     print(f"Extracted Age: {user_info.age}")
-    # end::run[]
 
 asyncio.run(main())
 

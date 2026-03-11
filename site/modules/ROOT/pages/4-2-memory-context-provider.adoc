@@ -63,9 +63,8 @@ async def main():
             include_reasoning=True,
             extract_entities=True,
         )
-        # end::memory[]
 
-        # tag::agent[]
+
         client = OpenAIResponsesClient()
 
         agent = client.as_agent(
@@ -80,9 +79,8 @@ async def main():
         )
 
         session = agent.create_session()
-        # end::agent[]
 
-        # tag::run[]
+
         queries = [
             "I really enjoy sci-fi movies, especially ones about time travel.",
             "What did I say my favorite genre was?",
@@ -93,9 +91,8 @@ async def main():
             print(f"\nUser: {query}")
             response = await agent.run(query, session=session)
             print(f"Assistant: {response.text}")
-        # end::run[]
 
-        # tag::search[]
+
         results = await memory.search_memory(
             query="sci-fi movies",
             include_messages=True,
@@ -107,7 +104,6 @@ async def main():
         print("Messages:", results.get("messages", []))
         print("Entities:", results.get("entities", []))
         print("Preferences:", results.get("preferences", []))
-        # end::search[]
     finally:
         await memory_client.close()
 
@@ -249,9 +245,8 @@ async def main():
             include_reasoning=True,
             extract_entities=True,
         )
-        # end::memory[]
 
-        # tag::agent[]
+
         client = OpenAIResponsesClient()
 
         agent = client.as_agent(
@@ -266,9 +261,8 @@ async def main():
         )
 
         session = agent.create_session()
-        # end::agent[]
 
-        # tag::run[]
+
         queries = [
             "I really enjoy sci-fi movies, especially ones about time travel.",
             "What did I say my favorite genre was?",
@@ -279,9 +273,8 @@ async def main():
             print(f"\nUser: {query}")
             response = await agent.run(query, session=session)
             print(f"Assistant: {response.text}")
-        # end::run[]
 
-        # tag::search[]
+
         results = await memory.search_memory(
             query="sci-fi movies",
             include_messages=True,
@@ -293,7 +286,6 @@ async def main():
         print("Messages:", results.get("messages", []))
         print("Entities:", results.get("entities", []))
         print("Preferences:", results.get("preferences", []))
-        # end::search[]
     finally:
         await memory_client.close()
 

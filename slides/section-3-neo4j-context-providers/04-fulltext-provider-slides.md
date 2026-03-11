@@ -59,10 +59,10 @@ Fulltext search is the better choice when:
 
 - Uses Neo4j's built-in **Lucene-based fulltext indexing** with **BM25 ranking**
 
-1. The user's query is preprocessed: common stop words ("what", "the", "is") are filtered out
-2. Remaining terms are tokenized and matched against the fulltext index
-3. Results are ranked by BM25 score, weighing term frequency, rarity, and document length
-4. Top results are injected as context for the LLM
+- **Stop word filtering:** the provider removes common words ("what", "the", "is") from the query before sending it to Neo4j
+- **Matching:** Neo4j's fulltext index tokenizes the remaining terms and matches them against indexed content
+- **Ranking:** results are scored using BM25, weighing term frequency, rarity, and document length
+- **Context injection:** top results are injected as context for the LLM
 
 ---
 

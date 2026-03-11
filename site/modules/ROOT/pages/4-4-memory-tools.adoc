@@ -53,9 +53,8 @@ async def main():
 
         for tool in tools:
             print(f"  - {tool.name}: {tool.description[:60]}...")
-        # end::tools[]
 
-        # tag::agent[]
+
         client = OpenAIResponsesClient()
 
         agent = client.as_agent(
@@ -77,9 +76,8 @@ async def main():
         )
 
         session = agent.create_session()
-        # end::agent[]
 
-        # tag::run[]
+
         queries = [
             "I love Christopher Nolan movies and anything about space.",
             "What are my movie preferences?",
@@ -92,9 +90,8 @@ async def main():
                 if update.text:
                     print(update.text, end="", flush=True)
             print()
-        # end::run[]
 
-        # tag::verify[]
+
         results = await memory.search_memory(
             query="Christopher Nolan movies space",
             include_messages=True,
@@ -119,7 +116,6 @@ async def main():
 
         if results.get("messages"):
             print(f"Messages stored: {len(results['messages'])}")
-        # end::verify[]
     finally:
         await memory_client.close()
 
@@ -316,9 +312,8 @@ async def main():
 
         for tool in tools:
             print(f"  - {tool.name}: {tool.description[:60]}...")
-        # end::tools[]
 
-        # tag::agent[]
+
         client = OpenAIResponsesClient()
 
         agent = client.as_agent(
@@ -340,9 +335,8 @@ async def main():
         )
 
         session = agent.create_session()
-        # end::agent[]
 
-        # tag::run[]
+
         queries = [
             "I love Christopher Nolan movies and anything about space.",
             "What are my movie preferences?",
@@ -355,9 +349,8 @@ async def main():
                 if update.text:
                     print(update.text, end="", flush=True)
             print()
-        # end::run[]
 
-        # tag::verify[]
+
         results = await memory.search_memory(
             query="Christopher Nolan movies space",
             include_messages=True,
@@ -382,7 +375,6 @@ async def main():
 
         if results.get("messages"):
             print(f"Messages stored: {len(results['messages'])}")
-        # end::verify[]
     finally:
         await memory_client.close()
 
