@@ -55,9 +55,7 @@ The `MemoryClient` is the entry point to all three memory types (short-term, lon
 
 ## Create the Unified Memory
 
-`Neo4jMicrosoftMemory.from_memory_client()` wraps the client into a unified interface that provides both a context provider and a chat message store.
-
-You configure it with:
+- `Neo4jMicrosoftMemory.from_memory_client()` wraps the client into a unified interface
 
 - **`session_id`**: scopes the conversation; messages and entities are grouped by session
 - **`include_short_term`** / **`include_long_term`** / **`include_reasoning`**: toggle which memory types are injected before each turn
@@ -79,11 +77,10 @@ You configure it with:
 
 ## Attach the Context Provider
 
-Pass `memory.context_provider` to the agent in the `context_providers` list, the same way you passed `Neo4jContextProvider` in Module 3.
-
-- The agent doesn't need to know it's using memory. The context provider handles everything transparently.
-- You can combine it with other context providers (e.g., a knowledge graph provider and a memory provider together)
-- The agent's instructions should mention that it has memory, so the LLM knows to reference past context in its responses
+- **Configuration**: same as any other context provider
+- **Transparent**: the agent doesn't need to know it's using memory
+- **Composable**: combine with other context providers (e.g., knowledge graph + memory together)
+- **Instructions**: tell the agent it has memory so the LLM references past context in responses
 
 ---
 

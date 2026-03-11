@@ -34,16 +34,10 @@ ol > li {
 
 ## From Unstructured Text to Structured Graph
 
-**Long-term memory:** Stores entities, preferences, and facts extracted from conversations
-
-**Extraction pipeline:** Processes individual conversation messages (both user and agent) to identify entities like people, organizations, and locations, then stores them as nodes in the Neo4j graph
-
-** Uses a multi-stage pipeline that combines:
-- Fast pattern matching
-- Model-based extraction
-- LLM fallback
-
-Results are merged to maximize **coverage** and **accuracy**.
+- **Long-term memory**: stores entities, preferences, and facts extracted from conversations
+- **Extraction pipeline**: processes conversation messages to identify entities and store them as Neo4j nodes
+- **Multi-stage approach**: combines fast pattern matching, model-based extraction, and LLM fallback
+- **Results are merged** to maximize coverage and accuracy
 
 ---
 

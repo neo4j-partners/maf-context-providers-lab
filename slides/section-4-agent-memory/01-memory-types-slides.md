@@ -46,25 +46,13 @@ But the agent itself has no memory:
 
 ---
 
-## A Conversation Without Memory
-
-- A user tells the agent they prefer Christopher Nolan films
-- Two turns later, they ask for a recommendation
-
-Without memory:
-- The conversation history is gone
-- The preference was never stored
-- The agent suggests a random comedy — it has no idea what the user said
-
----
-
 ## What Memory Needs to Capture
 
 Three categories of information accumulate during agent conversations:
 
-1. **What was said** — messages, responses, and follow-ups that persist across turns and sessions
-2. **What was learned** — facts and preferences extracted from conversation into structured knowledge
-3. **What was tried** — reasoning steps and tool calls the agent used, including what worked and what failed
+1. **What was said**: messages, responses, and follow-ups that persist across turns and sessions
+2. **What was learned**: facts and preferences extracted from conversation into structured knowledge
+3. **What was tried**: reasoning steps and tool calls the agent used, including what worked and what failed
 
 ---
 
@@ -72,10 +60,9 @@ Three categories of information accumulate during agent conversations:
 
 The `neo4j-agent-memory` library is a **graph-native memory system** for AI agents.
 
-- Stores conversations, builds knowledge graphs, learns from reasoning
-- All backed by Neo4j
-- Framework integrations for **LangChain**, **Pydantic AI**, **OpenAI Agents**, and **MAF**
-- The MAF integration wraps memory into context providers and callable tools
+- **Storage**: conversations, knowledge graphs, and reasoning traces, all backed by Neo4j
+- **Framework integrations**: LangChain, Pydantic AI, OpenAI Agents, and MAF
+- **MAF integration**: wraps memory into context providers and callable tools
 
 ---
 
@@ -142,11 +129,11 @@ Stores **traces of past agent behavior** for learning.
 
 All three memory types live in the same Neo4j database as graph structures:
 
-- **Conversations** contain linked **Message** nodes (short-term memory)
-- Messages link to **Entity** nodes that were mentioned or extracted from them (long-term memory)
-- Entities link to **other entities** they relate to, forming a knowledge graph
-- **ReasoningTrace** nodes connect to their individual **steps** and **tool calls** (reasoning memory)
-- Everything connects back to the **session** where it occurred
+- **Conversations → Messages**: linked message nodes store short-term memory
+- **Messages → Entities**: extracted or mentioned entities form long-term memory
+- **Entities → Entities**: related entities connect to each other, forming a knowledge graph
+- **ReasoningTrace → Steps → ToolCalls**: reasoning memory captures execution paths
+- **All nodes → Session**: everything connects back to the session where it occurred
 
 ---
 
@@ -154,10 +141,10 @@ All three memory types live in the same Neo4j database as graph structures:
 
 Because everything is in the same graph, memories connect to each other:
 
-- An entity extracted from a conversation **links back** to the message it came from
-- Messages link to the **session** they occurred in
-- Entities link to **other entities** they relate to
-- Reasoning traces connect to the **steps and tool calls** that compose them
+- **Entities → Messages**: extracted entities link back to the message they came from
+- **Messages → Sessions**: messages link to the session they occurred in
+- **Entities → Entities**: entities link to other entities they relate to
+- **Traces → Steps**: reasoning traces connect to the steps and tool calls that compose them
 
 - This is more than storage — it's a **connected knowledge structure** the agent can traverse
 
