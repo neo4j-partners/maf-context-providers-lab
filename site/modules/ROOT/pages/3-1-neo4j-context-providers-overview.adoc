@@ -26,25 +26,24 @@ The provider doesn't extract entities or keywords from the query. It passes the 
 
 The `index_type` parameter determines which search strategy the provider uses:
 
-[cols="1,2,2,1"]
+[cols="1,2,2"]
 |===
-| Mode | How It Works | Best For | Embedder Required?
+| Mode | How It Works | Key Strength
 
 | `"vector"`
 | Embeds the query, searches a vector index by cosine similarity
-| Semantic similarity -- finding conceptually related content
-| Yes
+| Understands meaning
 
 | `"fulltext"`
 | Tokenizes the query, removes stop words, searches a fulltext index by BM25 ranking
-| Keyword matching -- finding content with specific terms
-| No
+| Matches keywords
 
 | `"hybrid"`
 | Runs both vector and fulltext search, combines the scores
-| Best of both worlds -- semantic understanding plus keyword precision
-| Yes
+| Combines both
 |===
+
+**Graph-enhanced** enriches any mode with related knowledge from the graph.
 
 Each mode maps to a retriever class from the link:https://neo4j.com/docs/neo4j-graphrag-python/current/[`neo4j-graphrag-python`^] library:
 
@@ -73,6 +72,18 @@ Mode-specific parameters:
 * **`fulltext_index_name`** -- Required for `"hybrid"` mode. The name of the fulltext index to combine with vector search.
 * **`filter_stop_words`** -- For `"fulltext"` mode. Removes common words (articles, prepositions, question words) before searching. Defaults to `True`.
 * **`retrieval_query`** -- Optional Cypher query for graph enrichment after index search. Works with all three modes.
+
+== Graph-Enhanced Search
+
+Any search mode can be **graph-enhanced** by adding a `retrieval_query`. This layers graph traversal on top of the initial index search:
+
+* **Initial search** -- Performs vector, fulltext, or hybrid search as configured
+* **Graph traversal** -- Executes a Cypher query from each result to follow connections
+* **Richer context** -- Returns related entities, relationships, and metadata alongside the matched text
+
+Without graph enrichment, you get isolated text chunks. With graph enrichment, you get text chunks plus structured knowledge from the graph.
+
+Graph enrichment is what separates GraphRAG from standard vector RAG. The dedicated graph-enriched retrieval lesson covers this in detail.
 
 == Async Context Manager
 

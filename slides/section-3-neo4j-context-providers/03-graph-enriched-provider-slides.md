@@ -42,7 +42,7 @@ But your graph contains far more:
 - `Person` → `ACTED_IN` → `Movie`
 - `Person` → `DIRECTED` → `Movie`
 
-**Search finds the right movies. Graph enrichment collects the surrounding context.**
+- **Search** finds the right movies; **graph enrichment** collects the surrounding context
 
 ---
 
@@ -57,7 +57,7 @@ But your graph contains far more:
 - Traverses outward from the matched node, following relationships to collect genres, actors, and directors
 - Returns enriched context combining the original text with structured metadata
 
-The matched node is the **anchor**. You traverse outward from what search found.
+- The matched node is the **anchor** — you traverse outward from what search found
 
 ---
 
@@ -142,9 +142,8 @@ When traversing relationships in your retrieval query:
 - **`MATCH`** requires the relationship to exist. If a movie has no actors in the graph, that movie is **dropped entirely** from the results.
 - **`OPTIONAL MATCH`** keeps every matched node. If the relationship doesn't exist, the collected list is simply empty.
 
-This matters because your index search already found relevant results. You don't want the graph traversal step to silently remove them just because one relationship is missing.
-
-**Rule of thumb:** use `OPTIONAL MATCH` for any relationship that might not exist on every node.
+- Your index search already found relevant results — don't let graph traversal silently remove them because one relationship is missing
+- **Rule of thumb:** use `OPTIONAL MATCH` for any relationship that might not exist on every node
 
 ---
 

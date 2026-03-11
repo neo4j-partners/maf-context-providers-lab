@@ -34,13 +34,11 @@ ol > li {
 
 ## From Unstructured Text to Structured Graph
 
-Long-term memory stores entities, preferences, and facts extracted from conversations.
+**Long-term memory:** Stores entities, preferences, and facts extracted from conversations
 
-But how does the extraction happen, and what does it run on?
+**Extraction pipeline:** Processes individual conversation messages (both user and agent) to identify entities like people, organizations, and locations, then stores them as nodes in the Neo4j graph
 
-The pipeline processes the **text content of individual conversation messages**, both what the user says and what the agent responds. When a message is added to short-term memory, the extraction pipeline analyzes that message text to identify entities like people, organizations, and locations. These extracted entities are then stored in long-term memory as nodes in the Neo4j graph.
-
-The `neo4j-agent-memory` package uses a **multi-stage pipeline** that combines:
+** Uses a multi-stage pipeline that combines:
 - Fast pattern matching
 - Model-based extraction
 - LLM fallback
@@ -152,9 +150,15 @@ Resolution uses a composite strategy combining exact matching, fuzzy string matc
 
 ## Automatic vs Manual Extraction
 
-**Automatic:** When `extract_entities=True` is set on `Neo4jMicrosoftMemory`, entity extraction runs in `after_run()` after every agent response. It processes the agent's most recent response message rather than re-analyzing the entire conversation history each time. It runs **asynchronously** so it doesn't slow down the response to the user.
+**Automatic:** extraction runs in `after_run()` after every agent response
 
-**Manual:** You can also pre-populate the memory graph with known entities using the `MemoryClient` directly. This is useful for seeding the graph with domain knowledge before the agent starts conversing, for example adding key people, products, or locations that the agent should already know about.
+- Processes the agent's most recent response, not the full conversation history
+- **Async by default** — runs as a background task, doesn't block the next turn
+- Sync and offline batch modes also available
+
+**Manual:** pre-populate the graph with known entities using `MemoryClient`
+
+- Useful for seeding domain knowledge before the agent starts (key people, products, locations)
 
 ---
 

@@ -1,4 +1,4 @@
-= Fulltext Search with Neo4jContextProvider
+= Fulltext Search with Neo4j Context Provider
 :optional: true
 :branch: main
 

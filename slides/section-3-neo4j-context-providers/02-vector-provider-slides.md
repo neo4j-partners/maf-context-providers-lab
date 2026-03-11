@@ -28,20 +28,20 @@ ol > li {
 </style>
 
 
-# Vector Search with Neo4jContextProvider
+# Vector Search with Neo4j Context Provider
 
 ---
 
 ## What is Vector Search?
 
-Vectors are numerical representations of text encoded as high-dimensional arrays (often 1,536 dimensions).
+**Vectors:** Numerical representations of text encoded as high-dimensional arrays (often 1,536 dimensions)
 
-**The key property:** Similar meanings produce similar vectors.
+**Key property:** Similar meanings produce similar vectors
 
 - "time travel adventure" and "journey through time" → vectors close together
 - "time travel adventure" and "cooking recipes" → vectors far apart
 
-This enables **semantic search**: finding content by meaning, not keywords.
+- This enables **semantic search**: finding content by meaning, not keywords
 
 ---
 
@@ -73,7 +73,8 @@ The query embedder must use the **same model and dimensions** as the stored embe
 | `text-embedding-ada-002` (1536d) | `text-embedding-3-small` (1536d) | Poor results |
 | `text-embedding-ada-002` (1536d) | Any model (768d) | Fails |
 
-**Supported embedders in neo4j-graphrag:** OpenAI, Azure OpenAI, Cohere, Mistral AI, Google Vertex AI, Ollama, Sentence Transformers.
+**Supported embedders in neo4j-graphrag:**
+- OpenAI, Azure OpenAI, Cohere, Mistral AI, Google Vertex AI, Ollama, Sentence Transformers
 
 ---
 
@@ -98,7 +99,7 @@ The embedder converts query text into a vector that can be compared against `plo
 - **`index_name`**: The Neo4j vector index to search (e.g., `"moviePlots"`)
 - **`index_type`**: Set to `"vector"` for semantic search via cosine similarity
 - **`embedder`**: The same embedding model used to create the stored vectors
-- **`top_k`**: Number of results to retrieve (5 balances context richness with token usage)
+- **`top_k`**: Number of results to retrieve
 - **`context_prompt`**: Text prepended to results that guides the LLM on how to use the injected data
 
 ---
@@ -135,13 +136,11 @@ The agent receives relevant movie data on every turn without any explicit tool c
 
 ## With vs Without Context
 
-**Without the context provider:**
-The agent answers from training data. It mentions well-known movies but has no access to your specific database.
+**Without the context provider:** Agent answers from training data — mentions well-known movies but has no access to your specific database
 
-**With the context provider:**
-The agent's response is grounded in movies that actually exist in your Neo4j graph. It can reference specific plots and mention less obvious films that match semantically.
+**With the context provider:** Agent response is grounded in movies that actually exist in your Neo4j graph — can reference specific plots and less obvious films that match semantically
 
-**This is the core value:** consistent, automatic knowledge retrieval on every turn.
+**Core value:** Consistent, automatic knowledge retrieval on every turn
 
 ---
 

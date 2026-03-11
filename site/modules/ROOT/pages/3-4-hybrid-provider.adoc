@@ -1,4 +1,4 @@
-= Hybrid Search with Neo4jContextProvider
+= Hybrid Search with Neo4j Context Provider
 :optional: true
 :branch: main
 

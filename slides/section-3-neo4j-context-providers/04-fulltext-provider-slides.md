@@ -28,7 +28,7 @@ ol > li {
 </style>
 
 
-# Fulltext Search with Neo4jContextProvider
+# Fulltext Search with Neo4j Context Provider
 
 ---
 
@@ -59,7 +59,7 @@ Fulltext search is the better choice when:
 
 ## How It Works
 
-Fulltext search uses Neo4j's built-in **Lucene-based fulltext indexing** with **BM25 ranking**.
+**Fulltext search:** Uses Neo4j's built-in **Lucene-based fulltext indexing** with **BM25 ranking**
 
 1. The user's query is preprocessed: common stop words ("what", "the", "is") are filtered out
 2. Remaining terms are tokenized and matched against the fulltext index
@@ -76,7 +76,7 @@ BM25 (Best Matching 25) scores documents based on:
 - **Inverse document frequency**: how rare the terms are across all documents
 - **Document length normalization**: shorter documents with matches rank higher
 
-A movie plot mentioning "space" and "exploration" multiple times ranks higher than one that mentions them once.
+- A movie plot mentioning "space" and "exploration" multiple times ranks higher than one that mentions them once
 
 ---
 
@@ -115,7 +115,7 @@ By default, the provider filters common stop words before searching.
 | "Tell me about Christopher Nolan" | "Christopher Nolan" |
 | "What is the best action movie?" | "best action movie" |
 
-Words like "what," "the," "is," and "about" add noise to fulltext queries.
+- Words like "what," "the," "is," and "about" add noise to fulltext queries
 
 ---
 
@@ -137,7 +137,7 @@ Once configured, the fulltext provider plugs into an agent the same way as any o
 - The agent automatically retrieves fulltext results before each LLM call
 - No changes to agent setup, instructions, or session handling are needed
 
-The provider is interchangeable. You can swap between vector, fulltext, and hybrid without changing your agent code.
+- The provider is interchangeable — swap between vector, fulltext, and hybrid without changing agent code
 
 ---
 

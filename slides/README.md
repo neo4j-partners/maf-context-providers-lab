@@ -37,7 +37,7 @@ Slides are organized into 4 sections matching the course structure.
 
 | Slide | File | Topics |
 |---|---|---|
-| 01 | `section-3-neo4j-context-providers/01-neo4j-context-providers-overview-slides.md` | Neo4jContextProvider architecture, retriever classes, before_run workflow, configuration |
+| 01 | `section-3-neo4j-context-providers/01-neo4j-context-providers-overview-slides.md` | Neo4j Context Provider architecture, retriever classes, before_run workflow, configuration |
 | 02 | `section-3-neo4j-context-providers/02-vector-provider-slides.md` | Vector search, embeddings, cosine similarity, embedder configuration |
 | 03 | `section-3-neo4j-context-providers/03-graph-enriched-provider-slides.md` | retrieval_query parameter, Cypher traversal, graph-enriched context |
 | 04 | `section-3-neo4j-context-providers/04-fulltext-provider-slides.md` | Fulltext search, BM25 ranking, keyword matching, no embedder required |

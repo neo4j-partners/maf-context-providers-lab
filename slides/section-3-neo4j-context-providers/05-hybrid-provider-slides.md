@@ -28,7 +28,7 @@ ol > li {
 </style>
 
 
-# Hybrid Search with Neo4jContextProvider
+# Hybrid Search with Neo4j Context Provider
 
 ---
 
@@ -40,7 +40,7 @@ ol > li {
 **Fulltext search** matches keywords but misses semantic connections:
 - "feel-good movies about unlikely friendships" only matches those exact words
 
-**Hybrid search runs both and combines the results.**
+- **Hybrid search** runs both and combines the results
 
 ---
 
@@ -80,7 +80,7 @@ Hybrid search requires three things:
 | Fulltext index | `fulltext_index_name` | For keyword matching |
 | Embedder | `embedder` | To generate query vectors |
 
-Both indexes must exist in Neo4j before the provider can use them.
+- Both indexes must exist in Neo4j before the provider can use them
 
 ---
 
@@ -104,7 +104,7 @@ The hybrid provider plugs into an agent identically to vector or fulltext:
 - The agent automatically retrieves hybrid results before each LLM call
 - No changes to agent setup, instructions, or session handling are needed
 
-All three search modes are interchangeable from the agent's perspective.
+- All three search modes are interchangeable from the agent's perspective
 
 ---
 

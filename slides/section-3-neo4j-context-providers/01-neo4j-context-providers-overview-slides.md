@@ -39,7 +39,8 @@ Neo4j provides two context provider packages for the Microsoft Agent Framework:
 - **`agent-framework-neo4j`**: Retrieves knowledge from Neo4j indexes (vector, fulltext, or hybrid search) and injects it before every LLM call
 - **`neo4j-agent-memory`**: Gives agents persistent memory across conversations, capturing user preferences and entity mentions in Neo4j
 
-This module focuses on `agent-framework-neo4j`. The next module covers `neo4j-agent-memory`.
+- This module focuses on `agent-framework-neo4j`
+- The next module covers `neo4j-agent-memory`
 
 ---
 
@@ -49,11 +50,11 @@ The `neo4j-graphrag-python` library also provides a pipeline for **building** kn
 
 - **`SimpleKGPipeline`** automates splitting, entity extraction, embedding, and storage
 - Takes raw documents (PDFs, articles) and creates structured graph data
-- The same library you use to **query** your graph can also **construct** it
+- The same library used to **query** your graph can also **construct** it
 
 ---
 
-## Neo4jContextProvider
+## Neo4j Context Provider
 
 `Neo4jContextProvider` from the `agent-framework-neo4j` package:
 
@@ -61,7 +62,7 @@ The `neo4j-graphrag-python` library also provides a pipeline for **building** kn
 - Injects matching results before every LLM call via `before_run()`
 - Delegates all search to `neo4j-graphrag-python` retriever classes (`VectorRetriever`, `HybridRetriever`, etc.)
 
-You configure the provider; `neo4j-graphrag` runs the search.
+- You configure the provider; `neo4j-graphrag` runs the search
 
 ---
 
@@ -69,23 +70,28 @@ You configure the provider; `neo4j-graphrag` runs the search.
 
 `Neo4jContextProvider` supports three search modes via the `index_type` parameter:
 
-| Mode | How It Works | Best For | Embedder? |
-|------|-------------|----------|-----------|
-| **`vector`** | Cosine similarity on embeddings | Semantic similarity | Yes |
-| **`fulltext`** | BM25 ranking on tokenized text | Keyword matching | No |
-| **`hybrid`** | Runs both, combines scores | Best of both worlds | Yes |
+| Mode | How It Works | Key Strength |
+|------|-------------|--------------|
+| **`vector`** | Cosine similarity on embeddings | Understands meaning |
+| **`fulltext`** | BM25 ranking on tokenized text | Matches keywords |
+| **`hybrid`** | Runs both, combines scores | Combines both |
+
+**Graph-enhanced** enriches any mode with related knowledge from the graph.
 
 ---
 
-## When to Use Each Mode
+## Graph-Enhanced Search
 
-| Mode | Best For | Example Query |
-|------|----------|---------------|
-| **Vector** | Conceptual, exploratory questions | "Movies about unlikely friendships" |
-| **Fulltext** | Specific names, titles, exact terms | "Christopher Nolan Batman" |
-| **Hybrid** | Mixed conceptual and keyword queries | "Find movies about dream-sharing technology" |
+Any search mode can be **graph-enhanced** by adding a `retrieval_query`:
 
-**Vector** understands meaning. **Fulltext** matches keywords. **Hybrid** combines both.
+- **Initial search**: Performs vector, fulltext, or hybrid search as configured
+- **Graph traversal**: Executes a Cypher query from each result to follow connections
+- **Richer context**: Returns related entities, relationships, and metadata alongside the matched text
+
+**Without graph enrichment**: isolated text chunks
+**With graph enrichment**: text chunks + structured knowledge from the graph
+
+- Graph enrichment is what separates GraphRAG from standard vector RAG
 
 ---
 
@@ -105,11 +111,11 @@ Each time the agent receives a query, the provider's `before_run()` executes:
 5. Format results and inject via context.extend_messages()
 ```
 
-The LLM sees this context alongside the user's question.
+- The LLM sees this context alongside the user's question
 
 ---
 
-## Retriever Selection Logic
+## Context Provider Retriever Selection
 
 The provider selects the retriever based on your `index_type` and `retrieval_query` configuration:
 
@@ -125,54 +131,20 @@ Adding a `retrieval_query` upgrades to a Cypher-capable retriever.
 
 ---
 
-## Configuration Options
-
-```python
-provider = Neo4jContextProvider(
-    uri=neo4j_settings.uri,              # Neo4j connection
-    username=neo4j_settings.username,
-    password=neo4j_settings.get_password(),
-    index_name="moviePlots",             # Neo4j index to search
-    index_type="vector",                 # vector | fulltext | hybrid
-    embedder=embedder,                   # Required for vector/hybrid
-    top_k=5,                             # Number of results
-    message_history_count=10,            # Recent messages for query
-    context_prompt="## Search Results\n"
-                   "Use these to answer:",
-)
-```
-
----
-
-## Mode-Specific Parameters
+## Key Parameters
 
 | Parameter | Modes | Purpose |
 |-----------|-------|---------|
+| `top_k` | all | Number of results to retrieve |
+| `message_history_count` | all | Recent messages used to build the search query |
+| `context_prompt` | all | Text prepended to results to guide the LLM |
 | `embedder` | vector, hybrid | Converts query text to vectors |
 | `fulltext_index_name` | hybrid | Fulltext index for keyword search |
 | `filter_stop_words` | fulltext | Remove common words before search |
 | `retrieval_query` | all | Cypher for graph enrichment |
 
-Each provider instance supports a **single** `index_type`. Use multiple providers for multiple strategies.
-
----
-
-## Async Context Manager
-
-The provider manages its Neo4j connection lifecycle:
-
-```python
-async with provider:
-    agent = client.as_agent(
-        name="my-agent",
-        instructions="...",
-        context_providers=[provider],
-    )
-    session = agent.create_session()
-    response = await agent.run("query", session=session)
-```
-
-Connects on entry, verifies connectivity, initializes retriever, closes on exit.
+- Each provider instance supports a **single** `index_type`
+- Use multiple providers for multiple strategies
 
 ---
 
@@ -206,6 +178,5 @@ In this lesson, you learned:
 - **`before_run()`** takes recent messages, searches the index, and injects results
 - **Three search modes**: vector (semantic), fulltext (keyword), hybrid (combined)
 - **Retriever selection** is automatic based on `index_type` and `retrieval_query`
-- **Async context manager** handles connection lifecycle
 
 **Next:** Vector search for semantic similarity.
