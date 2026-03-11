@@ -55,34 +55,7 @@ The result includes plot text, similarity score, movie title, release year, genr
 
 When you provide a `retrieval_query`, the provider internally uses a Cypher-enhanced retriever (e.g., `VectorCypherRetriever` for vector mode, `HybridCypherRetriever` for hybrid mode) instead of the basic retriever. This example uses vector search:
 
-Define the retrieval query as a Python string:
-
-[source,python]
-----
-# Graph-enriched retrieval query
-# Appended after vector search: YIELD node, score
-RETRIEVAL_QUERY = """
-MATCH (node)-[:IN_GENRE]->(g:Genre)
-WITH node, score, collect(DISTINCT g.name) AS genres
-OPTIONAL MATCH (p:Person)-[:ACTED_IN]->(node)
-WITH node, score, genres, collect(DISTINCT p.name)[0..5] AS actors
-OPTIONAL MATCH (d:Person)-[:DIRECTED]->(node)
-WITH node, score, genres, actors, collect(DISTINCT d.name) AS directors
-WHERE score IS NOT NULL
-RETURN
-    node.plot AS text,
-    score,
-    node.title AS title,
-    node.released AS released,
-    genres,
-    actors,
-    directors
-ORDER BY score DESC
-"""
-
-----
-
-Pass it to the provider via the `retrieval_query` parameter:
+Define the retrieval query as a Python string and pass it to the provider via the `retrieval_query` parameter:
 
 [source,python]
 ----
@@ -111,50 +84,30 @@ The only difference from the vector search lesson is the `retrieval_query` param
 
 [source,python]
 ----
-async def main():
-    async with provider:
-        client = OpenAIResponsesClient()
+async with provider:
+    client = get_client()
 
-        agent = client.as_agent(
-            name="graph-enriched-agent",
-            instructions=(
-                "You are a helpful assistant that answers questions about "
-                "movies using graph-enriched context. Your context includes:\n"
-                "- Semantic search matches from movie plots\n"
-                "- Movie titles and release years\n"
-                "- Genres the movie belongs to\n"
-                "- Actors who appeared in the movie\n"
-                "- Directors of the movie\n\n"
-                "When answering, cite the movie title, relevant actors, and genres. "
-                "Be specific and reference the enriched graph data."
-            ),
-            context_providers=[provider],
-        )
+    agent = client.as_agent(
+        name="graph-enriched-agent",
+        instructions=(
+            "You are a helpful assistant that answers questions about "
+            "movies using graph-enriched context. Your context includes:\n"
+            "- Semantic search matches from movie plots\n"
+            "- Movie titles and release years\n"
+            "- Genres the movie belongs to\n"
+            "- Actors who appeared in the movie\n"
+            "- Directors of the movie\n\n"
+            "When answering, cite the movie title, relevant actors, and genres. "
+            "Be specific and reference the enriched graph data."
+        ),
+        context_providers=[provider],
+    )
 
-        session = agent.create_session()
-        # end::agent[]
+    session = agent.create_session()
 
-        # tag::run[]
-        query = "What are some good science fiction movies and who stars in them?"
-        print(f"User: {query}\n")
-        print("Answer: ", end="", flush=True)
-        response = await agent.run(query, session=session)
-        print(response.text)
-        print()
-        # end::run[]
-
-asyncio.run(main())
-
-----
-
-[source,python]
-----
-query = "What are some good science fiction movies and who stars in them?"
-print(f"User: {query}\n")
-print("Answer: ", end="", flush=True)
-response = await agent.run(query, session=session)
-print(response.text)
-print()
+    query = "What are some good science fiction movies and who stars in them?"
+    response = await agent.run(query, session=session)
+    print(response.text)
 ----
 
 The agent now receives context that includes plot text, movie title, release year, genres, actors, and directors for each match. It can give specific answers: "The Matrix (1999), directed by Lana and Lilly Wachowski, is a sci-fi action film about..." instead of a vague summary based on training data.

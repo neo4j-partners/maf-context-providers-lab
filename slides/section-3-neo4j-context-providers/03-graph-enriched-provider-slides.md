@@ -34,15 +34,9 @@ ol > li {
 
 ## Why Search Alone Isn't Enough
 
-Vector search returns **text** ranked by semantic similarity.
-
-But your graph contains far more:
-
-- `Movie` → `IN_GENRE` → `Genre`
-- `Person` → `ACTED_IN` → `Movie`
-- `Person` → `DIRECTED` → `Movie`
-
-- **Search** finds the right movies; **graph enrichment** collects the surrounding context
+- Index search returns text ranked by relevance
+- Graph-enriched retrieval adds a Cypher traversal step after the index search
+- The provider finds matching movies, then walks the graph to collect genres, cast, and directors for each match
 
 ---
 
@@ -61,28 +55,54 @@ But your graph contains far more:
 
 ---
 
-## The retrieval_query Parameter
+## Works with All Search Modes
 
-The `retrieval_query` is a Cypher query that runs **after** the index search completes:
+Graph enrichment is not limited to vector search:
+
+| index_type | Without retrieval_query | With retrieval_query |
+|------------|------------------------|---------------------|
+| `vector` | `VectorRetriever` | `VectorCypherRetriever` |
+| `hybrid` | `HybridRetriever` | `HybridCypherRetriever` |
+| `fulltext` | Fulltext retriever | Fulltext retriever |
+
+The same `retrieval_query` Cypher works across modes. It always receives `node` and `score`.
+
+---
+
+## The retrieval_query: Cypher Query to Enhance Search
 
 - Receives each matched `node` and its similarity `score` from the search step
 - Defines what graph data to traverse and return (relationships, properties, aggregated lists)
 - Transforms raw search hits into enriched context before the LLM sees them
-- Without it: provider returns only the text property of matched nodes
 - With it: provider switches to a Cypher-aware retriever (`VectorCypherRetriever` or `HybridCypherRetriever`)
 
 ---
 
-## How a Retrieval Query Works
+## Writing Retrieval Queries
 
-Starting from each matched `node` (with its `score` from the index search), the query:
+- Use `node` and `score` (provided by the index search)
+- Must return at least `text` and `score` columns
+- Use `OPTIONAL MATCH` for relationships that may not exist
+- Use `ORDER BY score DESC` to maintain relevance ranking
+- Limit collected lists (e.g., `[0..5]`) to control context size
 
-1. **Traverses relationships**: follows paths like `Movie → IN_GENRE → Genre` to collect connected data
-2. **Aggregates results**: gathers related values into lists (e.g., all genre names, actor names)
-3. **Controls size**: limits collected lists (e.g., top 5 actors) to keep context manageable
-4. **Returns structured output**: must include at least `text` and `score`, plus any additional fields you want the LLM to see
+---
 
-You'll write the full Cypher for this in the lab.
+## Example Retrieval Query
+
+```cypher
+MATCH (node)-[:IN_GENRE]->(g:Genre)
+WITH node, score, collect(DISTINCT g.name) AS genres
+OPTIONAL MATCH (p:Person)-[:ACTED_IN]->(node)
+WITH node, score, genres,
+     collect(DISTINCT p.name)[0..5] AS actors
+OPTIONAL MATCH (d:Person)-[:DIRECTED]->(node)
+WITH node, score, genres, actors,
+     collect(DISTINCT d.name) AS directors
+RETURN node.plot AS text, score,
+       node.title AS title, genres, actors, directors
+ORDER BY score DESC
+```
 
 ---
 
@@ -96,7 +116,7 @@ Starting from each matched movie node:
 | Actors | `Person` → `ACTED_IN` → `Movie` | Up to 5 actor names |
 | Directors | `Person` → `DIRECTED` → `Movie` | Director names |
 
-Plus: plot text, similarity score, movie title, release year.
+Plus: plot text, similarity score, movie title.
 
 ---
 
@@ -118,31 +138,14 @@ A young man discovers he can travel through time and tries
 to change the past to improve his future...
 ```
 
-The LLM now has structured context alongside the text.
-
----
-
-## Writing Retrieval Queries
-
-**Rules:**
-- Use `node` and `score` (provided by the index search)
-- Must return at least `text` and `score` columns
-- Use `OPTIONAL MATCH` for relationships that may not exist
-- Use `ORDER BY score DESC` to maintain relevance ranking
-- Limit collected lists (e.g., `[0..5]`) to control context size
-
-**The query defines what "enriched context" means for your use case.**
-
 ---
 
 ## Why OPTIONAL MATCH Matters
 
-When traversing relationships in your retrieval query:
+- **`MATCH`** requires the relationship to exist; missing relationship drops the node entirely
+- **`OPTIONAL MATCH`** keeps every matched node; missing relationships return empty lists
 
-- **`MATCH`** requires the relationship to exist. If a movie has no actors in the graph, that movie is **dropped entirely** from the results.
-- **`OPTIONAL MATCH`** keeps every matched node. If the relationship doesn't exist, the collected list is simply empty.
-
-- Your index search already found relevant results — don't let graph traversal silently remove them because one relationship is missing
+- Index search already found relevant results, so graph traversal should never silently remove them
 - **Rule of thumb:** use `OPTIONAL MATCH` for any relationship that might not exist on every node
 
 ---
@@ -155,20 +158,6 @@ To add graph enrichment to an existing provider, you only change one thing:
 - Everything else (`index_name`, `index_type`, `embedder`, `top_k`, `context_prompt`) stays the same as basic vector search
 
 The provider detects that `retrieval_query` is set and automatically switches to the Cypher-aware retriever under the hood. No other configuration changes are needed.
-
----
-
-## Works with All Search Modes
-
-Graph enrichment is not limited to vector search:
-
-| index_type | Without retrieval_query | With retrieval_query |
-|------------|------------------------|---------------------|
-| `vector` | `VectorRetriever` | `VectorCypherRetriever` |
-| `hybrid` | `HybridRetriever` | `HybridCypherRetriever` |
-| `fulltext` | Fulltext retriever | Fulltext retriever |
-
-The same `retrieval_query` Cypher works across modes. It always receives `node` and `score`.
 
 ---
 
