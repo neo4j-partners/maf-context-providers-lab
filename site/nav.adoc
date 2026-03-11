@@ -22,7 +22,6 @@
 * Slides
 ** Section 1: Setup
 *** xref:slides/slides-1-2-setup.adoc[Setup]
-*** xref:slides/slides-1-3-first-agent.adoc[First Agent]
 ** Section 2: Context Providers
 *** xref:slides/slides-2-1-context-providers.adoc[What Are Context Providers?]
 *** xref:slides/slides-2-2-simple-provider.adoc[Simple Context Provider]
