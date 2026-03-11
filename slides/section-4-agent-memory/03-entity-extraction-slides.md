@@ -89,12 +89,12 @@ Each entity node stores name, type, subtype, description, confidence score, and 
 
 ## Configuring Extraction
 
-Extraction is configured through `MemorySettings` with an `extraction` section that controls:
+Configured through `MemorySettings` with an `extraction` section:
 
-- **Which stages to enable**: spaCy, GLiNER, and LLM fallback can each be toggled independently
-- **Confidence threshold**: a minimum score (0.0–1.0) for storing an entity. Lower means more entities but also more noise
-- **Entity types**: limit extraction to specific POLE+O types (e.g., only PERSON and ORGANIZATION)
-- **Extractor type**: `"pipeline"` for multi-stage extraction, or `"llm"` for LLM-only
+- **Stages**: spaCy, GLiNER, and LLM fallback can each be toggled independently
+- **Confidence threshold**: minimum score (0.0–1.0) for storing an entity
+- **Entity types**: limit extraction to specific POLE+O types
+- **Extractor type**: `"pipeline"` for multi-stage, or `"llm"` for LLM-only
 ---
 
 ## Key Extraction Parameters
@@ -125,17 +125,12 @@ When multiple stages find the same entity, the pipeline decides which result to 
 
 ## Entity Deduplication
 
-The same entity may be mentioned in different ways: "Christopher Nolan," "Nolan," "the director of Inception."
+The same entity may be mentioned differently: "Christopher Nolan," "Nolan," "the director of Inception."
 
-The package deduplicates using **embedding similarity**:
-
-| Threshold | Behavior |
-|-----------|----------|
-| Above **auto-merge** (0.95) | Merged automatically |
-| Between **flag** (0.85) and auto-merge | Flagged for review |
-| Below **flag** threshold | Treated as distinct entities |
-
-Resolution uses a composite strategy combining exact matching, fuzzy string matching, and semantic similarity, each with configurable thresholds.
+- **Auto-merge (0.95+)**: merged automatically
+- **Flag (0.85–0.95)**: flagged for review
+- **Below threshold**: treated as distinct entities
+- **Resolution strategy**: combines exact matching, fuzzy string matching, and semantic similarity
 
 ---
 

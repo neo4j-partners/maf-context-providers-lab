@@ -20,8 +20,7 @@
 ** xref:4-5-reasoning-memory.adoc[Reasoning Memory]
 ** xref:4-6-gds-integration.adoc[Graph Algorithm Integration (Optional)]
 * Slides
-** Section 1: Introduction to MAF
-*** xref:slides/slides-1-1-what-is-maf.adoc[What is MAF?]
+** Section 1: Setup
 *** xref:slides/slides-1-2-setup.adoc[Setup]
 *** xref:slides/slides-1-3-first-agent.adoc[First Agent]
 ** Section 2: Context Providers
