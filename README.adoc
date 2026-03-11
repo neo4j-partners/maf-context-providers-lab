@@ -65,3 +65,16 @@ Opens http://localhost:8080 in your browser.
 == Deployment
 
 Pushing to `main` triggers the GitHub Actions workflow (`.github/workflows/deploy-antora.yml`) which builds and deploys to GitHub Pages.
+
+== Slides
+
+Presentation slides live in the `slides/` directory as Marp markdown files. To update the slide HTML embedded in the site:
+
+[source,bash]
+----
+cd slides
+npm install   # one-time setup, requires Node.js 22 LTS
+npm run build:html
+----
+
+This generates HTML files into `site/modules/ROOT/attachments/slides/section-3/`. Commit the updated HTML so the deployed site picks up the changes.

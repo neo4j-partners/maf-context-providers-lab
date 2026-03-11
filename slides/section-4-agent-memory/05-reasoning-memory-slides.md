@@ -56,7 +56,7 @@ A reasoning trace records the full execution path of an agent task:
 | **Outcome** | The final result of the task |
 | **Success** | Whether the task completed successfully |
 
-Each trace gets a **vector embedding** of the task description, enabling semantic search.
+- Each trace gets a **vector embedding** of the task description, enabling semantic search
 
 ---
 
@@ -69,7 +69,8 @@ The `record_agent_trace()` function captures a completed agent execution. You pr
 - **Outcome**: a description of what the agent concluded
 - **Success**: whether the task completed successfully
 
-The function stores the full trace in Neo4j as connected nodes (trace → steps → tool calls), with a vector embedding of the task description for later semantic search.
+- Stores the full trace in Neo4j as connected nodes (trace → steps → tool calls)
+- Adds a vector embedding of the task description for later semantic search
 
 ---
 
@@ -106,7 +107,7 @@ When the agent encounters a new task, it can search for traces from similar past
 - Returns matching traces with their task, outcome, success status, and steps
 - The agent can review what worked (or failed) before deciding on an approach
 
-This is how agents **learn from experience**: not by retraining, but by retrieving relevant past executions at inference time.
+- Agents **learn from experience** by retrieving relevant past executions at inference time — no retraining needed
 
 ---
 
@@ -137,9 +138,10 @@ The agent can use this information to prefer tools with higher success rates or 
 
 ## Reasoning Memory in Action
 
-**Session 1:** The agent handles *"Find sci-fi movies about time travel."* It uses `search_knowledge`, finds 3 movies, and recommends Interstellar. The trace is stored with a vector embedding of the task.
-
-**Session 2:** A new task arrives: *"Find action movies with good ratings."* Before the agent acts, `before_run()` finds the similar trace from Session 1. The agent sees that `search_knowledge` worked well for a similar movie-finding task, so it uses the same approach and gets better results by learning from past success.
+- **Session 1:** *"Find sci-fi movies about time travel."*
+  — Agent uses `search_knowledge`, finds 3 movies, recommends Interstellar; trace is stored with a vector embedding
+- **Session 2:** *"Find action movies with good ratings."*
+  — `before_run()` finds the similar trace from Session 1; agent reuses the `search_knowledge` approach that worked before
 
 ---
 

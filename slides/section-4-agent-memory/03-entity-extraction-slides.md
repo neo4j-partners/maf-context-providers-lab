@@ -101,9 +101,6 @@ Extraction is configured through `MemorySettings` with an `extraction` section t
 - **Confidence threshold**: a minimum score (0.0–1.0) for storing an entity. Lower means more entities but also more noise
 - **Entity types**: limit extraction to specific POLE+O types (e.g., only PERSON and ORGANIZATION)
 - **Extractor type**: `"pipeline"` for multi-stage extraction, or `"llm"` for LLM-only
-
-You'll configure these settings in the lab.
-
 ---
 
 ## Key Extraction Parameters

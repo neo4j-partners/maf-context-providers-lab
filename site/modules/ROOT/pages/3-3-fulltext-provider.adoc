@@ -12,10 +12,10 @@ Fulltext search doesn't require an embedder. It uses Neo4j's built-in fulltext i
 
 Fulltext search is the better choice when:
 
-* The user mentions specific names, titles, or terms that should match literally
+* You need exact term matching — proper nouns, technical terms, and identifiers that must match literally rather than semantically
 * You want keyword precision rather than semantic interpretation
 * You don't have or need vector embeddings on your nodes
-* You want lower latency (no embedding API call required)
+* No external API dependency — runs entirely inside Neo4j with no embedding service calls, cost, or rate limits
 
 Vector search is better when the query is conceptual ("feel-good movies about unlikely friendships") rather than keyword-based.
 
@@ -128,15 +128,6 @@ print()
 ----
 
 The query "Christopher Nolan Batman" contains specific names and terms that match literally in movie plots — exactly where fulltext search excels.
-
-== Vector vs Fulltext
-
-Compare the same agent with both search modes:
-
-* **"movies about finding meaning in life"** -- Vector search excels here because the concept is abstract. Fulltext search would look for the literal words "finding," "meaning," and "life."
-* **"Christopher Nolan Batman"** -- Fulltext search excels here because the query contains specific names that should match literally.
-
-Neither mode is universally better. The right choice depends on how your users query.
 
 [%collapsible]
 .Click to see the complete code

@@ -106,40 +106,38 @@ The provider follows the same `before_run()` / `after_run()` lifecycle from Modu
 
 ## No Tool Calls Required
 
-The context provider runs **automatically on every turn**. The agent never decides to look something up or save a preference.
+- The context provider runs **automatically on every turn** — the agent never decides to look something up or save a preference
 
 1. User query arrives
 2. `before_run()` searches memory and injects relevant context
 3. The LLM generates a response with that memory context available
 4. `after_run()` stores the new messages and extracts entities
 
-This is **passive memory**: always working in the background, no agent decision needed.
+- This is **passive memory** — always working in the background, no agent decision needed
 
 ---
 
 ## Multi-Turn Conversation Example
 
-**Turn 1:** *"I really enjoy sci-fi movies, especially ones about time travel."*
-`after_run()` saves the message and extracts "sci-fi" and "time travel" as entities.
-
-**Turn 2:** *"What did I say my favorite genre was?"*
-`before_run()` retrieves the previous message via semantic search and injects it as context. The agent answers accurately.
-
-**Turn 3:** *"Can you recommend something I might like?"*
-The agent has both conversation history and extracted preferences. It recommends based on what the user actually said.
+- **Turn 1:** *"I really enjoy sci-fi movies, especially ones about time travel."*
+  — `after_run()` saves the message and extracts "sci-fi" and "time travel" as entities
+- **Turn 2:** *"What did I say my favorite genre was?"*
+  — `before_run()` retrieves the previous message via semantic search; agent answers accurately
+- **Turn 3:** *"Can you recommend something I might like?"*
+  — Agent has conversation history and extracted preferences; recommends based on what the user said
 
 ---
 
 ## Inspecting Stored Memories
 
-After the conversation, you can verify what the provider stored by calling `search_memory()` with a query string.
+- Call `search_memory()` with a query string to verify what the provider stored
 
 The search returns results across all memory types you request:
 - **Messages**: past conversation turns that match semantically
 - **Entities**: extracted people, objects, locations, etc.
 - **Preferences**: user preferences the system captured
 
-This lets you confirm that `after_run()` is extracting and storing data correctly in Neo4j. You'll use this in the lab to inspect your agent's memory.
+- Use this to confirm `after_run()` is extracting and storing data correctly in Neo4j
 
 ---
 

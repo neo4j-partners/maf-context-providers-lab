@@ -48,18 +48,16 @@ Different tools for different jobs.
 
 Fulltext search is the better choice when:
 
-- The user mentions **specific names, titles, or terms**
+- You need **exact term matching** — proper nouns, technical terms, and identifiers that must match literally rather than semantically
 - You want **keyword precision** rather than semantic interpretation
 - You **don't have or need** vector embeddings on your nodes
-- You want **lower latency** (no embedding API call required)
-
-**No embedder needed.** Simpler setup, faster execution.
+- **No external API dependency** — runs entirely inside Neo4j with no embedding service calls, cost, or rate limits
 
 ---
 
 ## How It Works
 
-**Fulltext search:** Uses Neo4j's built-in **Lucene-based fulltext indexing** with **BM25 ranking**
+- Uses Neo4j's built-in **Lucene-based fulltext indexing** with **BM25 ranking**
 
 1. The user's query is preprocessed: common stop words ("what", "the", "is") are filtered out
 2. Remaining terms are tokenized and matched against the fulltext index
@@ -75,8 +73,7 @@ BM25 (Best Matching 25) scores documents based on:
 - **Term frequency**: how often the search terms appear in the text
 - **Inverse document frequency**: how rare the terms are across all documents
 - **Document length normalization**: shorter documents with matches rank higher
-
-- A movie plot mentioning "space" and "exploration" multiple times ranks higher than one that mentions them once
+- **Example:** a movie plot mentioning "space" and "exploration" multiple times ranks higher than one that mentions them once
 
 ---
 
@@ -115,7 +112,7 @@ By default, the provider filters common stop words before searching.
 | "Tell me about Christopher Nolan" | "Christopher Nolan" |
 | "What is the best action movie?" | "best action movie" |
 
-- Words like "what," "the," "is," and "about" add noise to fulltext queries
+- Words like "what," "the," "is," and "about" add noise to fulltext queries and reduce match quality
 
 ---
 
@@ -136,21 +133,7 @@ Once configured, the fulltext provider plugs into an agent the same way as any o
 - Pass it in the `context_providers` list when creating the agent
 - The agent automatically retrieves fulltext results before each LLM call
 - No changes to agent setup, instructions, or session handling are needed
-
 - The provider is interchangeable — swap between vector, fulltext, and hybrid without changing agent code
-
----
-
-## Vector vs Fulltext: Side by Side
-
-| Query | Vector Search | Fulltext Search |
-|-------|--------------|-----------------|
-| "movies about finding meaning in life" | Excels (abstract concept) | Looks for literal words |
-| "Christopher Nolan Batman" | May find similar themes | Excels (exact name match) |
-| "feel-good stories about friendship" | Understands the concept | Matches "friendship" literally |
-| "Quentin Tarantino crime films" | Finds crime themes broadly | Finds "Tarantino" precisely |
-
-**Neither mode is universally better.** The right choice depends on how your users query.
 
 ---
 

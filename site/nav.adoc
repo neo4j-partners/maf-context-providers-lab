@@ -19,3 +19,9 @@
 ** xref:4-4-memory-tools.adoc[Combining Context Providers with Memory Tools]
 ** xref:4-5-reasoning-memory.adoc[Reasoning Memory]
 ** xref:4-6-gds-integration.adoc[Graph Algorithm Integration (Optional)]
+* Slides
+** xref:slides/slides-3-1-overview.adoc[Neo4j Context Providers Overview]
+** xref:slides/slides-3-2-vector.adoc[Vector Search]
+** xref:slides/slides-3-3-graph-enriched.adoc[Graph-Enriched Retrieval]
+** xref:slides/slides-3-4-fulltext.adoc[Fulltext Search]
+** xref:slides/slides-3-5-hybrid.adoc[Hybrid Search]

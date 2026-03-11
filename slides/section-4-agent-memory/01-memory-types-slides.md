@@ -48,14 +48,13 @@ But the agent itself has no memory:
 
 ## A Conversation Without Memory
 
-A user tells the agent they prefer Christopher Nolan films. Two turns later, they ask for a recommendation.
+- A user tells the agent they prefer Christopher Nolan films
+- Two turns later, they ask for a recommendation
 
 Without memory:
 - The conversation history is gone
 - The preference was never stored
-- The agent suggests a random comedy
-
-**The agent has no idea what the user said.**
+- The agent suggests a random comedy — it has no idea what the user said
 
 ---
 
@@ -63,11 +62,9 @@ Without memory:
 
 Three categories of information accumulate during agent conversations:
 
-1. **What was said**: the conversation itself. Messages, responses, follow-ups. This history needs to persist across turns and sessions.
-
-2. **What was learned**: facts and preferences extracted from conversation. "The user prefers sci-fi" is structured knowledge derived from messages.
-
-3. **What was tried**: the reasoning and tool calls the agent used. If an approach worked, the agent should reuse it. If it failed, avoid it.
+1. **What was said** — messages, responses, and follow-ups that persist across turns and sessions
+2. **What was learned** — facts and preferences extracted from conversation into structured knowledge
+3. **What was tried** — reasoning steps and tool calls the agent used, including what worked and what failed
 
 ---
 
@@ -108,7 +105,7 @@ Stores **structured knowledge** extracted from conversations using the POLE+O da
 | **Facts** | Subject-Predicate-Object triples | "Nolan -> directed -> Inception" |
 | **Preferences** | User-specific information with category | "Prefers sci-fi over comedy" |
 
-Extraction happens **automatically**. Over time, the agent builds a knowledge graph about each user.
+- Extraction happens **automatically** — the agent builds a knowledge graph about each user over time
 
 ---
 
@@ -162,7 +159,7 @@ Because everything is in the same graph, memories connect to each other:
 - Entities link to **other entities** they relate to
 - Reasoning traces connect to the **steps and tool calls** that compose them
 
-This is more than storage. It's a **connected knowledge structure** the agent can traverse.
+- This is more than storage — it's a **connected knowledge structure** the agent can traverse
 
 ---
 

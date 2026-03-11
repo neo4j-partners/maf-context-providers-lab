@@ -34,17 +34,15 @@ ol > li {
 
 ## Passive Memory
 
-The memory context provider handles memory **passively** — it injects relevant memories before each turn and stores new ones after.
+- The context provider handles memory **passively** — injecting relevant memories before each turn and storing new ones after
+- This covers the common case: automatic context from prior conversations
 
-This covers the common case: the agent automatically has context from prior conversations without any explicit action.
-
-But sometimes the agent needs to take a **deliberate action**:
+But sometimes the agent needs a **deliberate action**:
 
 - User says "remember that I hate horror movies" and expects explicit storage
 - Agent needs to search for a specific entity before answering
 - Agent wants to look up past reasoning traces for a similar task
-
-**Passive injection alone can't handle targeted operations.**
+- Passive injection alone can't handle these targeted operations
 
 ---
 
@@ -114,14 +112,12 @@ Call `create_memory_tools(memory)` to generate the six tool instances, then pass
 
 The most effective setup uses **both mechanisms** together.
 
-**Turn 1:** *"I love Christopher Nolan movies and anything about space."*
-The context provider saves the message and extracts entities in the background. The agent **also** explicitly calls `remember_preference` to store "Christopher Nolan" under directors and "space" under themes.
-
-**Turn 2:** *"What are my movie preferences?"*
-The context provider injects relevant past messages automatically. The agent **also** calls `recall_preferences` to retrieve the explicit preferences it saved.
-
-**Turn 3:** *"Based on what you know about me, what should I watch next?"*
-The context provider injects memories as background context. The agent calls `search_knowledge` and `recall_preferences` to gather targeted information, then generates a grounded recommendation.
+- **Turn 1:** *"I love Christopher Nolan movies and anything about space."*
+  — Context provider saves message and extracts entities; agent also calls `remember_preference` explicitly
+- **Turn 2:** *"What are my movie preferences?"*
+  — Context provider injects past messages; agent also calls `recall_preferences` for explicit lookups
+- **Turn 3:** *"Based on what you know about me, what should I watch next?"*
+  — Context provider injects background context; agent calls `search_knowledge` + `recall_preferences` for a grounded recommendation
 
 ---
 
